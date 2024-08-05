@@ -9,8 +9,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('plan_subject', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('plan_id')->constrained()->onDelete('cascade');
-            $table->foreignId('subject_id')->constrained()->onDelete('cascade');
+            $table->foreign('plan_id')->references('id')->on('plan')->onDelete('cascade');
+            $table->foreign('subject_id')->references('id')->on('subject')->onDelete('cascade');
             $table->timestamps();
         });
     }
