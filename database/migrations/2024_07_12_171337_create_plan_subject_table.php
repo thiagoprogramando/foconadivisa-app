@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('plan_id');
             $table->unsignedBigInteger('subject_id');
             $table->foreign('plan_id')->references('id')->on('plan')->onDelete('cascade');
-            $table->foreign('subject_id')->references('id')->on('subject')->onDelete('cascade');
+            $table->foreign('subject_id')->references('id')->on('subjects')->onDelete('cascade');
             $table->timestamps();
         });
     }

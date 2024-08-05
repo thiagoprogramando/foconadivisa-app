@@ -9,8 +9,8 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('topic_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('subject_id')->nullable()->constrained('subjects')->onDelete('cascade');
+            $table->foreignId('topic_id')->nullable()->constrained('topics')->onDelete('cascade');
             $table->text('question_text')->nullable();
             $table->timestamps();
         });
