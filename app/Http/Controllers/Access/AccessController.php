@@ -36,6 +36,7 @@ class AccessController extends Controller {
         $user->name      = $request->name;
         $user->email     = $request->email;
         $user->password  = bcrypt($request->password);
+        $user->meta      = $request->meta;
 
         $credentials = $request->only(['email', 'password']);
         if($user->save() && Auth::attempt($credentials)) {

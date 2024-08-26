@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Notebook;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Notebook;
+use App\Models\Question;
 use Illuminate\Http\Request;
 
 class AnswerController extends Controller {
@@ -17,6 +18,19 @@ class AnswerController extends Controller {
             $answeredQuestionIds = $notebook->answers->pluck('question_id')->toArray();
             $unansweredQuestions = $notebook->questions()->whereNotIn('questions.id', $answeredQuestionIds)->paginate(1);
             return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions'));
+        }
+    }
+
+    public function answerReview($answer) {
+
+        $answer = Answer::find($answer);
+        if($answer) {
+
+            
+            return view('app.Notebook.Quiz.question-review', [
+                'answer' => $answer,
+                
+            ]);
         }
     }
 
@@ -33,6 +47,6 @@ class AnswerController extends Controller {
         $answer->option_id      = $request->input('option_id');
         $answer->save();
     
-        return redirect()->route('answer', [$notebook->id, $page + 1])->with('success', 'Resposta salva!');
+        return redirect()->route('answer-review', [$answer->id])->with('success', 'Resposta salva!');
     }
 }

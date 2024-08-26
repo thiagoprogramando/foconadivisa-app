@@ -69,7 +69,9 @@
                                     <form action="{{ route('delete-plan') }}" method="POST" class="delete">
                                         @csrf
                                         <input type="hidden" name="id" value="{{ $plan->id }}">
-                                        <button type="button" class="btn btn-outline-success mt-2 w-100">Comprar Plano</button>
+                                        @if(Auth::user()->plan != $plan->id)
+                                            <a href="{{ route('pay-plan', ['plan' => $plan->id]) }}" class="btn btn-outline-success mt-2 w-100">Comprar Plano</a>
+                                        @endif
                                         <a href="{{ route('plano', ['id' => $plan->id]) }}" class="btn btn-outline-warning mt-2 w-100">Editar plano</a>
                                         <button type="submit" class="btn btn-outline-danger mt-2 w-100">Excluir plano</button>
                                     </form>                                    

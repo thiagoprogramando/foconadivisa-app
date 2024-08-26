@@ -15,6 +15,7 @@ class Question extends Model {
         'subject_id',
         'topic_id',
         'question_text',
+        'comment_text',
     ];
 
     public function subject() {

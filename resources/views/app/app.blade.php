@@ -7,10 +7,10 @@
             <div class="col-6 col-sm-12 col-md-12 col-lg-12">
                 <div class="card">
                     <div class="row">
-                        <div class="col-md-4 text-center">
-                            <img src="{{ asset('template/img/components/monitoring.png') }}" class="img-fluid w-50" alt="Trabalhando...">
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 text-center d-flex align-items-center justify-content-center">
+                            <img src="{{ asset('template/img/components/monitoring.png') }}" class="img-fluid" alt="Trabalhando...">
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                             <div class="card-body">
                                 <h5 class="card-title">Olá, {{ Auth::user()->name }}!</h5>
                                 <p class="card-text">
@@ -32,7 +32,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="bi bi-question-square-fill"></i> </div>
                                     <div class="ps-3">
-                                        <h6>145</h6>
+                                        <h6>{{ $questionsTodayCount }}</h6>
                                     </div>
                                 </div>
                             </div>
@@ -46,7 +46,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="bi bi-book-half"></i> </div>
                                     <div class="ps-3">
-                                        <h6>145</h6>
+                                        <h6>{{ $totalQuestionsCount }}</h6>
                                     </div>
                                 </div>
                             </div>
@@ -60,7 +60,7 @@
                                 <div class="d-flex align-items-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="bi bi-bar-chart-fill"></i> </div>
                                     <div class="ps-3">
-                                        <h6>145</h6>
+                                        <h6>{{ number_format($progress, 2) }}%</h6>
                                     </div>
                                 </div>
                             </div>
@@ -98,40 +98,46 @@
         </div>
     </div>
 
+    
     <div class="col-sm-12 col-md-12 col-lg-12">
         <div class="row">
-            <div class="col-sm-12 col-md-6 col-lg-6">
-                <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">Relatório de respostas</h5>
-                      <canvas id="doughnutChart" style="max-height: 400px;"></canvas>
-                        <script>
-                            document.addEventListener("DOMContentLoaded", () => {
-                                new Chart(document.querySelector('#doughnutChart'), {
-                                    type: 'doughnut',
-                                    data: {
-                                        labels: [
-                                            'Erros',
-                                            'Sem respostas',
-                                            'Acertos'
-                                        ],
-                                        datasets: [{
-                                            label: 'Avanço de respostas',
-                                            data: [300, 50, 100],
-                                            backgroundColor: [
-                                            'rgb(255, 99, 132)',
-                                            'rgb(54, 162, 235)',
-                                            'rgb(153, 204, 50)'
+            @if($errorsCount > 0 || $correctCount > 0)
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                        <h5 class="card-title">Relatório de respostas</h5>
+                        <canvas id="doughnutChart" style="max-height: 400px;"></canvas>
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+
+                                    const errorsCount = @json($errorsCount);
+
+                                    const correctCount = @json($correctCount);
+
+                                    new Chart(document.querySelector('#doughnutChart'), {
+                                        type: 'doughnut',
+                                        data: {
+                                            labels: [
+                                                'Erros',
+                                                'Acertos'
                                             ],
-                                            hoverOffset: 4
-                                        }]
-                                    }
+                                            datasets: [{
+                                                label: 'Avanço de respostas',
+                                                data: [errorsCount, correctCount],
+                                                backgroundColor: [
+                                                '#FF0000',
+                                                '#00CC00'
+                                                ],
+                                                hoverOffset: 4
+                                            }]
+                                        }
+                                    });
                                 });
-                            });
-                        </script>
+                            </script>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
             <div class="col-sm-12 col-md-6 col-lg-6">
                 <div class="card">

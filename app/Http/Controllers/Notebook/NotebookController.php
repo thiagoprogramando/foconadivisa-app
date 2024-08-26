@@ -87,7 +87,10 @@ class NotebookController extends Controller {
 
         $subjects   = $request->input('subject', []);
         $topics     = $request->input('topics', []);
-        $number     = max(5, $request->input('number'));
+        $number     = max(1, $request->input('number'));
+
+        $removeQuestionResolved = $request->input('remove_question_resolved', false);
+        $showQuestionFail = $request->input('show_question_fail', false);
 
         if (!is_array($subjects)) {
             $subjects = [];
@@ -105,6 +108,26 @@ class NotebookController extends Controller {
 
         if (!empty($topics)) {
             $query->whereIn('topic_id', $topics);
+        }
+
+        if ($removeQuestionResolved) {
+            $resolvedQuestions = Answer::whereHas('notebook', function($q) {
+                $q->where('user_id', Auth::id());
+            })
+            ->pluck('question_id')
+            ->toArray();
+            $query->whereNotIn('id', $resolvedQuestions);
+        }
+
+        if ($showQuestionFail) {
+            $failedQuestions = Answer::join('options', 'answers.option_id', '=', 'options.id')
+                                    ->where('options.is_correct', false)
+                                    ->whereHas('notebook', function($q) {
+                                        $q->where('user_id', Auth::id());
+                                    })
+                                    ->pluck('answers.question_id')
+                                    ->toArray();
+            $query->whereIn('id', $failedQuestions);
         }
 
         $questions = $query->inRandomOrder()->take($number)->get();

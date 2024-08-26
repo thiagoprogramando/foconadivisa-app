@@ -21,10 +21,12 @@ class User extends Authenticatable {
         'status',
         'plan',
         'type',
+        'meta',
         
         'email',
         'password',
-        'code'
+        'code',
+        'customer',
     ];
 
     protected $hidden = [
@@ -43,7 +45,7 @@ class User extends Authenticatable {
 
     public function secondName() {
         $nameParts = explode(' ', $this->name);
-        return $nameParts[1];
+        return isset($nameParts[1]) ? $nameParts[1] : '';
     }
 
     public function labelPlan() {

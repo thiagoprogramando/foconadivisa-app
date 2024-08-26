@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\Access\AccessController;
 use App\Http\Controllers\AppController;
+use App\Http\Controllers\Gateway\AssasController;
 use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
-use App\Http\Controllers\Subject\OptionController;
 use App\Http\Controllers\Subject\QuestionController;
 use App\Http\Controllers\Subject\SubjectController;
+
 use App\Http\Controllers\User\PlanController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::post('delete-subject-associate', [PlanController::class, 'deleteSubjectAssociate'])->name('delete-subject-associate');
     Route::post('delete-topic-associate', [PlanController::class, 'deleteTopicAssociate'])->name('delete-topic-associate');
 
+    //Plan & Gatway
+    Route::get('/pay-plan/{plan}', [AssasController::class, 'payPlan'])->name('pay-plan');
+
     // Topic
     Route::post('create-topic', [SubjectController::class, 'createTopic'])->name('create-topic');
     Route::post('delete-topic', [SubjectController::class, 'deleteTopic'])->name('delete-topic');
@@ -58,8 +62,6 @@ Route::middleware('auth')->group(function () {
     Route::get('create-question/{subject}', [QuestionController::class, 'createQuestion'])->name('create-question');
     Route::post('update-question', [QuestionController::class, 'updateQuestion'])->name('update-question');
     Route::post('delete-question', [QuestionController::class, 'deleteQuestion'])->name('delete-question');
-    Route::post('create-option', [OptionController::class, 'createOption'])->name('create-option');
-    Route::post('delete-option', [OptionController::class, 'deleteOption'])->name('delete-option');
 
     //Notebook
     Route::get('/caderno/{id}', [NotebookController::class, 'notebook'])->name('caderno');
@@ -70,6 +72,7 @@ Route::middleware('auth')->group(function () {
 
     //Ansnwer
     Route::get('/answer/{id}', [AnswerController::class, 'answer'])->name('answer');
+    Route::get('/answer-review/{answer}', [AnswerController::class, 'answerReview'])->name('answer-review');
     Route::post('/notebooks/{notebook}/questions/{question}/{page}/submit', [AnswerController::class, 'submitAnswerAndNext'])->name('submitAnswerAndNext');
     
 });

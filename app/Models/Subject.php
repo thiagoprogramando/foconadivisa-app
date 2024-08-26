@@ -22,7 +22,7 @@ class Subject extends Model {
     }
 
     public function questions() {
-        return $this->hasManyThrough(Question::class, Topic::class);
+        return $this->hasMany(Question::class);
     }
 
     public function countTopics() {

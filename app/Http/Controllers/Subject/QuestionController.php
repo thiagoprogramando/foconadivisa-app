@@ -14,15 +14,15 @@ class QuestionController extends Controller {
     public function viewQuestion($id) {
 
         $question   = Question::find($id);
-        $options    = Option::where('question_id', $question->id)->get();
         $subject    = Subject::find($question->subject_id);
         $topics     = Topic::where('subject_id', $question->subject_id)->get();
+        $options = $question->options->keyBy('option_number');
 
         return view('app.Subject.Question.create-question', [
             'topics'    => $topics,
             'question'  => $question,
             'subject'   => $subject,
-            'options'   => $options
+            'options'   => $options,
         ]);
     }
 
@@ -41,13 +41,41 @@ class QuestionController extends Controller {
     public function updateQuestion(Request $request) {
 
         $question = Question::find($request->id);
-        $question->question_text = $request->question_text;
-        $question->topic_id = $request->topic_id;
-        if($question->save()) {
-            return redirect()->back()->with('success', 'Dados salvos com sucesso!');
-        }
+        if ($question) {
 
-        return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');
+            $question->question_text    = $request->input('question_text');
+            $question->topic_id         = $request->input('topic_id');
+            $question->comment_text     = $request->input('comment_text');
+            if ($question->save()) {
+                
+                for ($i = 1; $i <= 5; $i++) {
+
+                    $optionText = $request->input("option_{$i}") ?: '---';;
+                    $isCorrect = $request->input("is_correct_{$i}") ? true : false;
+    
+                    $option = Option::where('question_id', $question->id)
+                                    ->where('option_number', $i)
+                                    ->first();
+                    
+                    if ($option) {
+                        $option->option_text = $optionText;
+                        $option->is_correct = $isCorrect;
+                    } else {
+                        $option = new Option();
+                        $option->question_id = $question->id;
+                        $option->option_number = $i;
+                        $option->option_text = $optionText;
+                        $option->is_correct = $isCorrect;
+                    }
+    
+                    $option->save();
+                }
+    
+                return redirect()->back()->with('success', 'Dados salvos com sucesso!');
+            }
+        }
+    
+        return redirect()->back()->with('error', 'Ops! Não foram encontrados dados da Questão.');
     }
 
     public function deleteQuestion(Request $request) {

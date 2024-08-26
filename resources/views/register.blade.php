@@ -57,6 +57,9 @@
                                                 <input type="password" name="password" class="form-control" placeholder="Senha:" required>
                                             </div>
                                             <div class="col-12">
+                                                <input type="number" name="meta" class="form-control" placeholder="Qual sua meta de Questões?">
+                                            </div>
+                                            <div class="col-12">
                                                 <button class="btn btn-primary w-100" type="submit">Cadastrar-me</button>
                                             </div>
                                             <div class="col-12">

@@ -51,6 +51,18 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="remove_question_resolved" id="flexSwitchCheckChecked">
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">Eliminar questão já resolvidas</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="show_question_fail" id="flexSwitchCheckChecked">
+                                                <label class="form-check-label" for="flexSwitchCheckChecked">Mostrar apenas as que eu já errei</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">

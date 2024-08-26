@@ -18,12 +18,14 @@ return new class extends Migration {
             $table->unsignedBigInteger('plan')->default(1);
             $table->foreign('plan')->references('id')->on('plan')->onDelete('cascade');
             $table->integer('type')->default(0); // is 0 = user | 1 - ADM 2 - Colaborador
+            $table->unsignedBigInteger('meta')->default(100);
 
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
 
             $table->string('password');
             $table->string('code')->nullable();
+            $table->string('customer')->nullable();
             
             $table->rememberToken();
             $table->timestamps();
