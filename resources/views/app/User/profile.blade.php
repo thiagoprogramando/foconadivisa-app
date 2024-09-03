@@ -51,7 +51,7 @@
                         </div>
                     </div>
                     <div class="col-12 col-sm-12 col-md-4 offset-md-8 col-lg-4 offset-lg-8">
-                        <button type="submit" class="btn btn-outline-success w-100">Atualizar</button>
+                        <button type="submit" class="btn btn-dark w-100">Atualizar</button>
                     </div>
                 </form>
             </div>

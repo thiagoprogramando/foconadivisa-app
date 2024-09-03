@@ -7,8 +7,8 @@
 
             <div class="col-12">
                 <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-primary">Middle</button>
-                    <button type="button" class="btn btn-outline-primary">Right</button>
+                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
+                    <a href="{{ route('usuarios') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </div>
 
@@ -29,7 +29,7 @@
                             <tr>
                                 <th scope="row">{{ $user->id }}</th>
                                 <td>{{ $user->name }}</td>
-                                <td>{{ $user->phone }} - {{ $user->email }} <br> {{ $user->cpfcnpj }}</td>
+                                <td><span class="badge bg-dark"><i class="bi bi-envelope me-1"></i></i>{{ $user->phone }} - {{ $user->email }}</span><br> {{ $user->cpfcnpj }}</td>
                                 <td>{{ $user->labelPlan->name }}</td>
                                 <td>{{ $user->typeLabel() }}</td>
                                 <td class="text-center">

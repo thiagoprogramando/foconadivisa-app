@@ -5,6 +5,7 @@ use App\Http\Controllers\AppController;
 use App\Http\Controllers\Gateway\AssasController;
 use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
+use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Subject\QuestionController;
 use App\Http\Controllers\Subject\SubjectController;
 
@@ -35,6 +36,10 @@ Route::middleware('auth')->group(function () {
     Route::post('create-plan', [PlanController::class, 'createPlan'])->name('create-plan');
     Route::post('update-plan', [PlanController::class, 'updatePlan'])->name('update-plan');
     Route::post('delete-plan', [PlanController::class, 'deletePlan'])->name('delete-plan');
+
+    //Payment
+    Route::get('/pagamentos', [PaymentController::class, 'payments'])->name('pagamentos');
+    Route::post('/delete-payment', [PaymentController::class, 'deletePayment'])->name('delete-payment');
     
     //Subject
     Route::get('/conteudos', [SubjectController::class, 'subjects'])->name('conteudos');

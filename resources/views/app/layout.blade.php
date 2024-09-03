@@ -10,7 +10,7 @@
         <meta content="" name="keywords">
 
         <link href="{{ asset('template/img/favicon.png') }}" rel="icon">
-        <link href="{{ asset('template/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+        <link href="{{ asset('template/img/favicon.png') }}" rel="apple-touch-icon">
 
         <link href="https://fonts.gstatic.com" rel="preconnect">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -58,7 +58,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
                         <i class="bi bi-bell"></i>
-                        <span class="badge bg-primary badge-number">4</span>
+                        <span class="badge bg-dark badge-number">4</span>
                     </a>
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
@@ -192,7 +192,7 @@
                 <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="{{ route('cadernos') }}">
-                            <i class="bi bi-circle"></i><span>Criar Novo</span>
+                            <i class="bi bi-circle"></i><span>Meus Cadernos</span>
                         </a>
                     </li>
                     <li>
@@ -208,7 +208,7 @@
                 <a class="nav-link collapsed" href="{{ route('planos') }}"><i class="bi bi-cart"></i><span>Planos</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" href=""><i class="bi bi-arrow-down-square-fill"></i><span>Pendências</span></a>
+                <a class="nav-link collapsed" href="{{ route('pagamentos') }}"><i class="bi bi-arrow-down-square-fill"></i><span>Pendências</span></a>
             </li>
 
             <li class="nav-heading">Gestão</li>

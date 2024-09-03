@@ -7,9 +7,9 @@
 
             <div class="col-12">
                 <div class="btn-group" role="group">
-                    <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-outline-primary">Novo Conteúdo</button>
-                    <button type="button" class="btn btn-outline-primary">Middle</button>
-                    <button type="button" class="btn btn-outline-primary">Right</button>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-dark">Novo Conteúdo</button>
+                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
+                    <a href="{{ route('conteudos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
 
                 <div class="modal fade" id="newPlan" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -39,7 +39,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
-                                    <button type="submit" class="btn btn-outline-success">Criar Conteúdo</button>
+                                    <button type="submit" class="btn btn-dark">Criar Conteúdo</button>
                                 </div>
                             </form>
                         </div>

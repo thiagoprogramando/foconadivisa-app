@@ -9,7 +9,7 @@
     <meta content="" name="keywords">
 
     <link href="{{ asset('template/img/favicon.png') }}" rel="icon">
-    <link href="{{ asset('template/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset('template/img/favicon.png') }}" rel="apple-touch-icon">
 
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -33,7 +33,7 @@
                 <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
                   <div class="d-flex justify-content-center py-4">
-                      <a href="index.html" class="logo d-flex align-items-center w-auto">
+                      <a href="{{ route('login') }}" class="logo d-flex align-items-center w-auto">
                         <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
                         <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                       </a>
@@ -61,7 +61,7 @@
                             </div>
                           </div>
                           <div class="col-12">
-                            <button class="btn btn-primary w-100" type="submit">Acessar</button>
+                            <button class="btn btn-dark w-100" type="submit">Acessar</button>
                           </div>
                           <div class="col-12">
                             <p class="small mb-0">Não tem uma conta? <a href="{{ route('cadastro') }}">Criar Conta</a></p>

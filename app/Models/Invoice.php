@@ -19,4 +19,21 @@ class Invoice extends Model {
         'payment_url',
         'payment_status',
     ];
+
+    public function labelPlan() {
+        return $this->belongsTo(Plan::class, 'plan_id');
+    }
+
+    public function statusLabel() {
+        switch ($this->payment_status) {
+            case 0:
+                return 'Pendente de Pagamento';
+                break;
+            case 1:
+                return 'Aprovado';
+                break;
+            default:
+                return '---';
+        }
+    }
 }

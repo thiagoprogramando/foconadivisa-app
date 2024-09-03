@@ -7,9 +7,9 @@
 
             <div class="col-12">
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
-                    <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-outline-primary">Novo Plano</button>
-                    <button type="button" class="btn btn-outline-primary">Middle</button>
-                    <button type="button" class="btn btn-outline-primary">Right</button>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-dark">Novo Plano</button>
+                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
+                    <a href="{{ route('planos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
 
                 <div class="modal fade" id="newPlan" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -45,7 +45,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
-                                    <button type="submit" class="btn btn-outline-success">Criar Plano</button>
+                                    <button type="submit" class="btn btn-dark">Criar Plano</button>
                                 </div>
                             </form>
                         </div>
@@ -70,10 +70,10 @@
                                         @csrf
                                         <input type="hidden" name="id" value="{{ $plan->id }}">
                                         @if(Auth::user()->plan != $plan->id)
-                                            <a href="{{ route('pay-plan', ['plan' => $plan->id]) }}" class="btn btn-outline-success mt-2 w-100">Comprar Plano</a>
+                                            <a href="{{ route('pay-plan', ['plan' => $plan->id]) }}" class="btn btn-outline-dark mt-2 w-100">Comprar Plano</a>
                                         @endif
                                         <a href="{{ route('plano', ['id' => $plan->id]) }}" class="btn btn-outline-warning mt-2 w-100">Editar plano</a>
-                                        <button type="submit" class="btn btn-outline-danger mt-2 w-100">Excluir plano</button>
+                                        <button type="submit" class="btn btn-danger mt-2 w-100">Excluir plano</button>
                                     </form>                                    
                                 </div>
                             </div>
