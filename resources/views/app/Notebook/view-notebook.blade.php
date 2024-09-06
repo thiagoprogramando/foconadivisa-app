@@ -24,7 +24,7 @@
                 @if($notebook->status == 1) 
                     <a id="result" class="btn btn-outline-success mt-3 mb-3 w-25">RESULTADO</a>
                 @else
-                    <a href="{{ route('answer', ['id' => $notebook->id]) }}" class="btn btn-outline-success mt-3 mb-3 w-25">COMEÇAR</a>
+                    <a href="{{ route('answer', ['id' => $notebook->id]) }}" class="btn btn-dark mt-3 mb-3 w-25">COMEÇAR</a>
                 @endif
 
                 <h5 class="card-title">Analise o seu progresso</h5>
@@ -124,17 +124,55 @@
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <form action="{{ route('update-subject') }}" method="POST" class="row">
+                <form action="{{ route('update-notebook') }}" method="POST" class="row">
                     @csrf
                     <input type="hidden" name="id" value="{{ $notebook->id }}">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-floating mb-2">
                             <input type="text" name="name" class="form-control" id="name" placeholder="Nome:" value="{{ $notebook->name }}">
                             <label for="name">Nome</label>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-floating mb-2">
+                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" value="{{ $notebook->questions->count() }}">
+                            <label for="questions">N° questões</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                        <select id="swal-subject" name="subject[]" multiple placeholder="Escolha de conteúdos">
+                            @foreach($subjects as $subject)
+                                <option value="{{ $subject->id }}" 
+                                    {{ in_array($subject->id, old('subject', $selectedSubjects)) ? 'selected' : '' }}>
+                                    {{ $subject->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                        <select id="swal-topic" name="topics[]" multiple placeholder="Escolha de tópicos (opcional)">
+                            @foreach($topics as $topic)
+                                <option value="{{ $topic->id }}" 
+                                    {{ in_array($topic->id, old('topics', $selectedTopics)) ? 'selected' : '' }}>
+                                    {{ $topic->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="remove_question_resolved" id="flexSwitchCheckChecked">
+                            <label class="form-check-label" for="flexSwitchCheckChecked">Eliminar questão já resolvidas</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="show_question_fail" id="flexSwitchCheckChecked">
+                            <label class="form-check-label" for="flexSwitchCheckChecked">Mostrar apenas as que eu já errei</label>
+                        </div>
+                    </div>
                     <div class="col-12 col-sm-12 col-md-3 offset-md-9 col-lg-3 offset-lg-9">
-                        <button type="submit" class="btn btn-outline-success w-100">Atualizar Caderno</button>
+                        <button type="submit" class="btn btn-dark w-100">Atualizar Caderno</button>
                     </div>
                 </form>
             </div>
@@ -144,6 +182,24 @@
     <script>
         $('#result').click(function (){
             $('#contact-tab').click();
+        });
+
+        new TomSelect("#swal-subject",{
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            maxItems: 10
+        });
+
+        new TomSelect("#swal-topic",{
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            maxItems: 10
         });
     </script>
 @endsection

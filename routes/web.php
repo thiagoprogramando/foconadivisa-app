@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/completing-notebook/{id}', [NotebookController::class, 'completingNotebook'])->name('completing-notebook');
     Route::post('create-notebook', [NotebookController::class, 'createNotebook'])->name('create-notebook');
     Route::post('delete-notebook', [NotebookController::class, 'deleteNotebook'])->name('delete-notebook');
+    Route::post('update-notebook', [NotebookController::class, 'updateNotebook'])->name('update-notebook');
 
     //Ansnwer
     Route::get('/answer/{id}', [AnswerController::class, 'answer'])->name('answer');

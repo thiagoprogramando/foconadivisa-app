@@ -15,4 +15,12 @@ class NotebookQuestion extends Model {
         'notebook_id',
         'question_id',
     ];
+
+    public function notebook() {
+        return $this->belongsTo(Notebook::class, 'notebook_id');
+    }
+
+    public function question() {
+        return $this->belongsTo(Question::class, 'question_id');
+    }
 }

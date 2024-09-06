@@ -19,8 +19,8 @@ class Notebook extends Model {
     ];
 
     public function questions() {
-        return $this->belongsToMany(Question::class, 'notebook_questions');
-    }
+        return $this->belongsToMany(Question::class, 'notebook_questions', 'notebook_id', 'question_id');
+    }    
 
     public function countQuestions() {
         return $this->questions()->count();
@@ -73,7 +73,6 @@ class Notebook extends Model {
         }
     }
 
-    // Melhor/Pior desempenho
     public function getBestPerformanceSubjects() {
         return $this->calculatePerformanceByContent('subject', true);
     }
