@@ -195,11 +195,13 @@
                             <i class="bi bi-circle"></i><span>Meus Cadernos</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="components-accordion.html">
-                            <i class="bi bi-circle"></i><span>Caderno X</span>
-                        </a>
-                    </li>
+                    @foreach ($myNotebooks as $notebook)
+                        <li>
+                            <a href="{{ route('caderno', ['id' => $notebook->id]) }}">
+                                <i class="bi bi-circle"></i><span>{{ $notebook->name }}</span>
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </li>
 
