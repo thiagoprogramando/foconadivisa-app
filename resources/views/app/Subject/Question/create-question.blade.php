@@ -34,12 +34,14 @@
                             <label for="question">Questão:</label>
                         </div>
                     </div>
-
+                    @php
+                        $letters = ['A', 'B', 'C', 'D', 'E'];
+                    @endphp
                     @for($i = 1; $i <= 5; $i++)
                         <div class="col-12 col-sm-12 col-md-10 col-lg-10">
                             <div class="form-floating mb-2">
                                 <input type="text" name="option_{{ $i }}" class="form-control" id="option_{{ $i }}" placeholder="{{ $i }} - Opção" value="{{ $options[$i]->option_text ?? '' }}">
-                                <label for="option_{{ $i }}">{{ $i }})</label>
+                                <label for="option_{{ $i }}">{{ $letters[$i - 1] }})</label>
                             </div>
                         </div>
                         <div class="col-12 col-sm-12 col-md-2 col-lg-2">
@@ -74,6 +76,17 @@
                 field: "text",
                 direction: "asc"
             }
+        });
+        document.querySelectorAll('.form-check-input').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    document.querySelectorAll('.form-check-input').forEach(function(otherCheckbox) {
+                        if (otherCheckbox !== checkbox) {
+                            otherCheckbox.checked = false;
+                        }
+                    });
+                }
+            });
         });
     </script>
 

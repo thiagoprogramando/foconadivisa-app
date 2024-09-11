@@ -128,7 +128,7 @@
                     field: "text",
                     direction: "asc"
                 },
-                maxItems: 10
+                maxItems: 100
             });
 
             new TomSelect("#swal-topic",{
@@ -137,7 +137,7 @@
                     field: "text",
                     direction: "asc"
                 },
-                maxItems: 10
+                maxItems: 100
             });
         });
     </script>

@@ -12,7 +12,7 @@
                     Questão: <b>{{ $question->question_text }}</b>
                 </h6>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $question->id, $unansweredQuestions->currentPage()]) }}">
+                    <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $question->id, $unansweredQuestions->currentPage()]) }}">
                         @csrf
                         @foreach($question->options as $option)
                             <div class="form-check-question">
@@ -23,8 +23,9 @@
                         <hr class="mt-5">
                         <div class="text-center">
                             <div class="btn-group w-50 mt-3" role="group">
-                                <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-outline-danger w-25">SAIR</a>
-                                <button type="submit" class="btn btn-outline-success w-25">RESPONDER</button>
+                                <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-dark">SAIR</a>
+                                <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                <button type="submit" class="btn btn-outline-success">RESPONDER</button>
                             </div>
                         </div>
                     </form>
@@ -42,4 +43,22 @@
             </div>
         @endif
     </div>
+
+    <script>
+        document.getElementById('questionForm').addEventListener('submit', function(event) {
+    
+            event.preventDefault();
+            const isOptionSelected = document.querySelector('input[name="option_id"]:checked');
+            if (!isOptionSelected) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Selecione uma opção',
+                    text: 'Por favor, escolha uma opção antes de enviar sua resposta.',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                this.submit();
+            }
+        });
+    </script>
 @endsection

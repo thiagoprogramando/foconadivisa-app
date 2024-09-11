@@ -41,6 +41,17 @@
                                                 <label for="value">Valor</label>
                                             </div>
                                         </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                            <div class="form-floating mb-2">
+                                                <select name="type" class="form-select" id="type">
+                                                    <option value="" selected>Forma de cobrança</option>
+                                                    <option value="1">Mensal</option>
+                                                    <option value="2">Anual</option>
+                                                    <option value="3">Vitalício</option>
+                                                </select>
+                                                <label for="type">Forma de cobrança</label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -62,7 +73,7 @@
                                     <h4 class="my-0 font-weight-normal">{{ $plan->name }}</h4>
                                 </div>
                                 <div class="card-body">
-                                    <h1 class="card-title pricing-card-title text-center">R$ {{ number_format($plan->value, 2, ',', '.') }} <small class="text-muted">/ mês</small></h1>
+                                    <h1 class="card-title pricing-card-title text-center">R$ {{ number_format($plan->value, 2, ',', '.') }} <small class="text-muted">/ {{ $plan->typeLabel() }}</small></h1>
                                     <p class="text-justify mb-5">
                                         {{ strlen($plan->description) > 150 ? substr($plan->description, 0, 150) . '...' : $plan->description }}
                                     </p>

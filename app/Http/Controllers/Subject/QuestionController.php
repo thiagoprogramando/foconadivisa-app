@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Subject;
 
 use App\Http\Controllers\Controller;
+use App\Models\NotebookQuestion;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Subject;
@@ -89,6 +90,20 @@ class QuestionController extends Controller {
         
         if($question && $question->delete()) {
             return redirect()->route('conteudo', ['id' => $subject])->with('success', 'Questão excluída com sucesso!');
+        }
+
+        return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');
+    }
+
+    public function deleteQuestionAnswer($notebook, $question) {
+
+        $question = NotebookQuestion::where('question_id', $question);
+        if(!$question) {
+            return redirect()->back()->with('error', 'Ops! Não foram encontrados dados da Questão.');
+        }
+        
+        if($question && $question->delete()) {
+            return redirect()->route('answer', ['id' => $notebook])->with('success', 'Questão eliminada com sucesso!');
         }
 
         return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');

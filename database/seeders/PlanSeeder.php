@@ -10,11 +10,12 @@ class PlanSeeder extends Seeder {
 
     public function run(): void {
         DB::table('plan')->insert([
-            'name' => 'Gratuito',
-            'description' => 'Aproveite os benefícios',
-            'value' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'name'          => 'Gratuito',
+            'description'   => 'Aproveite os benefícios',
+            'value'         => 0,
+            'type'          => 1,
+            'created_at'    => now(),
+            'updated_at'    => now(),
         ]);
     }
 }
