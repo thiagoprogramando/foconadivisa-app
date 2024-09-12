@@ -29,7 +29,7 @@
                         <div class="card info-card sales-card">
                             <div class="card-body">
                                 <h5 class="card-title text-center">Questões <span>| Hoje</span></h5>
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="bi bi-question-square-fill"></i> </div>
                                     <div class="ps-3">
                                         <h6>{{ $questionsTodayCount }}</h6>
@@ -43,7 +43,7 @@
                         <div class="card info-card sales-card">
                             <div class="card-body">
                                 <h5 class="card-title text-center">Questões <span>| Geral</span></h5>
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="bi bi-book-half"></i> </div>
                                     <div class="ps-3">
                                         <h6>{{ $totalQuestionsCount }}</h6>
@@ -57,7 +57,7 @@
                         <div class="card info-card sales-card">
                             <div class="card-body">
                                 <h5 class="card-title text-center">Progresso</h5>
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center justify-content-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="bi bi-bar-chart-fill"></i> </div>
                                     <div class="ps-3">
                                         <h6>{{ number_format($progress, 2) }}%</h6>

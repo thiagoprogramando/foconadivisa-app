@@ -11,7 +11,7 @@ class PaymentController extends Controller {
     
     public function payments() {
 
-        $payments = Invoice::where('user_id', Auth::user()->id)->orderBy('payment_status', 'asc')->paginate(10);
+        $payments = Invoice::where('user_id', Auth::user()->id)->orderBy('payment_status', 'asc')->get();
         return view('app.Payment.list-payment', [
             'payments' => $payments
         ]);

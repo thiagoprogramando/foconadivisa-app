@@ -27,10 +27,11 @@ class QuestionController extends Controller {
         ]);
     }
 
-    public function createQuestion($subject) {
+    public function createQuestion($subject = null, $topic = null) {
 
-        $question = new Question();
-        $question->subject_id = $subject;
+        $question               = new Question();
+        $question->subject_id   = $subject;
+        $question->topic_id     = $topic;
         
         if($question->save()) {
             return redirect()->route('questao', ['id' => $question->id])->with('success', 'Preencha todos os dados da questão!');

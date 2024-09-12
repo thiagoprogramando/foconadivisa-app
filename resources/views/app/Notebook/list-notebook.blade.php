@@ -36,20 +36,34 @@
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                                            <select id="swal-subject" name="subject[]" placeholder="Escolha de conteúdos">
-                                                <option value="" selected>Escolha de conteúdos</option>
-                                                @foreach($subjects as $subject)
-                                                    <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <div class="row">
+                                                <div class="col-8 col-sm-8 col-md-8">
+                                                    <select id="swal-subject" name="subject[]" placeholder="Escolha de conteúdos">
+                                                        <option value="" selected>Escolha de conteúdos</option>
+                                                        @foreach($subjects as $subject)
+                                                            <option value="{{ $subject->id }}" id-quanty="{{ $subject->countQuestions() }}">{{ $subject->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-4 col-sm-4 col-md-4">
+                                                    <button type="button" id="select-all-subjects" title="Selecionar todos os conteúdos" class="btn btn-block btn-dark"><i class="bi bi-ui-checks"></i> Todos</button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                                            <select id="swal-topic" name="topics[]" placeholder="Escolha de tópicos (opcional)">
-                                                <option value="" selected>Escolha de tópicos (opcional)</option>
-                                                @foreach($topics as $topic)
-                                                    <option value="{{ $topic->id }}">{{ $topic->name }}</option>
-                                                @endforeach
-                                            </select>
+                                            <div class="row">
+                                                <div class="col-8 col-sm-8 col-md-8">
+                                                    <select id="swal-topic" name="topics[]" placeholder="Escolha de tópicos (opcional)">
+                                                        <option value="" selected>Escolha de tópicos (opcional)</option>
+                                                        @foreach($topics as $topic)
+                                                            <option value="{{ $topic->id }}" id-quanty="{{ $topic->countQuestions() }}">{{ $topic->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-4 col-sm-4 col-md-4">
+                                                    <button type="button" id="select-all-topics" title="Selecionar todos os tópicos" class="btn btn-block btn-dark"><i class="bi bi-ui-checks"></i> Todos</button>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
                                             <div class="form-check form-switch">
@@ -62,6 +76,9 @@
                                                 <input class="form-check-input" type="checkbox" name="show_question_fail" id="flexSwitchCheckChecked">
                                                 <label class="form-check-label" for="flexSwitchCheckChecked">Mostrar apenas as que eu já errei</label>
                                             </div>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
+                                            <small class="btn btn-dark" id="question-count">Foram encontradas: 0 questões</small>
                                         </div>
                                     </div>
                                 </div>
@@ -124,23 +141,58 @@
 
     <script>
         $('.modal-swal').click(function(){
-            new TomSelect("#swal-subject",{
+            var subject = new TomSelect("#swal-subject",{
                 create: false,
                 sortField: {
                     field: "text",
                     direction: "asc"
                 },
-                maxItems: 100
+                maxItems: 1000,
+                onChange: updateQuestionCount
             });
 
-            new TomSelect("#swal-topic",{
+            var topic = new TomSelect("#swal-topic",{
                 create: false,
                 sortField: {
                     field: "text",
                     direction: "asc"
                 },
-                maxItems: 100
+                maxItems: 1000,
+                onChange: updateQuestionCount
             });
+
+            function updateQuestionCount() {
+
+                var selectedSubjects = Array.from(subject.getValue());
+                var selectedTopics = Array.from(topic.getValue());
+
+                var totalSubjectQuestions = selectedSubjects.reduce(function(total, optionId) {
+                    var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
+                    var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
+                    return total + quanty;
+                }, 0);
+
+                var totalTopicQuestions = selectedTopics.reduce(function(total, optionId) {
+                    var option = document.querySelector('#swal-topic option[value="' + optionId + '"]');
+                    var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
+                    return total + quanty;
+                }, 0);
+
+                var totalQuestions = totalSubjectQuestions + totalTopicQuestions;
+                document.getElementById('question-count').textContent = `Foram encontradas: ${totalQuestions} questões`;
+            }
+
+            document.getElementById('select-all-subjects').addEventListener('click', function () {
+                var allOptions = Array.from(document.querySelectorAll('#swal-subject option')).map(option => option.value);
+                subject.setValue(allOptions);
+            });
+
+            document.getElementById('select-all-topics').addEventListener('click', function () {
+                var allOptions = Array.from(document.querySelectorAll('#swal-topic option')).map(option => option.value);
+                topic.setValue(allOptions);
+            });
+
+            updateQuestionCount();
         });
     </script>
 

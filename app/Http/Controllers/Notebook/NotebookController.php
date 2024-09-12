@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Notebook;
 use App\Models\NotebookQuestion;
+use App\Models\Notification;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -168,6 +169,14 @@ class NotebookController extends Controller {
         });
 
         if (!$questions->isEmpty()) {
+
+            $notification               = new Notification();
+            $notification->user_id      = Auth::user()->id;
+            $notification->type         = 1;
+            $notification->title        = 'Caderno de questões criado!';
+            $notification->description  = 'Você já pode acessar e às questões responder do seu novo caderno!';
+            $notification->save();
+
             return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno criado com sucesso!');
         } else {
             return redirect()->back()->with('error', 'Erro ao criar o caderno. Nenhuma questão encontrada.');
@@ -180,10 +189,6 @@ class NotebookController extends Controller {
         if (!$notebook) {
             return redirect()->back()->with('error', 'Caderno de questões não foi encontrado!');
         }
-
-        $notebook->update([
-            'name' => $request->input('name'),
-        ]);
 
         $subjects = $request->input('subject', []);
         $topics = $request->input('topics', []);
@@ -202,12 +207,16 @@ class NotebookController extends Controller {
             $topics = [];
         }
 
-        if (!empty($subjects)) {
-            $query->whereIn('subject_id', $subjects);
-        }
-
-        if (!empty($topics)) {
-            $query->whereIn('topic_id', $topics);
+        if (!empty($topics) && !empty($subjects)) {
+            $query->where(function ($q) use ($subjects, $topics) {
+                if (!empty($subjects)) {
+                    $q->whereIn('subject_id', $subjects);
+                }
+        
+                if (!empty($topics)) {
+                    $q->orWhereIn('topic_id', $topics);
+                }
+            });
         }
 
         if ($removeQuestionResolved) {
@@ -250,6 +259,11 @@ class NotebookController extends Controller {
             });
 
             if (!$filteredQuestions->isEmpty()) {
+                $notebook->update([
+                    'name'      => $request->input('name'),
+                    'status'    => 0,
+                    'percetage' => 50,
+                ]);
                 return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno atualizado com sucesso!');
             } else {
                 return redirect()->back()->with('error', 'Erro ao atualizar o caderno. Nenhuma questão disponível.');

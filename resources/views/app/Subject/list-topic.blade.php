@@ -33,7 +33,9 @@
                                         <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $topic->id }}">
-                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <button title="Excluir Tópico" type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <a title="Detalhes" href="{{ route('conteudo', ['id' => $topic->subject_id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
+                                            <a title="Nova Questão associada ao Tópico" href="{{ route('create-question', ['subject' => $topic->subject_id, 'topic' => $topic->id]) }}" class="btn btn-dark"><i class="bi bi-plus-circle"></i></a>
                                         </form>
                                     </td>
                                 </tr>

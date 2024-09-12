@@ -47,6 +47,6 @@ class AnswerController extends Controller {
         $answer->option_id      = $request->input('option_id');
         $answer->save();
     
-        return redirect()->route('answer-review', [$answer->id])->with('success', 'Resposta salva!');
+        return redirect()->route('answer-review', [$answer->id]);
     }
 }

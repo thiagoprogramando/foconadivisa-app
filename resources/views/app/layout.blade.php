@@ -71,11 +71,11 @@
 
                         @foreach ($notifications as $notification)
                             <li class="notification-item">
-                                {{ $notification->typeLabel() }}
+                                {!! $notification->typeLabel() !!}
                                 <div>
                                     <h4>{{ $notification->title }}</h4>
                                     <p>{{ $notification->description }}</p>
-                                    <p>{{ $notification->created_at }}</p>
+                                    <p>{{ $notification->created_at->format('d/m/Y H:i') }}</p>
                                 </div>
                             </li>
                             <li>

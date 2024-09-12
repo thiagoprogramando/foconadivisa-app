@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Gateway;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Models\Notification;
 use App\Models\Plan;
 use App\Models\User;
 
@@ -36,6 +37,11 @@ class AssasController extends Controller {
             return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');
         }
 
+        Invoice::where('user_id', Auth::user()->id)
+        ->where('payment_status', 0)
+        ->where('plan_id', $plan->id)
+        ->delete();
+
         $invoice                = new Invoice();
         $invoice->user_id       = Auth::user()->id;
         $invoice->plan_id       = $plan->id;
@@ -43,6 +49,13 @@ class AssasController extends Controller {
         $invoice->payment_token = $dataInvoice['id'];
         $invoice->payment_url   = $dataInvoice['invoiceUrl'];
         if($invoice->save()) {
+
+            $notification               = new Notification();
+            $notification->user_id      = Auth::user()->id;
+            $notification->type         = 1;
+            $notification->title        = 'Fatura gerada para o novo Plano!';
+            $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
+            $notification->save();
 
             return redirect($dataInvoice['invoiceUrl']);
         }
@@ -145,7 +158,14 @@ class AssasController extends Controller {
                 $user->save();
 
                 $invoice->payment_status = 1;
-                $invoice->save();
+                if($invoice->save()) {
+                    $notification               = new Notification();
+                    $notification->user_id      = $user->id;
+                    $notification->type         = 2;
+                    $notification->title        = 'Pagamento aprovado!';
+                    $notification->description  = 'Agradecemos por nos escolher. Aproveite os benefícios do seu novo Plano!';
+                    $notification->save();
+                }
 
                 return response()->json(['status' => 'success', 'message' => 'Processo concluído com sucesso!']);
             }

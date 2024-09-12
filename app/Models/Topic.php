@@ -25,6 +25,10 @@ class Topic extends Model {
         return $this->hasMany(Question::class);
     }
 
+    public function countQuestions() {
+        return $this->questions()->count();
+    }
+
     protected static function boot() {
         parent::boot();
 

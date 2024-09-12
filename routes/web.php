@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
 
     //Question & Option
     Route::get('questao/{id}', [QuestionController::class, 'viewQuestion'])->name('questao');
-    Route::get('create-question/{subject}', [QuestionController::class, 'createQuestion'])->name('create-question');
+    Route::get('create-question/{subject?}/{topic?}', [QuestionController::class, 'createQuestion'])->name('create-question');
     Route::post('update-question', [QuestionController::class, 'updateQuestion'])->name('update-question');
     Route::post('delete-question', [QuestionController::class, 'deleteQuestion'])->name('delete-question');
     Route::get('delete-question-answer/{notebook}/{question}', [QuestionController::class, 'deleteQuestionAnswer'])->name('delete-question-answer');

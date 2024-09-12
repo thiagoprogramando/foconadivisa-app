@@ -11,6 +11,10 @@ class AccessController extends Controller {
     
     public function login() {
 
+        if(Auth::check()) {
+            return redirect()->route('app');
+        }
+
         return view('login');
     }
 
@@ -26,6 +30,10 @@ class AccessController extends Controller {
     }
 
     public function register() {
+
+        if(Auth::check()) {
+            return redirect()->route('app');
+        }
 
         return view('register');
     }

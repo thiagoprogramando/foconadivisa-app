@@ -19,7 +19,7 @@ class Notifications extends ServiceProvider {
         View::composer('*', function ($view) {
             
             if(Auth::check()) {
-                $notifications = Notification::where('user_id', Auth::user()->id)->orderBy('created_at', 'asc')->get();
+                $notifications = Notification::where('user_id', Auth::user()->id)->orderBy('created_at', 'desc')->get();
                 $view->with(['notifications' => $notifications]);
             }
         });

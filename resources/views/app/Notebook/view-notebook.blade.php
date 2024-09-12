@@ -22,9 +22,9 @@
             <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
 
                 @if($notebook->status == 1) 
-                    <a id="result" class="btn btn-outline-success mt-3 mb-3 w-25">RESULTADO</a>
+                    <a id="result" class="btn btn-outline-success mt-3 mb-3">RESULTADO</a>
                 @else
-                    <a href="{{ route('answer', ['id' => $notebook->id]) }}" class="btn btn-dark mt-3 mb-3 w-25">COMEÇAR</a>
+                    <a href="{{ route('answer', ['id' => $notebook->id]) }}" class="btn btn-dark mt-3 mb-3">COMEÇAR</a>
                 @endif
 
                 <h5 class="card-title">Analise o seu progresso</h5>

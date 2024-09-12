@@ -5,8 +5,8 @@
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
         <title>{{ env('APP_NAME') }} - {{ env('APP_DESCRIPTION') }}</title>
-        <meta content="" name="description">
-        <meta content="" name="keywords">
+        <meta content="{{ env('META_DESCRIPTION') }}" name="description">
+        <meta content="{{ env('META_KEYWORDS') }}" name="keywords">
 
         <link href="{{ asset('template/img/favicon.png') }}" rel="icon">
         <link href="{{ asset('template/img/favicon.png') }}" rel="apple-touch-icon">
@@ -90,5 +90,26 @@
         <script src="{{ asset('template/vendor/tinymce/tinymce.min.js') }}"></script>
         <script src="{{ asset('template/vendor/php-email-form/validate.js') }}"></script>
         <script src="{{ asset('template/js/main.js') }}"></script>
+        <script src="{{ asset('template/js/jquery.js') }}"></script>
+        <script src="{{ asset('template/js/sweetalert.js') }}"></script>
+        <script>
+            @if(session('error'))
+                  Swal.fire({
+                      title: 'Erro!',
+                      text: '{{ session('error') }}',
+                      icon: 'error',
+                      timer: 2000
+                  })
+              @endif
+              
+              @if(session('success'))
+                  Swal.fire({
+                      title: 'Sucesso!',
+                      text: '{{ session('success') }}',
+                      icon: 'success',
+                      timer: 2000
+                  })
+              @endif
+          </script>
     </body>
 </html>

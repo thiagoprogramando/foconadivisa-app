@@ -1,5 +1,5 @@
 @extends('app.layout')
-@section('title') Dashboard @endsection
+@section('title') FAQ - Perguntas frequentes @endsection
 @section('content')
 
     <div class="row">

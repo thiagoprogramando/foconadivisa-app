@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\Notification;
 use App\Models\User;
 
 use Illuminate\Http\Request;
@@ -71,6 +71,14 @@ class UserController extends Controller {
         }
         
         if($user && $user->update($data)) {
+
+            $notification               = new Notification();
+            $notification->user_id      = $user->id;
+            $notification->type         = 1;
+            $notification->title        = 'Dados alterados!';
+            $notification->description  = 'Seus dados foram atualizados com sucesso!';
+            $notification->save();
+
             return redirect()->back()->with('success', 'Dados atualizados com sucesso!');
         }
 
@@ -81,7 +89,6 @@ class UserController extends Controller {
         
         $user = User::find($request->id);
         if($user && $user->delete()) {
-
             return redirect()->back()->with('success', 'Usuário excluído com sucesso!');
         }
 
