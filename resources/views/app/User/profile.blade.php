@@ -13,7 +13,7 @@
                     @endif
                 </div>
 
-                <button class="btn btn-primary mt-3" id="change-photo-button">Trocar foto de perfil</button>
+                <button class="btn btn-dark mt-3" id="change-photo-button">Trocar foto de perfil</button>
 
                 <form action="{{ route('update-profile') }}" method="POST" enctype="multipart/form-data" id="photo-upload-form" class="d-none">
                     @csrf
@@ -26,30 +26,43 @@
                 <form action="{{ route('update-profile') }}" method="POST" class="row g-0">
                     @csrf
                     <input type="hidden" name="id" value="{{ Auth::user()->id }}">
-                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                         <div class="form-floating mb-3 m-1">
                             <input type="text" name="name" class="form-control" value="{{ Auth::user()->name }}" id="name" placeholder="Nome:" required>
                             <label for="name">Nome</label>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <div class="col-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-floating mb-3 m-1">
                             <input type="number" name="cpfcnpj" class="form-control" value="{{ Auth::user()->cpfcnpj }}" id="cpfcnpj" placeholder="CPF ou CNPJ:" required>
                             <label for="cpfcnpj">CPF ou CNPJ:</label>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                        <div class="form-floating mb-3 m-1">
-                            <input type="email" name="email" class="form-control" value="{{ Auth::user()->email }}" id="email" placeholder="Email:" required>
-                            <label for="email">Email</label>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <div class="col-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-floating mb-3 m-1">
                             <input type="number" name="phone" class="form-control" value="{{ Auth::user()->phone }}" id="phone" placeholder="Telefone:" required>
                             <label for="phone">Telefone:</label>
                         </div>
                     </div>
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                        <div class="form-floating mb-3 m-1">
+                            <input type="email" name="email" class="form-control" value="{{ Auth::user()->email }}" id="email" placeholder="Email:" required>
+                            <label for="email">Email</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+                        <div class="form-floating mb-3 m-1">
+                            <input type="text" name="password" class="form-control" id="password" placeholder="Senha (Opcional):">
+                            <label for="password">Senha (Opcional):</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+                        <div class="form-floating mb-3 m-1">
+                            <input type="number" name="meta" class="form-control" value="{{ Auth::user()->meta }}" id="meta" placeholder="Meta:">
+                            <label for="meta">Meta:</label>
+                        </div>
+                    </div>
+                    
                     <div class="col-12 col-sm-12 col-md-4 offset-md-8 col-lg-4 offset-lg-8">
                         <button type="submit" class="btn btn-dark w-100">Atualizar</button>
                     </div>

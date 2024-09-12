@@ -46,6 +46,8 @@ class UserController extends Controller {
             'cpfcnpj'   => $request->cpfcnpj,
             'email'     => $request->email,
             'phone'     => $request->phone,
+            'meta'      => $request->meta,
+            'password'  => bcrypt($request->password)
         ];
 
         $data = array_filter($data, function($value) {

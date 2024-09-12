@@ -8,9 +8,11 @@ use App\Http\Controllers\Notebook\NotebookController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Subject\QuestionController;
 use App\Http\Controllers\Subject\SubjectController;
-
+use App\Http\Controllers\User\FaqController;
 use App\Http\Controllers\User\PlanController;
+use App\Http\Controllers\User\SearchController;
 use App\Http\Controllers\User\UserController;
+use App\Models\Faq;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AccessController::class, 'login'])->name('index');
@@ -29,6 +31,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/usuarios', [UserController::class, 'users'])->name('usuarios');
     Route::post('update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
     Route::post('delete-user', [UserController::class, 'deleteUser'])->name('delete-user');
+        //Search
+        Route::get('search', [SearchController::class, 'search'])->name('search');
+        //Faq
+        Route::get('faq', [FaqController::class, 'faq'])->name('faq');
+        Route::post('create-faq', [FaqController::class, 'createFaq'])->name('create-faq');
+        Route::get('delete-faq/{id}', [FaqController::class, 'deleteFaq'])->name('delete-faq');
 
     //Plan
     Route::get('/planos', [PlanController::class, 'plans'])->name('planos');

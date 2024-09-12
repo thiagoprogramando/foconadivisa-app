@@ -4,11 +4,11 @@
 
     <div class="col-sm-12 col-md-7 col-lg-7 mb-3">
         <div class="row">
-            <div class="col-6 col-sm-12 col-md-12 col-lg-12">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                 <div class="card">
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 text-center d-flex align-items-center justify-content-center">
-                            <img src="{{ asset('template/img/components/monitoring.png') }}" class="img-fluid" alt="Trabalhando...">
+                            <img src="{{ asset('template/img/components/monitoring.png') }}" class="img-fluid w-50" alt="Trabalhando...">
                         </div>
                         <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                             <div class="card-body">
@@ -23,9 +23,9 @@
                 </div>
             </div>
 
-            <div class="col-6 col-sm-12 col-md-12 col-lg-12">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                 <div class="row">
-                    <div class="col-sm-12 col-md-4 col-lg-4">
+                    <div class="col-6 col-sm-6 col-md-4 col-lg-4">
                         <div class="card info-card sales-card">
                             <div class="card-body">
                                 <h5 class="card-title text-center">Questões <span>| Hoje</span></h5>
@@ -39,7 +39,7 @@
                         </div>
                     </div>
         
-                    <div class="col-sm-12 col-md-4 col-lg-4">
+                    <div class="col-6 col-sm-6 col-md-4 col-lg-4">
                         <div class="card info-card sales-card">
                             <div class="card-body">
                                 <h5 class="card-title text-center">Questões <span>| Geral</span></h5>
@@ -53,7 +53,7 @@
                         </div>
                     </div>
         
-                    <div class="col-sm-12 col-md-4 col-lg-4">
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="card info-card sales-card">
                             <div class="card-body">
                                 <h5 class="card-title text-center">Progresso</h5>
@@ -72,102 +72,40 @@
     </div>
 
     <div class="col-sm-12 col-md-5 col-lg-5">
-        <div class="card">
-            <div class="card-body pb-0">
-                <h5 class="card-title">Novidades &amp; Atualizações <span>| Recentes</span></h5>
-                <div class="news">
-                    <div class="post-item clearfix">
-                        <img src="assets/img/news-1.jpg" alt="">
-                        <h4><a href="#">Nihil blanditiis at in nihil autem</a></h4>
-                        <p>Sit recusandae non aspernatur laboriosam. Quia enim eligendi sed ut harum...</p>
-                    </div>
+        @if($errorsCount > 0 || $correctCount > 0)
+            <div class="card">
+                <div class="card-body">
+                <h5 class="card-title text-center">GRÁFICO DE RESPOSTAS</h5>
+                <canvas id="doughnutChart" style="max-height: 200px;"></canvas>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
 
-                    <div class="post-item clearfix">
-                        <img src="assets/img/news-2.jpg" alt="">
-                        <h4><a href="#">Quidem autem et impedit</a></h4>
-                        <p>Illo nemo neque maiores vitae officiis cum eum turos elan dries werona nande...</p>
-                    </div>
+                            const errorsCount = @json($errorsCount);
 
-                    <div class="post-item clearfix">
-                        <img src="assets/img/news-3.jpg" alt="">
-                        <h4><a href="#">Id quia et et ut maxime similique occaecati ut</a></h4>
-                        <p>Fugiat voluptas vero eaque accusantium eos. Consequuntur sed ipsam et totam...</p>
-                    </div>
+                            const correctCount = @json($correctCount);
+
+                            new Chart(document.querySelector('#doughnutChart'), {
+                                type: 'doughnut',
+                                data: {
+                                    labels: [
+                                        'Erros',
+                                        'Acertos'
+                                    ],
+                                    datasets: [{
+                                        label: 'Avanço de respostas',
+                                        data: [errorsCount, correctCount],
+                                        backgroundColor: [
+                                        '#FF0000',
+                                        '#00CC00'
+                                        ],
+                                        hoverOffset: 4
+                                    }]
+                                }
+                            });
+                        });
+                    </script>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
-
-    
-    <div class="col-sm-12 col-md-12 col-lg-12">
-        <div class="row">
-            @if($errorsCount > 0 || $correctCount > 0)
-                <div class="col-sm-12 col-md-6 col-lg-6">
-                    <div class="card">
-                        <div class="card-body">
-                        <h5 class="card-title">Relatório de respostas</h5>
-                        <canvas id="doughnutChart" style="max-height: 400px;"></canvas>
-                            <script>
-                                document.addEventListener("DOMContentLoaded", () => {
-
-                                    const errorsCount = @json($errorsCount);
-
-                                    const correctCount = @json($correctCount);
-
-                                    new Chart(document.querySelector('#doughnutChart'), {
-                                        type: 'doughnut',
-                                        data: {
-                                            labels: [
-                                                'Erros',
-                                                'Acertos'
-                                            ],
-                                            datasets: [{
-                                                label: 'Avanço de respostas',
-                                                data: [errorsCount, correctCount],
-                                                backgroundColor: [
-                                                '#FF0000',
-                                                '#00CC00'
-                                                ],
-                                                hoverOffset: 4
-                                            }]
-                                        }
-                                    });
-                                });
-                            </script>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-            <div class="col-sm-12 col-md-6 col-lg-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Continue de onde parou...</h5>
-                        
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Caderno</th>
-                                    <th scope="col">Conteúdo</th>
-                                    <th scope="col" class="text-center">Questões</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#545 caderno</td>
-                                    <td>
-                                        <span class="badge bg-primary">Matemática Financeira</span> 
-                                        <span class="badge bg-primary">Português</span> 
-                                        <span class="badge bg-primary">Geografia</span>
-                                    </td>
-                                    <td class="text-center">28</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 @endsection

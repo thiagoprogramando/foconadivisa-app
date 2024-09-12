@@ -41,33 +41,35 @@
                     </div>
                 </form>
 
-                <table class="table table-hover mt-5">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($associatedSubjects as $associate)
+                <div class="table-responsive">
+                    <table class="table table-hover mt-5">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $associate->id }}</th>
-                                <td>{{ $associate->name }}</td>
-                                <td>{{ $associate->description }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-subject-associate') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="subject_id" value="{{ $associate->id }}">
-                                        <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>   
+                        </thead>
+                        <tbody>
+                            @foreach ($associatedSubjects as $associate)
+                                <tr>
+                                    <th scope="row">{{ $associate->id }}</th>
+                                    <td>{{ $associate->name }}</td>
+                                    <td>{{ $associate->description }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-subject-associate') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="subject_id" value="{{ $associate->id }}">
+                                            <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>   
+                </div>
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
@@ -129,33 +131,35 @@
                     </div>
                 </form>
 
-                <table class="table table-hover mt-5">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($associatedTopics as $associate)
+                <div class="table-responsive">
+                    <table class="table table-hover mt-5">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $associate->id }}</th>
-                                <td>{{ $associate->name }}</td>
-                                <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-topic-associate') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="topic_id" value="{{ $associate->id }}">
-                                        <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>  
+                        </thead>
+                        <tbody>
+                            @foreach ($associatedTopics as $associate)
+                                <tr>
+                                    <th scope="row">{{ $associate->id }}</th>
+                                    <td>{{ $associate->name }}</td>
+                                    <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-topic-associate') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="topic_id" value="{{ $associate->id }}">
+                                            <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>  
+                </div>
             </div>
         </div>
         

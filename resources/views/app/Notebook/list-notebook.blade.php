@@ -76,45 +76,47 @@
             </div>
 
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Conteúdos</th>
-                            <th scope="col" class="text-center">Progresso</th>
-                            <th scope="col" class="text-center">Questões</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($notebooks as $notebook)
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $notebook->id }}</th>
-                                <td>{{ $notebook->name }}</td>
-                                <td>
-                                    @foreach ($notebook->getSubjectsNames() as $subject)
-                                        <span class="badge bg-dark">{{ $subject }}</span>
-                                    @endforeach
-
-                                    @foreach ($notebook->getTopicsNames() as $topic)
-                                        <span class="badge bg-secondary">{{ $topic }}</span>
-                                    @endforeach
-                                </td>
-                                <td class="text-center">{{ $notebook->percentage }}%</td>
-                                <td class="text-center">{{ $notebook->countQuestions() }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-notebook') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $notebook->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                        <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-outline-success"><i class="bi bi-arrow-bar-right"></i></a>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Conteúdos</th>
+                                <th scope="col" class="text-center">Progresso</th>
+                                <th scope="col" class="text-center">Questões</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>   
+                        </thead>
+                        <tbody>
+                            @foreach ($notebooks as $notebook)
+                                <tr>
+                                    <th scope="row">{{ $notebook->id }}</th>
+                                    <td>{{ $notebook->name }}</td>
+                                    <td>
+                                        @foreach ($notebook->getSubjectsNames() as $subject)
+                                            <span class="badge bg-dark">{{ $subject }}</span>
+                                        @endforeach
+
+                                        @foreach ($notebook->getTopicsNames() as $topic)
+                                            <span class="badge bg-secondary">{{ $topic }}</span>
+                                        @endforeach
+                                    </td>
+                                    <td class="text-center">{{ $notebook->percentage }}%</td>
+                                    <td class="text-center">{{ $notebook->countQuestions() }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-notebook') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $notebook->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-outline-success"><i class="bi bi-arrow-bar-right"></i></a>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>   
+                </div>
             </div>
 
         </div>

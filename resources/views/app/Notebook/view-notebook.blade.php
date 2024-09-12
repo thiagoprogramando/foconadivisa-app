@@ -28,30 +28,32 @@
                 @endif
 
                 <h5 class="card-title">Analise o seu progresso</h5>
-                <table class="table table-striped table-sm table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">Questão</th>
-                            <th scope="col">Resposta</th>
-                            <th scope="col" class="text-center">Gabarito</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($answers as $key => $answer)
-                        <tr>
-                            <td class="w-50">{{ $key + 1 }}) {{ $answer->question->question_text }}</td>
-                            <td><span class="badge bg-dark">{{ $answer->option->option_text }}</span></td>
-                            <td class="text-center">
-                                @if ($answer->isCorrect() == 1)
-                                    <i class="bi bi-check2-circle text-success"></i>
-                                @else
-                                    <i class="bi bi-x-circle text-danger"></i>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-striped table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Questão</th>
+                                <th scope="col">Resposta</th>
+                                <th scope="col" class="text-center">Gabarito</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($answers as $key => $answer)
+                            <tr>
+                                <td class="w-50">{{ $key + 1 }}) {{ $answer->question->question_text }}</td>
+                                <td><span class="badge bg-dark">{{ $answer->option->option_text }}</span></td>
+                                <td class="text-center">
+                                    @if ($answer->isCorrect() == 1)
+                                        <i class="bi bi-check2-circle text-success"></i>
+                                    @else
+                                        <i class="bi bi-x-circle text-danger"></i>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">

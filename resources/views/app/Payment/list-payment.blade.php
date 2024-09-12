@@ -14,35 +14,37 @@
             </div>
 
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Plano</th>
-                            <th scope="col">Link de Pagamento</th>
-                            <th scope="col" class="text-center">Status</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($payments as $payment)
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $payment->id }}</th>
-                                <td>{{ $payment->labelPlan->name }}</td>
-                                <td> <a href="{{ $payment->payment_url }}"><span class="badge bg-dark">{{ $payment->payment_url }}</span></a> </td>
-                                <td class="text-center">{{ $payment->statusLabel() }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-payment') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $payment->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                        <a href="{{ $payment->payment_url }}" target="_blank" class="btn btn-dark"><i class="bi bi-credit-card-2-back"></i></a>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Plano</th>
+                                <th scope="col">Link de Pagamento</th>
+                                <th scope="col" class="text-center">Status</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>   
+                        </thead>
+                        <tbody>
+                            @foreach ($payments as $payment)
+                                <tr>
+                                    <th scope="row">{{ $payment->id }}</th>
+                                    <td>{{ $payment->labelPlan->name }}</td>
+                                    <td> <a href="{{ $payment->payment_url }}"><span class="badge bg-dark">{{ $payment->payment_url }}</span></a> </td>
+                                    <td class="text-center">{{ $payment->statusLabel() }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-payment') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $payment->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <a href="{{ $payment->payment_url }}" target="_blank" class="btn btn-dark"><i class="bi bi-credit-card-2-back"></i></a>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>  
+                </div> 
             </div>
 
         </div>

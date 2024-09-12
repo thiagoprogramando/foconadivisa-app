@@ -48,37 +48,39 @@
             </div>
 
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-center">Tópicos</th>
-                            <th scope="col" class="text-center">Questões</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($subjects as $subject)
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $subject->id }}</th>
-                                <td>{{ $subject->name }}</td>
-                                <td>{{ strlen($subject->description) > 60 ? substr($subject->description, 0, 60) . '...' : $subject->description }}</td>
-                                <td class="text-center">{{ $subject->countTopics() }}</td>
-                                <td class="text-center">{{ $subject->countQuestions() }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-subject') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $subject->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                        <a href="{{ route('conteudo', ['id' => $subject->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Tópicos</th>
+                                <th scope="col" class="text-center">Questões</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>   
+                        </thead>
+                        <tbody>
+                            @foreach ($subjects as $subject)
+                                <tr>
+                                    <th scope="row">{{ $subject->id }}</th>
+                                    <td>{{ $subject->name }}</td>
+                                    <td>{{ strlen($subject->description) > 60 ? substr($subject->description, 0, 60) . '...' : $subject->description }}</td>
+                                    <td class="text-center">{{ $subject->countTopics() }}</td>
+                                    <td class="text-center">{{ $subject->countQuestions() }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-subject') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $subject->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <a href="{{ route('conteudo', ['id' => $subject->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>   
             </div>
 
         </div>

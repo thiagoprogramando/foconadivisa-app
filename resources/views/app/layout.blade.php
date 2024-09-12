@@ -41,9 +41,9 @@
         </div>
 
         <div class="search-bar">
-            <form class="search-form d-flex align-items-center" method="POST" action="#">
-                <input type="text" name="query" placeholder="Pesquisar" title="Pesquisar">
-                <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+            <form class="search-form d-flex align-items-center" method="GET" action="{{ route('search') }}">
+                <input type="text" name="search" placeholder="Pesquisar" title="Pesquisar">
+                <button type="submit" title="Pesquisar"><i class="bi bi-search"></i></button>
             </form>
         </div>
 
@@ -118,7 +118,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="pages-faq.html">
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('faq') }}">
                                 <i class="bi bi-question-circle"></i>
                                 <span>Precisa de ajuda?</span>
                             </a>

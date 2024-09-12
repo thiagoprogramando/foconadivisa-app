@@ -64,33 +64,34 @@
                     </div>
                 </div>
 
-                <table class="table table-hover mt-5">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($topics as $topic)
+                <div class="table-responsive">
+                    <table class="table table-hover mt-5">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $topic->id }}</th>
-                                <td>{{ $topic->name }}</td>
-                                <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $topic->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table> 
-
+                        </thead>
+                        <tbody>
+                            @foreach ($topics as $topic)
+                                <tr>
+                                    <th scope="row">{{ $topic->id }}</th>
+                                    <td>{{ $topic->name }}</td>
+                                    <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $topic->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table> 
+                </div>
             </div>
 
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
@@ -101,33 +102,35 @@
                     <button type="button" class="btn btn-outline-primary">Excel</button>
                 </div>
 
-                <table class="table table-hover mt-5">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Questão</th>
-                            <th scope="col">Tópico</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($questions as $question)
+                <div class="table-responsive">
+                    <table class="table table-hover mt-5">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $question->id }}</th>
-                                <td>{{ $question->question_text }}</td>
-                                <td>{{ optional($question->topic)->name ?? '---' }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-question') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $question->id }}">
-                                        <a href="{{ route('questao', ['id' => $question->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Questão</th>
+                                <th scope="col">Tópico</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table> 
+                        </thead>
+                        <tbody>
+                            @foreach ($questions as $question)
+                                <tr>
+                                    <th scope="row">{{ $question->id }}</th>
+                                    <td>{{ $question->question_text }}</td>
+                                    <td>{{ optional($question->topic)->name ?? '---' }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-question') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $question->id }}">
+                                            <a href="{{ route('questao', ['id' => $question->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table> 
+                </div>
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
