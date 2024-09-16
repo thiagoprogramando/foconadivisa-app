@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Support\Facades\Auth;
+
 class Subject extends Model {
 
     use HasFactory;
@@ -33,16 +35,36 @@ class Subject extends Model {
         return $this->questions()->count();
     }
 
+    public function questionResolved() {
+        
+        $userId = Auth::id();
+        
+        return $this->questions()
+            ->whereHas('answers', function($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->count();
+    }
+
+    public function questionFail() {
+
+        $userId = Auth::id();
+
+        return $this->questions()
+            ->whereHas('answers', function($query) use ($userId) {
+                $query->where('user_id', $userId)
+                      ->where('status', 2);
+            })->count();
+    }
+
     protected static function boot() {
         parent::boot();
 
         static::deleting(function ($subject) {
            
-            foreach ($subject->topics as $topic) {
-                $topic->questions()->delete();
-            }
+            $topicIds = $subject->topics()->pluck('id');
+            Question::whereIn('topic_id', $topicIds)->delete();
 
-            $subject->topics()->delete();
+            Topic::where('subject_id', $subject->id)->delete();
             $subject->plans()->detach();
         });
     }

@@ -30,16 +30,16 @@ class Notebook extends Model {
         return $this->hasMany(Answer::class, 'notebook_id');
     }
 
+    public function getAnsweredQuestionsCount() {
+        return $this->answers()->count();
+    }
+
     public function getSubjectsNames() {
         return $this->questions->load('subject')->pluck('subject.name')->unique()->toArray();
     }
 
     public function getTopicsNames() {
         return $this->questions->load('topic')->pluck('topic.name')->unique()->toArray();
-    }
-
-    public function getAnsweredQuestionsCount() {
-        return $this->answers()->count();
     }
 
     public function getPendingQuestionsCount() {
@@ -124,7 +124,6 @@ class Notebook extends Model {
 
         static::deleting(function ($notebook) {
             $notebook->questions()->detach();
-            $notebook->answers()->delete();
         });
     }
 }

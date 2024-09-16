@@ -9,10 +9,12 @@ use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Subject\QuestionController;
 use App\Http\Controllers\Subject\SubjectController;
 use App\Http\Controllers\User\FaqController;
+use App\Http\Controllers\User\NotificationController;
 use App\Http\Controllers\User\PlanController;
 use App\Http\Controllers\User\SearchController;
 use App\Http\Controllers\User\UserController;
 use App\Models\Faq;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AccessController::class, 'login'])->name('index');
@@ -37,6 +39,8 @@ Route::middleware('auth')->group(function () {
         Route::get('faq', [FaqController::class, 'faq'])->name('faq');
         Route::post('create-faq', [FaqController::class, 'createFaq'])->name('create-faq');
         Route::get('delete-faq/{id}', [FaqController::class, 'deleteFaq'])->name('delete-faq');
+        //Notification
+        Route::get('delete-notification/{id}', [NotificationController::class, 'deleteNotification'])->name('delete-notification');
 
     //Plan
     Route::get('/planos', [PlanController::class, 'plans'])->name('planos');
@@ -82,9 +86,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/cadernos', [NotebookController::class, 'notebooks'])->name('cadernos');
     Route::get('/completing-notebook/{id}', [NotebookController::class, 'completingNotebook'])->name('completing-notebook');
     Route::post('create-notebook', [NotebookController::class, 'createNotebook'])->name('create-notebook');
-    Route::post('delete-notebook', [NotebookController::class, 'deleteNotebook'])->name('delete-notebook');
     Route::post('update-notebook', [NotebookController::class, 'updateNotebook'])->name('update-notebook');
-
+    Route::post('delete-notebook', [NotebookController::class, 'deleteNotebook'])->name('delete-notebook');
+    Route::get('delete-notebook-get/{id}', [NotebookController::class, 'deleteGetNotebook'])->name('delete-notebook-get');
+    
     //Ansnwer
     Route::get('/answer/{id}', [AnswerController::class, 'answer'])->name('answer');
     Route::get('/answer-review/{answer}', [AnswerController::class, 'answerReview'])->name('answer-review');

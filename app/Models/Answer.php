@@ -12,10 +12,15 @@ class Answer extends Model {
     protected $table = "answers";
 
     protected $fillable = [
+        'user_id',
         'notebook_id',
         'question_id',
         'option_id',
     ];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 
     public function notebook() {
         return $this->belongsTo(Notebook::class);

@@ -2,6 +2,20 @@
 @section('title') Caderno: {{ $notebook->name }} @endsection
 @section('content')
 
+    <style>
+        .form-check-question {
+            font-size: 36px !important;
+        }
+
+        .form-check-label {
+            font-size: 30px !important;
+        }
+
+        .question {
+            font-size: 30px !important;
+        }
+    </style>
+
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
         <h3>{{ $notebook->name }}</h3>
         <hr>
@@ -15,7 +29,7 @@
                     <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $question->id, $unansweredQuestions->currentPage()]) }}">
                         @csrf
                         @foreach($question->options as $option)
-                            <div class="form-check-question">
+                            <div class="form-check-question mb-3">
                                 <input class="form-check-input" type="radio" name="option_id" value="{{ $option->id }}" id="option{{ $option->id }}">
                                 <label class="form-check-label" for="option{{ $option->id }}"> {{ $option->option_text }} </label>
                             </div>

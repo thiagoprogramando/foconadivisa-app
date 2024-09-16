@@ -29,7 +29,7 @@
         <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     </head>
 
-<body>
+<body @if(!empty($menu) && $menu == 1) class="toggle-sidebar" @endif>
 
     <header id="header" class="header fixed-top d-flex align-items-center">
         <div class="d-flex align-items-center justify-content-between">
@@ -70,14 +70,16 @@
                         </li>
 
                         @foreach ($notifications as $notification)
-                            <li class="notification-item">
-                                {!! $notification->typeLabel() !!}
-                                <div>
-                                    <h4>{{ $notification->title }}</h4>
-                                    <p>{{ $notification->description }}</p>
-                                    <p>{{ $notification->created_at->format('d/m/Y H:i') }}</p>
-                                </div>
-                            </li>
+                            <a href="{{ route('delete-notification', ['id' => $notification->id]) }}">
+                                <li class="notification-item">
+                                    {!! $notification->typeLabel() !!}
+                                    <div>
+                                        <h4>{{ $notification->title }}</h4>
+                                        <p>{{ $notification->description }}</p>
+                                        <p>{{ $notification->created_at->format('d/m/Y H:i') }}</p>
+                                    </div>
+                                </li>
+                            </a>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>

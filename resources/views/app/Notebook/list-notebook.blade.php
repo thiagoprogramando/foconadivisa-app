@@ -41,7 +41,7 @@
                                                     <select id="swal-subject" name="subject[]" placeholder="Escolha de conteúdos">
                                                         <option value="" selected>Escolha de conteúdos</option>
                                                         @foreach($subjects as $subject)
-                                                            <option value="{{ $subject->id }}" id-quanty="{{ $subject->countQuestions() }}">{{ $subject->name }}</option>
+                                                            <option value="{{ $subject->id }}" id-quanty="{{ $subject->countQuestions() }}" id-resolved="{{ $subject->questionResolved() }}" id-fail="{{ $subject->questionFail() }}">{{ $subject->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -66,17 +66,17 @@
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" name="remove_question_resolved" id="flexSwitchCheckChecked">
-                                                <label class="form-check-label" for="flexSwitchCheckChecked">Eliminar questão já resolvidas</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="filter" value="remove_question_resolved" id="removeQuestionResolved">
+                                                <label class="form-check-label" for="removeQuestionResolved">Eliminar questão já resolvidas</label>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" name="show_question_fail" id="flexSwitchCheckChecked">
-                                                <label class="form-check-label" for="flexSwitchCheckChecked">Mostrar apenas as que eu já errei</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="filter" value="show_question_fail" id="showQuestionFail">
+                                                <label class="form-check-label" for="showQuestionFail">Mostrar apenas as que eu já errei</label>
                                             </div>
-                                        </div>
+                                        </div>                                                                                
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
                                             <small class="btn btn-dark" id="question-count">Foram encontradas: 0 questões</small>
                                         </div>
@@ -141,7 +141,7 @@
 
     <script>
         $('.modal-swal').click(function(){
-            var subject = new TomSelect("#swal-subject",{
+            var subject = new TomSelect("#swal-subject", {
                 create: false,
                 sortField: {
                     field: "text",
@@ -151,7 +151,7 @@
                 onChange: updateQuestionCount
             });
 
-            var topic = new TomSelect("#swal-topic",{
+            var topic = new TomSelect("#swal-topic", {
                 create: false,
                 sortField: {
                     field: "text",
@@ -166,30 +166,65 @@
                 var selectedSubjects = Array.from(subject.getValue());
                 var selectedTopics = Array.from(topic.getValue());
 
-                var totalSubjectQuestions = selectedSubjects.reduce(function(total, optionId) {
+                var filter = $('input[name="filter"]:checked').val();
+
+                var totalQuestions = 0;
+
+                selectedSubjects.forEach(function(optionId) {
                     var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
                     var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
-                    return total + quanty;
-                }, 0);
+                    var resolved = parseInt(option.getAttribute('id-resolved')) || 0;
+                    var fail = parseInt(option.getAttribute('id-fail')) || 0;
 
-                var totalTopicQuestions = selectedTopics.reduce(function(total, optionId) {
+                    if (filter === 'remove_question_resolved') {
+                        totalQuestions += quanty;
+                        totalQuestions -= resolved;
+                    } else if (filter === 'show_question_fail') {
+                        totalQuestions += fail;
+                    } else {
+                        totalQuestions += quanty;
+                    }
+                });
+
+                selectedTopics.forEach(function(optionId) {
                     var option = document.querySelector('#swal-topic option[value="' + optionId + '"]');
                     var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
-                    return total + quanty;
-                }, 0);
+                    totalQuestions += quanty;
+                });
 
-                var totalQuestions = totalSubjectQuestions + totalTopicQuestions;
                 document.getElementById('question-count').textContent = `Foram encontradas: ${totalQuestions} questões`;
+
+                var inputQuestions = document.getElementById('questions');
+                inputQuestions.max = totalQuestions;
+
+                if (parseInt(inputQuestions.value) > totalQuestions) {
+                    inputQuestions.value = totalQuestions;
+                }
             }
 
-            document.getElementById('select-all-subjects').addEventListener('click', function () {
+            $('#select-all-subjects').on('click', function() {
                 var allOptions = Array.from(document.querySelectorAll('#swal-subject option')).map(option => option.value);
                 subject.setValue(allOptions);
+                updateQuestionCount();
             });
 
-            document.getElementById('select-all-topics').addEventListener('click', function () {
+            $('#select-all-topics').on('click', function() {
                 var allOptions = Array.from(document.querySelectorAll('#swal-topic option')).map(option => option.value);
                 topic.setValue(allOptions);
+                updateQuestionCount();
+            });
+
+            $('#questions').on('input', function() {
+                var inputQuestions = document.getElementById('questions');
+                var maxQuestions = parseInt(inputQuestions.max);
+
+                if (parseInt(inputQuestions.value) > maxQuestions) {
+                    inputQuestions.value = maxQuestions;
+                }
+            });
+
+            $('input[name="filter"]').on('change', function() {
+                updateQuestionCount();
             });
 
             updateQuestionCount();

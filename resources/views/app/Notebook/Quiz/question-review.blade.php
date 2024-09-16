@@ -1,6 +1,19 @@
 @extends('app.layout')
 @section('title') Caderno: {{ $answer->notebook->name }} @endsection
 @section('content')
+    <style>
+        .form-check-question {
+            font-size: 36px !important;
+        }
+
+        .form-check-label {
+            font-size: 30px !important;
+        }
+
+        .question {
+            font-size: 30px !important;
+        }
+    </style>
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
         <h3>{{ $answer->notebook->name }}</h3>

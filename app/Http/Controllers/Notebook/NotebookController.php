@@ -27,13 +27,13 @@ class NotebookController extends Controller {
         $notebook = Notebook::find($id);
         if($notebook) {
 
-            $bestPerformanceSubjects = $notebook->getBestPerformanceSubjects();
-            $worstPerformanceSubjects = $notebook->getWorstPerformanceSubjects();
-            $bestPerformanceTopics = $notebook->getBestPerformanceTopics();
-            $worstPerformanceTopics = $notebook->getWorstPerformanceTopics();
+            $bestPerformanceSubjects    = $notebook->getBestPerformanceSubjects();
+            $worstPerformanceSubjects   = $notebook->getWorstPerformanceSubjects();
+            $bestPerformanceTopics      = $notebook->getBestPerformanceTopics();
+            $worstPerformanceTopics     = $notebook->getWorstPerformanceTopics();
 
-            $selectedSubjects = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.subject_id')->filter()->toArray();
-            $selectedTopics = $selectedTopics = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.topic_id')->filter()->toArray();
+            $selectedSubjects   = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.subject_id')->filter()->toArray();
+            $selectedTopics     = $selectedTopics = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.topic_id')->filter()->toArray();
 
             $plan = $user->labelPlan;
             if ($plan) {
@@ -117,8 +117,7 @@ class NotebookController extends Controller {
         $topics     = $request->input('topics', []);
         $number     = max(1, $request->input('number'));
 
-        $removeQuestionResolved = $request->input('remove_question_resolved', false);
-        $showQuestionFail = $request->input('show_question_fail', false);
+        $filter = $request->input('filter', false);
 
         $query = Question::query();
 
@@ -138,29 +137,49 @@ class NotebookController extends Controller {
             $query->whereIn('topic_id', $topics);
         }
 
-        if ($removeQuestionResolved) {
-            $resolvedQuestions = Answer::whereHas('notebook', function($q) {
-                $q->where('user_id', Auth::id());
-            })
+        if ($filter == 'remove_question_resolved') {
+            
+            $resolvedQuestions = Answer::where('user_id', Auth::id())
             ->pluck('question_id')
             ->toArray();
             $query->whereNotIn('id', $resolvedQuestions);
         }
 
-        if ($showQuestionFail) {
+        if ($filter == 'show_question_fail') {
+            
             $failedQuestions = Answer::join('options', 'answers.option_id', '=', 'options.id')
-                                    ->where('options.is_correct', false)
-                                    ->whereHas('notebook', function($q) {
-                                        $q->where('user_id', Auth::id());
-                                    })
-                                    ->pluck('answers.question_id')
-                                    ->toArray();
+            ->where('options.is_correct', false)
+            ->where('answers.user_id', Auth::id())
+            ->pluck('answers.question_id')
+            ->toArray();
             $query->whereIn('id', $failedQuestions);
         }
 
-        $questions = $query->inRandomOrder()->take($number)->get();
-        DB::transaction(function () use ($notebook, $questions) {
-            foreach ($questions as $question) {
+        $questionsBySubject = $query->get()->groupBy('subject_id');
+        $totalQuestions = [];
+        foreach ($questionsBySubject as $subjectId => $questions) {
+            $totalQuestions[$subjectId] = $questions->count();
+        }
+
+        $questionsNeeded = $number;
+        $selectedQuestions = collect();
+
+        foreach ($totalQuestions as $subjectId => $count) {
+            if ($questionsNeeded <= 0) break;
+    
+            $questionsToSelect = min(intval($number / count($totalQuestions)), $count);
+            $selectedQuestions = $selectedQuestions->merge($questionsBySubject[$subjectId]->random($questionsToSelect));
+            $questionsNeeded -= $questionsToSelect;
+        }
+
+        if ($questionsNeeded > 0) {
+            $remainingQuestions = $query->inRandomOrder()->take($questionsNeeded)->get();
+            $selectedQuestions = $selectedQuestions->merge($remainingQuestions);
+        }
+
+        $selectedQuestions = $selectedQuestions->shuffle()->take($number);
+        DB::transaction(function () use ($notebook, $selectedQuestions) {
+            foreach ($selectedQuestions as $question) {
                 NotebookQuestion::create([
                     'notebook_id' => $notebook->id,
                     'question_id' => $question->id,
@@ -168,13 +187,13 @@ class NotebookController extends Controller {
             }
         });
 
-        if (!$questions->isEmpty()) {
+        if (!$selectedQuestions->isEmpty()) {
 
             $notification               = new Notification();
             $notification->user_id      = Auth::user()->id;
             $notification->type         = 1;
             $notification->title        = 'Caderno de questões criado!';
-            $notification->description  = 'Você já pode acessar e às questões responder do seu novo caderno!';
+            $notification->description  = 'Você já pode acessar e responder às questões responder do seu novo caderno!';
             $notification->save();
 
             return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno criado com sucesso!');
@@ -184,94 +203,109 @@ class NotebookController extends Controller {
     }
 
     public function updateNotebook(Request $request) {
-        
+
         $notebook = Notebook::find($request->id);
         if (!$notebook) {
             return redirect()->back()->with('error', 'Caderno de questões não foi encontrado!');
         }
-
+    
         $subjects = $request->input('subject', []);
         $topics = $request->input('topics', []);
         $number = max(1, $request->input('number'));
-
-        $removeQuestionResolved = $request->input('remove_question_resolved', false);
-        $showQuestionFail = $request->input('show_question_fail', false);
-
+    
+        $filter = $request->input('filter', false);
+    
         $query = Question::query();
-
+    
         if (!is_array($subjects)) {
             $subjects = [];
         }
-
+    
         if (!is_array($topics)) {
             $topics = [];
         }
-
-        if (!empty($topics) && !empty($subjects)) {
+    
+        if (!empty($topics) || !empty($subjects)) {
             $query->where(function ($q) use ($subjects, $topics) {
                 if (!empty($subjects)) {
                     $q->whereIn('subject_id', $subjects);
                 }
-        
+    
                 if (!empty($topics)) {
                     $q->orWhereIn('topic_id', $topics);
                 }
             });
         }
 
-        if ($removeQuestionResolved) {
-            $resolvedQuestions = Answer::whereHas('notebook', function($q) {
-                $q->where('user_id', Auth::id());
-            })
+        if ($filter == 'remove_question_resolved') {
+            
+            $resolvedQuestions = Answer::where('user_id', Auth::id())
             ->pluck('question_id')
             ->toArray();
             $query->whereNotIn('id', $resolvedQuestions);
         }
 
-        if ($showQuestionFail) {
+        if ($filter == 'show_question_fail') {
+            
             $failedQuestions = Answer::join('options', 'answers.option_id', '=', 'options.id')
-                                    ->where('options.is_correct', false)
-                                    ->whereHas('notebook', function($q) {
-                                        $q->where('user_id', Auth::id());
-                                    })
-                                    ->pluck('answers.question_id')
-                                    ->toArray();
+            ->where('options.is_correct', false)
+            ->where('answers.user_id', Auth::id())
+            ->pluck('answers.question_id')
+            ->toArray();
             $query->whereIn('id', $failedQuestions);
         }
 
-        $existingQuestionIds = $notebook->questions->pluck('id')->toArray();
-        if($number > $notebook->questions->count()) {
-
-            $newsQuestions = ($number - $notebook->questions->count());
-            $questions = $query->inRandomOrder()->take($newsQuestions)->get();
-
-            $filteredQuestions = $questions->filter(function($question) use ($existingQuestionIds) {
-                return !in_array($question->id, $existingQuestionIds);
-            });
-
-            DB::transaction(function () use ($notebook, $filteredQuestions) {
-                foreach ($filteredQuestions as $question) {
-                    NotebookQuestion::create([
-                        'notebook_id' => $notebook->id,
-                        'question_id' => $question->id,
-                    ]);
-                }
-            });
-
-            if (!$filteredQuestions->isEmpty()) {
-                $notebook->update([
-                    'name'      => $request->input('name'),
-                    'status'    => 0,
-                    'percetage' => 50,
-                ]);
-                return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno atualizado com sucesso!');
-            } else {
-                return redirect()->back()->with('error', 'Erro ao atualizar o caderno. Nenhuma questão disponível.');
-            }
+        $questionsBySubject = $query->get()->groupBy('subject_id');
+        $totalQuestions = [];
+        foreach ($questionsBySubject as $subjectId => $questions) {
+            $totalQuestions[$subjectId] = $questions->count();
         }
 
-        return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno atualizado com sucesso!');
-    }
+        $questionsNeeded = $number;
+        $selectedQuestions = collect();
+
+        foreach ($totalQuestions as $subjectId => $count) {
+            if ($questionsNeeded <= 0) break;
+    
+            $questionsToSelect = min(intval($number / count($totalQuestions)), $count);
+            $selectedQuestions = $selectedQuestions->merge($questionsBySubject[$subjectId]->random($questionsToSelect));
+            $questionsNeeded -= $questionsToSelect;
+        }
+
+        if ($questionsNeeded > 0) {
+            $remainingQuestions = $query->inRandomOrder()->take($questionsNeeded)->get();
+            $selectedQuestions = $selectedQuestions->merge($remainingQuestions);
+        }
+
+        $selectedQuestions = $selectedQuestions->shuffle()->take($number);
+        DB::transaction(function () use ($notebook, $selectedQuestions) {
+            foreach ($selectedQuestions as $question) {
+                NotebookQuestion::create([
+                    'notebook_id' => $notebook->id,
+                    'question_id' => $question->id,
+                ]);
+            }
+        });
+
+        if (!$selectedQuestions->isEmpty()) {
+
+            $notebook->status       = 0;
+            $notebook->name         = $request->name;
+            $notebook->percentage   = 0;
+            $notebook->save();
+
+            $notification               = new Notification();
+            $notification->user_id      = Auth::user()->id;
+            $notification->type         = 1;
+            $notification->title        = 'Caderno de atualizado!';
+            $notification->description  = 'Você já pode acessar e responder às novas questões responder do seu caderno!';
+            $notification->save();
+
+            return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno atualizado com sucesso! Foram adicionados '.$selectedQuestions->count().' novas questões');
+        } else {
+            return redirect()->back()->with('error', 'Erro ao criar o caderno. Nenhuma questão encontrada.');
+        }
+    }    
 
     public function deleteNotebook(Request $request) {
 
@@ -279,6 +313,17 @@ class NotebookController extends Controller {
         if($notebook && $notebook->delete()) {
 
             return redirect()->back()->with('success', 'Caderno excluído com sucesso!');
+        }
+
+        return redirect()->back()->with('error', 'Não foi possível excluir o caderno, tente novamente mais tarde!');
+    }
+
+    public function deleteGetNotebook($id) {
+
+        $notebook = Notebook::find($id);
+        if($notebook && $notebook->delete()) {
+
+            return redirect()->route('cadernos')->with('success', 'Caderno excluído com sucesso!');
         }
 
         return redirect()->back()->with('error', 'Não foi possível excluir o caderno, tente novamente mais tarde!');

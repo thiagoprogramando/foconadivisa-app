@@ -33,7 +33,8 @@ class Topic extends Model {
         parent::boot();
 
         static::deleting(function ($topic) {
-            $topic->questions()->delete();
+            Question::where('topic_id', $topic->id)->delete();
+            $topic->plans()->detach();
         });
     }
 }
