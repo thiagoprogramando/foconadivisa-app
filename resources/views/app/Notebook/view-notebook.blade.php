@@ -2,10 +2,7 @@
 @section('title') Caderno: {{ $notebook->name }} @endsection
 @section('content')
 
-    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
-        <h3>{{ $notebook->name }}</h3>
-        <hr>
-        
+    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">        
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Geral</button>
@@ -126,29 +123,22 @@
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <form action="{{ route('update-notebook') }}" method="POST" class="row">
-                    @csrf
+                <form class="row">
                     <input type="hidden" name="id" value="{{ $notebook->id }}">
-                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-floating mb-2">
-                            <input type="text" name="name" class="form-control" id="name" placeholder="Nome:" value="{{ $notebook->name }}">
-                            <label for="name">Nome</label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Nome:" value="{{ $notebook->name }}" readonly>
+                            <label for="name">Caderno</label>
                         </div>
                     </div>
-                    <div class="col-6 col-sm-6 col-md-3 col-lg-3">
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-floating mb-2">
-                            <input type="number" class="form-control" placeholder="N° questões (Atual)" value="{{ $notebook->questions->count() }}" disabled>
-                            <label for="questions">Questões (Atual)</label>
-                        </div>
-                    </div>
-                    <div class="col-6 col-sm-6 col-md-3 col-lg-3">
-                        <div class="form-floating mb-2">
-                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões: (novas)">
-                            <label for="questions">Questões (novas)</label>
+                            <input type="number" class="form-control" placeholder="Questões" value="{{ $notebook->questions->count() }}" readonly>
+                            <label for="questions">Questões</label>
                         </div>
                     </div>
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <select id="swal-subject" name="subject[]" multiple placeholder="Escolha de conteúdos">
+                        <select id="swal-subject-disabled" multiple placeholder="Conteúdos" disabled>
                             @foreach($subjects as $subject)
                                 <option value="{{ $subject->id }}" 
                                     id-quanty="{{ $subject->countQuestions() }}" id-resolved="{{ $subject->questionResolved() }}" id-fail="{{ $subject->questionFail() }}"
@@ -159,7 +149,7 @@
                         </select>
                     </div>
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <select id="swal-topic" name="topics[]" multiple placeholder="Escolha de tópicos (opcional)">
+                        <select id="swal-topic-disabled" multiple placeholder="Tópicos" disabled>
                             @foreach($topics as $topic)
                                 <option value="{{ $topic->id }}" 
                                     {{ in_array($topic->id, old('topics', $selectedTopics)) ? 'selected' : '' }}>
@@ -168,22 +158,96 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="filter" value="remove_question_resolved" id="removeQuestionResolved">
-                            <label class="form-check-label" for="removeQuestionResolved">Eliminar questão já resolvidas</label>
+                    <div class="col-12 col-sm-12 offset-md-8 col-md-4 offset-lg-8 col-lg-4 btn-group">
+                        <button type="button" class="btn btn-dark modal-swal" data-bs-toggle="modal" data-bs-target="#newPlan"><i class="bi bi-plus-circle"></i> Questões</button>
+                        <a href="{{ route('delete-notebook-get', ['id' => $notebook->id]) }}" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Excluir</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="newPlan" tabindex="-1" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalhes:</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('update-notebook') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $notebook->id }}">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                                <div class="form-floating mb-2">
+                                    <input type="text" name="name" class="form-control" id="name" placeholder="Nome:" value="{{ $notebook->name }}" required>
+                                    <label for="name">Nome</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                                <div class="form-floating mb-2">
+                                    <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" required>
+                                    <label for="questions">N° questões</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                                <div class="row">
+                                    <div class="col-8 col-sm-8 col-md-8">
+                                        <select id="swal-subject" name="subject[]" placeholder="Escolha de conteúdos">
+                                            <option value="" selected>Escolha de conteúdos</option>
+                                            @foreach($subjects as $subject)
+                                                <option value="{{ $subject->id }}" 
+                                                    id-quanty="{{ $subject->countQuestions() }}" id-resolved="{{ $subject->questionResolved() }}" id-fail="{{ $subject->questionFail() }}"
+                                                    {{ in_array($subject->id, old('subject', $selectedSubjects)) ? 'selected' : '' }}>
+                                                    {{ $subject->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-4 col-sm-4 col-md-4">
+                                        <button type="button" id="select-all-subjects" title="Selecionar todos os conteúdos" class="btn btn-block btn-dark"><i class="bi bi-ui-checks"></i> Todos</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                                <div class="row">
+                                    <div class="col-8 col-sm-8 col-md-8">
+                                        <select id="swal-topic" name="topics[]" placeholder="Escolha de tópicos (opcional)">
+                                            <option value="" selected>Escolha de tópicos (opcional)</option>
+                                            @foreach($topics as $topic)
+                                                <option value="{{ $topic->id }}" 
+                                                    {{ in_array($topic->id, old('topics', $selectedTopics)) ? 'selected' : '' }}>
+                                                    {{ $topic->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-4 col-sm-4 col-md-4">
+                                        <button type="button" id="select-all-topics" title="Selecionar todos os tópicos" class="btn btn-block btn-dark"><i class="bi bi-ui-checks"></i> Todos</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="filter" value="remove_question_resolved" id="removeQuestionResolved">
+                                    <label class="form-check-label" for="removeQuestionResolved">Eliminar questão já resolvidas</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="filter" value="show_question_fail" id="showQuestionFail">
+                                    <label class="form-check-label" for="showQuestionFail">Mostrar apenas as que eu já errei</label>
+                                </div>
+                            </div>                                                                                
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
+                                <small class="btn btn-dark" id="question-count">Foram encontradas: 0 questões</small>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="filter" value="show_question_fail" id="showQuestionFail">
-                            <label class="form-check-label" for="showQuestionFail">Mostrar apenas as que eu já errei</label>
-                        </div>
-                    </div>  
-                    <div class="col-12 col-sm-12 col-md-8 offset-md-4 col-lg-8 offset-lg-4 btn-group">
-                        <button type="button" class="btn btn-dark" id="question-count">Foram encontradas: 0 questões</button>
-                        <a href="{{ route('delete-notebook-get', ['id' => $notebook->id]) }}" class="btn btn-outline-danger">Excluir Caderno</a>
-                        <button type="submit" class="btn btn-dark">Atualizar Caderno</button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-outline-success">Criar Caderno</button>
                     </div>
                 </form>
             </div>
@@ -191,97 +255,117 @@
     </div>
 
     <script>
+        new TomSelect("#swal-subject-disabled", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            maxItems: 1000,
+        });
+
+        new TomSelect("#swal-topic-disabled", {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            },
+            maxItems: 1000,
+        });
+
         $('#result').click(function (){
             $('#contact-tab').click();
         });
 
-        var subject = new TomSelect("#swal-subject", {
-            create: false,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            },
-            maxItems: 1000,
-            onChange: updateQuestionCount
-        });
+        $('.modal-swal').click(function(){
 
-        var topic = new TomSelect("#swal-topic", {
-            create: false,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            },
-            maxItems: 1000,
-            onChange: updateQuestionCount
-        });
+            var subject = new TomSelect("#swal-subject", {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                maxItems: 1000,
+                onChange: updateQuestionCount
+            });
 
-        function updateQuestionCount() {
+            var topic = new TomSelect("#swal-topic", {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                maxItems: 1000,
+                onChange: updateQuestionCount
+            });
 
-            var selectedSubjects = Array.from(subject.getValue());
-            var selectedTopics = Array.from(topic.getValue());
+            function updateQuestionCount() {
 
-            var filter = $('input[name="filter"]:checked').val();
+                var selectedSubjects = Array.from(subject.getValue());
+                var selectedTopics = Array.from(topic.getValue());
 
-            var totalQuestions = 0;
+                var filter = $('input[name="filter"]:checked').val();
 
-            selectedSubjects.forEach(function(optionId) {
-                var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
-                var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
-                var resolved = parseInt(option.getAttribute('id-resolved')) || 0;
-                var fail = parseInt(option.getAttribute('id-fail')) || 0;
+                var totalQuestions = 0;
 
-                if (filter === 'remove_question_resolved') {
+                selectedSubjects.forEach(function(optionId) {
+                    var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
+                    var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
+                    var resolved = parseInt(option.getAttribute('id-resolved')) || 0;
+                    var fail = parseInt(option.getAttribute('id-fail')) || 0;
+
+                    if (filter === 'remove_question_resolved') {
+                        totalQuestions += quanty;
+                        totalQuestions -= resolved;
+                    } else if (filter === 'show_question_fail') {
+                        totalQuestions += fail;
+                    } else {
+                        totalQuestions += quanty;
+                    }
+                });
+
+                selectedTopics.forEach(function(optionId) {
+                    var option = document.querySelector('#swal-topic option[value="' + optionId + '"]');
+                    var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
                     totalQuestions += quanty;
-                    totalQuestions -= resolved;
-                } else if (filter === 'show_question_fail') {
-                    totalQuestions += fail;
-                } else {
-                    totalQuestions += quanty;
+                });
+
+                document.getElementById('question-count').textContent = `Foram encontradas: ${totalQuestions} questões`;
+
+                var inputQuestions = document.getElementById('questions');
+                inputQuestions.max = totalQuestions;
+
+                if (parseInt(inputQuestions.value) > totalQuestions) {
+                    inputQuestions.value = totalQuestions;
+                }
+            }
+
+            $('#select-all-subjects').on('click', function() {
+                var allOptions = Array.from(document.querySelectorAll('#swal-subject option')).map(option => option.value);
+                subject.setValue(allOptions);
+                updateQuestionCount();
+            });
+
+            $('#select-all-topics').on('click', function() {
+                var allOptions = Array.from(document.querySelectorAll('#swal-topic option')).map(option => option.value);
+                topic.setValue(allOptions);
+                updateQuestionCount();
+            });
+
+            $('#questions').on('input', function() {
+                var inputQuestions = document.getElementById('questions');
+                var maxQuestions = parseInt(inputQuestions.max);
+
+                if (parseInt(inputQuestions.value) > maxQuestions) {
+                    inputQuestions.value = maxQuestions;
                 }
             });
 
-            selectedTopics.forEach(function(optionId) {
-                var option = document.querySelector('#swal-topic option[value="' + optionId + '"]');
-                var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
-                totalQuestions += quanty;
-            });
-
-            document.getElementById('questions').value = `${totalQuestions}`;
-            document.getElementById('question-count').textContent = `Foram encontradas: ${totalQuestions} questões`;
-
-            var inputQuestions = document.getElementById('questions');
-            inputQuestions.max = totalQuestions;
-
-            if (parseInt(inputQuestions.value) > totalQuestions) {
-                inputQuestions.value = totalQuestions;
-            }
-        }
-
-        $('#select-all-subjects').on('click', function() {
-            var allOptions = Array.from(document.querySelectorAll('#swal-subject option')).map(option => option.value);
-            subject.setValue(allOptions);
-            updateQuestionCount();
-        });
-
-        $('#select-all-topics').on('click', function() {
-            var allOptions = Array.from(document.querySelectorAll('#swal-topic option')).map(option => option.value);
-            topic.setValue(allOptions);
-            updateQuestionCount();
-        });
-
-        $('#questions').on('input', function() {
-            var inputQuestions = document.getElementById('questions');
-            var maxQuestions = parseInt(inputQuestions.max);
-
-            if (parseInt(inputQuestions.value) > maxQuestions) {
-                inputQuestions.value = maxQuestions;
-            }
-            });
-
             $('input[name="filter"]').on('change', function() {
+                updateQuestionCount();
+            });
+
             updateQuestionCount();
         });
-
-        updateQuestionCount();
     </script>
 @endsection

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Notebook;
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Notebook;
+use App\Models\NotebookQuestion;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,8 +16,13 @@ class AnswerController extends Controller {
 
         $notebook = Notebook::find($notebook);
         if($notebook) {
-            $answeredQuestionIds = $notebook->answers->pluck('question_id')->toArray();
-            $unansweredQuestions = $notebook->questions()->whereNotIn('questions.id', $answeredQuestionIds)->paginate(1);
+
+            $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)
+            ->pluck('notebook_question_id')
+            ->toArray();
+            $unansweredQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
+            ->whereNotIn('id', $answeredNotebookQuestionIds)
+            ->paginate(1);
             $menu                = 1;
 
             return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'menu'));
@@ -27,6 +33,7 @@ class AnswerController extends Controller {
 
         $answer = Answer::find($answer);
         if($answer) {
+            
             return view('app.Notebook.Quiz.question-review', [
                 'answer' => $answer,
                 'menu'   => 1
@@ -50,12 +57,13 @@ class AnswerController extends Controller {
             return redirect()->back()->with('error', 'A questão não foi encontrada.');
         }
     
-        $answer                 = new Answer();
-        $answer->user_id        = Auth::id();
-        $answer->notebook_id    = $notebook->id;
-        $answer->question_id    = $questionId;
-        $answer->option_id      = $request->input('option_id');
-        $answer->status         = $this->calculateAnswerStatus($question, $request->input('option_id'));
+        $answer                         = new Answer();
+        $answer->user_id                = Auth::id();
+        $answer->notebook_id            = $notebook->id;
+        $answer->notebook_question_id   = $request->notebook_question_id;
+        $answer->question_id            = $questionId;
+        $answer->option_id              = $request->input('option_id');
+        $answer->status                 = $this->calculateAnswerStatus($question, $request->input('option_id'));
         $answer->save();
     
         return redirect()->route('answer-review', [$answer->id]);

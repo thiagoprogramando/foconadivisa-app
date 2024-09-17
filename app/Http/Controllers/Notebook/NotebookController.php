@@ -208,7 +208,14 @@ class NotebookController extends Controller {
         if (!$notebook) {
             return redirect()->back()->with('error', 'Caderno de questões não foi encontrado!');
         }
-    
+
+        $notebook->status       = 0;
+        $notebook->name         = $request->name;
+        $notebook->percentage   = 0;
+        if (!$notebook->save()) {
+            return redirect()->back()->with('error', 'Caderno de questões não foi encontrado!');
+        }
+        
         $subjects = $request->input('subject', []);
         $topics = $request->input('topics', []);
         $number = max(1, $request->input('number'));
@@ -288,11 +295,6 @@ class NotebookController extends Controller {
         });
 
         if (!$selectedQuestions->isEmpty()) {
-
-            $notebook->status       = 0;
-            $notebook->name         = $request->name;
-            $notebook->percentage   = 0;
-            $notebook->save();
 
             $notification               = new Notification();
             $notification->user_id      = Auth::user()->id;

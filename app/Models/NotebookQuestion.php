@@ -23,4 +23,8 @@ class NotebookQuestion extends Model {
     public function question() {
         return $this->belongsTo(Question::class, 'question_id');
     }
+
+    public function answers() {
+        return $this->hasMany(Answer::class, 'notebook_question_id');
+    }  
 }

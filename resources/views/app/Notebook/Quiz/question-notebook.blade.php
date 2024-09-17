@@ -20,30 +20,43 @@
         <h3>{{ $notebook->name }}</h3>
         <hr>
         
-        @if($unansweredQuestions->count() > 0)
-            @foreach($unansweredQuestions as $question)
-                <h6 class="card-title question">
-                    Questão: <b>{{ $question->question_text }}</b>
-                </h6>
-                <div class="card-body">
-                    <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $question->id, $unansweredQuestions->currentPage()]) }}">
-                        @csrf
-                        @foreach($question->options as $option)
-                            <div class="form-check-question mb-3">
-                                <input class="form-check-input" type="radio" name="option_id" value="{{ $option->id }}" id="option{{ $option->id }}">
-                                <label class="form-check-label" for="option{{ $option->id }}"> {{ $option->option_text }} </label>
+        @if($unansweredQuestions && $unansweredQuestions->count() > 0)
+            @foreach($unansweredQuestions as $notebookQuestion)
+                @php
+                    $question = $notebookQuestion->question;
+                @endphp
+
+                @if($question)
+                    <h6 class="card-title question">
+                        Questão: <b>{{ $question->question_text }}</b>
+                    </h6>
+
+                    <div class="card-body">
+                        <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $notebookQuestion->id, $unansweredQuestions->currentPage()]) }}">
+                            @csrf
+
+                            <input type="hidden" name="notebook_question_id" value="{{ $notebookQuestion->id }}">
+
+                            @foreach($question->options as $option)
+                                <div class="form-check-question mb-3">
+                                    <input class="form-check-input" type="radio" name="option_id" value="{{ $option->id }}" id="option{{ $option->id }}">
+                                    <label class="form-check-label" for="option{{ $option->id }}"> {{ $option->option_text }} </label>
+                                </div>
+                            @endforeach
+
+                            <hr class="mt-5">
+                            <div class="text-center">
+                                <div class="btn-group w-50 mt-3" role="group">
+                                    <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-dark">SAIR</a>
+                                    <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                    <button type="submit" class="btn btn-outline-success">RESPONDER</button>
+                                </div>
                             </div>
-                        @endforeach
-                        <hr class="mt-5">
-                        <div class="text-center">
-                            <div class="btn-group w-50 mt-3" role="group">
-                                <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-dark">SAIR</a>
-                                <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a>
-                                <button type="submit" class="btn btn-outline-success">RESPONDER</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                        </form>
+                    </div>
+                @else
+                    <p>Questão não encontrada.</p>
+                @endif
             @endforeach
 
             <div class="mt-3 text-center">
