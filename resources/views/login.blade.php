@@ -63,8 +63,10 @@
                           <div class="col-12">
                             <button class="btn btn-dark w-100" type="submit">Acessar</button>
                           </div>
-                          <div class="col-12">
+                          <div class="col-12 text-center">
                             <p class="small mb-0">Não tem uma conta? <a href="{{ route('cadastro') }}">Criar Conta</a></p>
+                            ou
+                            <p class="small mb-0"><a href="{{ route('recuperar-conta') }}">Recuperar conta</a></p>
                           </div>
                       </form>
                     </div>

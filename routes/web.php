@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Access\AccessController;
+use App\Http\Controllers\Access\ForgoutController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\Gateway\AssasController;
 use App\Http\Controllers\Notebook\AnswerController;
@@ -13,8 +14,7 @@ use App\Http\Controllers\User\NotificationController;
 use App\Http\Controllers\User\PlanController;
 use App\Http\Controllers\User\SearchController;
 use App\Http\Controllers\User\UserController;
-use App\Models\Faq;
-use Illuminate\Notifications\Notification;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AccessController::class, 'login'])->name('index');
@@ -23,6 +23,10 @@ Route::post('logon', [AccessController::class, 'logon'])->name('logon');
 
 Route::get('/cadastro', [AccessController::class, 'register'])->name('cadastro');
 Route::post('registrer', [AccessController::class, 'registrer'])->name('registrer');
+
+Route::get('/recuperar-conta/{code?}', [ForgoutController::class, 'forgout'])->name('recuperar-conta');
+Route::post('/send-recovery', [ForgoutController::class, 'sendRecovery'])->name('send-recovery');
+Route::post('/recovery-password', [ForgoutController::class, 'recoveryPassword'])->name('recovery-password');
 
 Route::middleware('auth')->group(function () {
 
