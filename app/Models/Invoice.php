@@ -20,6 +20,10 @@ class Invoice extends Model {
         'payment_status',
     ];
 
+    public function labelUser() {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function labelPlan() {
         return $this->belongsTo(Plan::class, 'plan_id');
     }

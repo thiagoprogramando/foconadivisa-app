@@ -177,49 +177,51 @@
                 <a class="nav-link collapsed" href="{{ route('pagamentos') }}"><i class="bi bi-arrow-down-square-fill"></i><span>Pendências</span></a>
             </li>
 
-            <li class="nav-heading">Gestão</li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#components-materiais" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-bookmarks"></i><span>Conteúdo</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="components-materiais" class="nav-content collapse " data-bs-parent="#sidebar-materiais">
-                    <li>
-                        <a href="{{ route('conteudos') }}">
-                            <i class="bi bi-circle"></i><span>Conteúdos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('topicos') }}">
-                            <i class="bi bi-circle"></i><span>Tópicos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="components-accordion.html">
-                            <i class="bi bi-circle"></i><span>Relatórios</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#components-cart" data-bs-toggle="collapse" href="#">
-                <i class="bi bi-cart-check"></i><span>Planos</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="components-cart" class="nav-content collapse " data-bs-parent="#sidebar-cart">
-                    <li>
-                        <a href="{{ route('planos') }}">
-                            <i class="bi bi-circle"></i><span>Planos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="components-accordion.html">
-                            <i class="bi bi-circle"></i><span>Vendas</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('usuarios') }}"><i class="bi bi-person"></i><span>Usuários</span></a>
-            </li>
+            @if(Auth::user()->type == 1)
+                <li class="nav-heading">Gestão</li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#components-materiais" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-bookmarks"></i><span>Conteúdo</span><i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="components-materiais" class="nav-content collapse " data-bs-parent="#sidebar-materiais">
+                        <li>
+                            <a href="{{ route('conteudos') }}">
+                                <i class="bi bi-circle"></i><span>Conteúdos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('topicos') }}">
+                                <i class="bi bi-circle"></i><span>Tópicos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="components-accordion.html">
+                                <i class="bi bi-circle"></i><span>Relatórios</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" data-bs-target="#components-cart" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-cart-check"></i><span>Planos</span><i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <ul id="components-cart" class="nav-content collapse " data-bs-parent="#sidebar-cart">
+                        <li>
+                            <a href="{{ route('planos') }}">
+                                <i class="bi bi-circle"></i><span>Planos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('vendas') }}">
+                                <i class="bi bi-circle"></i><span>Vendas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="{{ route('usuarios') }}"><i class="bi bi-person"></i><span>Usuários</span></a>
+                </li>
+            @endif
         </ul>
     </aside>
 

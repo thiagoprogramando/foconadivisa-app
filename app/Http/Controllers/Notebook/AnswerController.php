@@ -15,15 +15,11 @@ class AnswerController extends Controller {
     public function answer($notebook) {
 
         $notebook = Notebook::find($notebook);
-        if($notebook) {
+        if ($notebook) {
 
-            $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)
-            ->pluck('notebook_question_id')
-            ->toArray();
-            $unansweredQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
-            ->whereNotIn('id', $answeredNotebookQuestionIds)
-            ->paginate(1);
-            $menu                = 1;
+            $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)->pluck('notebook_question_id')->toArray();
+            $unansweredQuestions = NotebookQuestion::where('notebook_id', $notebook->id)->whereNotIn('id', $answeredNotebookQuestionIds)->paginate(1);
+            $menu = 1;
 
             return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'menu'));
         }
@@ -41,31 +37,37 @@ class AnswerController extends Controller {
         }
     }
 
-    public function submitAnswerAndNext(Request $request, $notebookId, $questionId, $page) {
+    public function submitAnswerAndNext(Request $request, $notebookId, $notebookQuestionId, $page) {
         
         $request->validate([
             'option_id' => 'required|exists:options,id',
+            'notebook_question_id' => 'required|exists:notebook_questions,id',
         ]);
-    
+
         $notebook = Notebook::find($notebookId);
-        if(!$notebook) {
+        if (!$notebook) {
             return redirect()->back()->with('error', 'O caderno não foi encontrado.');
         }
 
-        $question = Question::find($questionId);
+        $notebookQuestion = NotebookQuestion::find($notebookQuestionId);
+        if (!$notebookQuestion) {
+            return redirect()->back()->with('error', 'A questão não foi encontrada.');
+        }
+
+        $question = $notebookQuestion->question;
         if (!$question) {
             return redirect()->back()->with('error', 'A questão não foi encontrada.');
         }
-    
-        $answer                         = new Answer();
-        $answer->user_id                = Auth::id();
-        $answer->notebook_id            = $notebook->id;
-        $answer->notebook_question_id   = $request->notebook_question_id;
-        $answer->question_id            = $questionId;
-        $answer->option_id              = $request->input('option_id');
-        $answer->status                 = $this->calculateAnswerStatus($question, $request->input('option_id'));
+
+        $answer = new Answer();
+        $answer->user_id = Auth::id();
+        $answer->notebook_id = $notebook->id;
+        $answer->notebook_question_id = $notebookQuestion->id; 
+        $answer->question_id = $question->id;
+        $answer->option_id = $request->input('option_id');
+        $answer->status = $this->calculateAnswerStatus($question, $request->input('option_id'));
         $answer->save();
-    
+
         return redirect()->route('answer-review', [$answer->id]);
     }
 

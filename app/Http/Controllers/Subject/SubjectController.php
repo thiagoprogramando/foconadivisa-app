@@ -34,8 +34,8 @@ class SubjectController extends Controller {
         $subject = Subject::find($id);
         if($subject) {
 
-            $topics = Topic::where('subject_id', $subject->id)->paginate(30);
-            $questions = Question::where('subject_id', $subject->id)->orderBy('topic_id', 'asc')->paginate(30);
+            $topics     = Subject::where('subject_id', $subject->id)->where('type', 2)->get();
+            $questions  = Question::where('subject_id', $subject->id)->orderBy('subject_id', 'asc')->get();
             return view('app.Subject.view-subject', [
                 'subject'   => $subject,
                 'topics'    => $topics,
@@ -87,7 +87,7 @@ class SubjectController extends Controller {
 
     public function topics(Request $request) {
 
-        $query = Topic::orderBy('name', 'desc');
+        $query = Subject::orderBy('name', 'desc')->where('type', 2);
 
         if(!empty($request->name)) {
             $query->where('name', 'like', '%' . $request->name . '%');
@@ -97,7 +97,7 @@ class SubjectController extends Controller {
             $query->where('description', 'like', '%' . $request->description . '%');
         }
 
-        $topics = $query->paginate(30);
+        $topics = $query->get();
 
         return view('app.Subject.list-topic', [
             'topics' => $topics
@@ -106,10 +106,11 @@ class SubjectController extends Controller {
 
     public function createTopic(Request $request) {
 
-        $topic              = new Topic();
+        $topic              = new Subject();
         $topic->name        = $request->name;
         $topic->description = $request->description;
         $topic->subject_id  = $request->subject_id;
+        $topic->type        = 2;
         if($topic->save()) {
 
             return redirect()->back()->with('success', 'Tópico criado com sucesso!');
@@ -120,7 +121,7 @@ class SubjectController extends Controller {
 
     public function deleteTopic(Request $request) {
 
-        $topic = Topic::find($request->id);
+        $topic = Subject::find($request->id);
         if($topic && $topic->delete()) {
 
             return redirect()->back()->with('success', 'Tópico excluído com sucesso!');

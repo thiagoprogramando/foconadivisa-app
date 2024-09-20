@@ -68,8 +68,8 @@ class PlanController extends Controller {
         $plan = Plan::find($id);
         if($plan) {
 
-            $subjects            = Subject::orderBy('name', 'desc')->get();
-            $topics              = Topic::orderBy('name', 'desc')->get();
+            $subjects            = Subject::where('type', 1)->orderBy('name', 'desc')->get();
+            $topics              = Subject::where('type', 2)->orderBy('name', 'desc')->get();
             $associatedSubjects  = $plan->subjects;
             $associatedTopics    = $plan->topics;
             
@@ -77,8 +77,8 @@ class PlanController extends Controller {
             return view('app.User.view-plan', [
                 'plan'               => $plan,
                 'subjects'           => $subjects,
-                'topics'             => $topics,
                 'associatedSubjects' => $associatedSubjects,
+                'topics'             => $topics,
                 'associatedTopics'   => $associatedTopics 
             ]);
         }
@@ -92,31 +92,61 @@ class PlanController extends Controller {
         if(!$plan) {
             return redirect()->back()->with('error', 'Ops! Não foram encontrados dados do plano.');
         }
-
+    
         if (!is_array($request->subject_id) || empty($request->subject_id)) {
             return redirect()->back()->with('error', 'Nenhum conteúdo foi selecionado.');
         }
-
+    
         $subjectsToAdd = [];
         foreach ($request->subject_id as $subjectId) {
+            
             $subject = Subject::find($subjectId);
-            if ($subject && !$plan->subjects()->where('subject_id', $subject->id)->exists()) {
+            if ($subject && !$plan->subjects()->where('plan_subject.subject_id', $subject->id)->exists()) {
                 $subjectsToAdd[] = $subject->id;
             }
         }
-
+    
         if (count($subjectsToAdd) > 0) {
             $plan->subjects()->attach($subjectsToAdd);
             return redirect()->back()->with('success', 'Conteúdos adicionados ao Plano com sucesso!');
         }
-
+    
         return redirect()->back()->with('info', 'Todos os conteúdos selecionados já estão associados ao Plano.');
-    }
+    }    
+
+    public function addTopic(Request $request) {
+
+        $plan = Plan::find($request->plan_id);
+        if(!$plan) {
+            return redirect()->back()->with('error', 'Ops! Não foram encontrados dados do plano.');
+        }
+    
+        if (!is_array($request->subject_id) || empty($request->subject_id)) {
+            return redirect()->back()->with('error', 'Nenhum Tópico foi selecionado.');
+        }
+    
+        $subjectsToAdd = [];
+        foreach ($request->subject_id as $subjectId) {
+            
+            $subject = Subject::find($subjectId);
+            if ($subject && !$plan->topics()->where('plan_subject.subject_id', $subject->id)->exists()) {
+                $subjectsToAdd[] = $subject->id;
+            }
+        }
+    
+        if (count($subjectsToAdd) > 0) {
+            $plan->subjects()->attach($subjectsToAdd);
+            return redirect()->back()->with('success', 'Tópicos adicionados ao Plano com sucesso!');
+        }
+    
+        return redirect()->back()->with('info', 'Todos os Tópicos selecionados já estão associados ao Plano.');
+    }    
 
     public function deleteSubjectAssociate(Request $request) {
 
         $plan = Plan::findOrFail($request->plan_id);
-        if ($plan->subjects()->where('subject_id', $request->subject_id)->exists()) {
+        if ($plan->subjects()->where('plan_subject.subject_id', $request->subject_id)->exists()) {
+
             $plan->subjects()->detach($request->subject_id);
             return redirect()->back()->with('success', 'Conteúdo removido do Plano com sucesso!');
         }
@@ -124,46 +154,15 @@ class PlanController extends Controller {
         return redirect()->back()->with('error', 'Ops! Não foi encontrada a associação entre o Plano e o Conteúdo.');
     }
 
-    public function addTopic(Request $request) {
-        
-        $plan = Plan::find($request->plan_id);
-        if (!$plan) {
-            return redirect()->back()->with('error', 'Ops! Não foram encontrados dados do plano.');
-        }
-
-        if (!is_array($request->topic_id) || empty($request->topic_id)) {
-            return redirect()->back()->with('error', 'Nenhum tópico foi selecionado.');
-        }
-
-        $topicsToAdd = [];
-        foreach ($request->topic_id as $topicId) {
-            $topic = Topic::find($topicId);
-            if ($topic && !$plan->topics()->where('topic_id', $topic->id)->exists()) {
-                $topicsToAdd[] = $topic->id;
-            }
-        }
-
-        if (count($topicsToAdd) > 0) {
-            $plan->topics()->attach($topicsToAdd);
-            return redirect()->back()->with('success', 'Tópicos adicionados ao Plano com sucesso!');
-        }
-
-        return redirect()->back()->with('info', 'Todos os tópicos selecionados já estão associados ao Plano.');
-    }
-
     public function deleteTopicAssociate(Request $request) {
 
-        $plan = Plan::find($request->plan_id);
-        if ($plan) {
+        $plan = Plan::findOrFail($request->plan_id);
+        if ($plan->topics()->where('plan_subject.subject_id', $request->subject_id)->exists()) {
 
-            if ($plan->topics()->where('topic_id', $request->topic_id)->exists()) {
-                $plan->topics()->detach($request->topic_id);
-                return redirect()->back()->with('success', 'Tópico desassociado do Plano com sucesso!');
-            }
-            
-            return redirect()->back()->with('error', 'Ops! Este tópico não está associado ao plano.');
+            $plan->topics()->detach($request->subject_id);
+            return redirect()->back()->with('success', 'Tópico removido do Plano com sucesso!');
         }
-        
-        return redirect()->back()->with('error', 'Ops! Não foram encontrados dados do plano.');
+
+        return redirect()->back()->with('error', 'Ops! Não foi encontrada a associação entre o Plano e o Conteúdo.');
     }
 }

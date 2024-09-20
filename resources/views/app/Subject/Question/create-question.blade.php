@@ -21,7 +21,7 @@
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
                         <select id="swal-topic" name="topic_id" placeholder="Escolha um tópico (Opcional)">
-                            <option value="{{ $question->topic_id }}" selected>@if(empty($question->topic_id)) Escolha um tópico (Opcional) @else {{ $question->topic->name }} @endif</option>
+                            <option value="{{ $question->subject_id }}" selected>@if(empty($question->subject_id)) Escolha um tópico (Opcional) @else {{ $question->topic->name }} @endif</option>
                             @foreach($topics as $topic)
                                 <option value="{{ $topic->id }}">{{ $topic->name }}</option>
                             @endforeach
@@ -61,7 +61,7 @@
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <button type="submit" class="btn btn-outline-success w-100 mb-2">Salvar</button>
-                        <a href="{{ route('create-question', ['subject' => $subject->id]) }}" class="btn btn-outline-primary w-100 mb-2">Nova Questão</a>
+                        <a href="{{ route('create-question', ['topic' => $subject->id]) }}" class="btn btn-outline-primary w-100 mb-2">Nova Questão</a>
                     </div>
                 </form>
             </div>

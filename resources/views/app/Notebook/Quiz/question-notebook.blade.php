@@ -4,15 +4,15 @@
 
     <style>
         .form-check-question {
-            font-size: 36px !important;
+            font-size: 18px !important;
         }
 
         .form-check-label {
-            font-size: 30px !important;
+            font-size: 18px !important;
         }
 
         .question {
-            font-size: 30px !important;
+            font-size: 18px !important;
         }
     </style>
 
@@ -34,7 +34,7 @@
                     <div class="card-body">
                         <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $notebookQuestion->id, $unansweredQuestions->currentPage()]) }}">
                             @csrf
-
+                            
                             <input type="hidden" name="notebook_question_id" value="{{ $notebookQuestion->id }}">
 
                             @foreach($question->options as $option)

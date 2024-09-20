@@ -24,11 +24,11 @@ class Answer extends Model {
     }
 
     public function notebook() {
-        return $this->belongsTo(Notebook::class);
+        return $this->belongsTo(Notebook::class, 'notebook_id');
     }
 
     public function question() {
-        return $this->belongsTo(Question::class);
+        return $this->belongsTo(Question::class, 'question_id');
     }
 
     public function option() {

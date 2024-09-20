@@ -35,11 +35,17 @@ class Notebook extends Model {
     }
 
     public function getSubjectsNames() {
-        return $this->questions->load('subject')->pluck('subject.name')->unique()->toArray();
+        return $this->questions->load('subject')
+                ->filter(function($question) {
+                    return $question->subject->type === 1;
+                })->pluck('subject.name')->unique()->toArray();
     }
 
     public function getTopicsNames() {
-        return $this->questions->load('topic')->pluck('topic.name')->unique()->toArray();
+        return $this->questions->load('subject')
+                ->filter(function($question) {
+                    return $question->subject->type === 2;
+                })->pluck('subject.name')->unique()->toArray();
     }
 
     public function getPendingQuestionsCount() {
@@ -119,11 +125,11 @@ class Notebook extends Model {
         return implode(' ', $results);
     }
 
-    protected static function boot() {
-        parent::boot();
+    // protected static function boot() {
+    //     parent::boot();
 
-        static::deleting(function ($notebook) {
-            $notebook->questions()->detach();
-        });
-    }
+    //     static::deleting(function ($notebook) {
+    //         $notebook->questions()->detach();
+    //     });
+    // }
 }

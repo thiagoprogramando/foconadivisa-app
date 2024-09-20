@@ -7,6 +7,7 @@ use App\Http\Controllers\Gateway\AssasController;
 use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
 use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\Sale\InvoiceController;
 use App\Http\Controllers\Subject\QuestionController;
 use App\Http\Controllers\Subject\SubjectController;
 use App\Http\Controllers\User\FaqController;
@@ -56,6 +57,11 @@ Route::middleware('auth')->group(function () {
     //Payment
     Route::get('/pagamentos', [PaymentController::class, 'payments'])->name('pagamentos');
     Route::post('/delete-payment', [PaymentController::class, 'deletePayment'])->name('delete-payment');
+
+    //Sale
+    Route::get('/vendas', [InvoiceController::class, 'invoices'])->name('vendas');
+    Route::get('/confirm-invoice/{id}', [InvoiceController::class, 'confirmPayment'])->name('confirm-invoice');
+    Route::post('/delete-invoice', [InvoiceController::class, 'deletePayment'])->name('delete-invoice');
     
     //Subject
     Route::get('/conteudos', [SubjectController::class, 'subjects'])->name('conteudos');
@@ -80,7 +86,7 @@ Route::middleware('auth')->group(function () {
 
     //Question & Option
     Route::get('questao/{id}', [QuestionController::class, 'viewQuestion'])->name('questao');
-    Route::get('create-question/{subject?}/{topic?}', [QuestionController::class, 'createQuestion'])->name('create-question');
+    Route::get('create-question/{topic}', [QuestionController::class, 'createQuestion'])->name('create-question');
     Route::post('update-question', [QuestionController::class, 'updateQuestion'])->name('update-question');
     Route::post('delete-question', [QuestionController::class, 'deleteQuestion'])->name('delete-question');
     Route::get('delete-question-answer/{notebook}/{question}', [QuestionController::class, 'deleteQuestionAnswer'])->name('delete-question-answer');

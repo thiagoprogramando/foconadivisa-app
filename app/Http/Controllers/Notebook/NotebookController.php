@@ -134,24 +134,20 @@ class NotebookController extends Controller {
         }
 
         if (!empty($topics)) {
-            $query->whereIn('topic_id', $topics);
+            $query->whereIn('subject_id', $topics);
         }
 
         if ($filter == 'remove_question_resolved') {
             
-            $resolvedQuestions = Answer::where('user_id', Auth::id())
-            ->pluck('question_id')
-            ->toArray();
+            $resolvedQuestions = Answer::where('user_id', Auth::id())->pluck('question_id')->toArray();
             $query->whereNotIn('id', $resolvedQuestions);
         }
 
         if ($filter == 'show_question_fail') {
             
             $failedQuestions = Answer::join('options', 'answers.option_id', '=', 'options.id')
-            ->where('options.is_correct', false)
-            ->where('answers.user_id', Auth::id())
-            ->pluck('answers.question_id')
-            ->toArray();
+            ->where('options.is_correct', false)->where('answers.user_id', Auth::id())
+            ->pluck('answers.question_id')->toArray();
             $query->whereIn('id', $failedQuestions);
         }
 

@@ -97,7 +97,7 @@
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
                 
                 <div class="btn-group mt-3" role="group" aria-label="Basic outlined example">
-                    <a href="{{ route('create-question', ['subject' => $subject->id]) }}" target="_blank" class="btn btn-outline-primary">Nova Questão</a>
+                    <a href="{{ route('create-question', ['topic' => $subject->id]) }}" target="_blank" class="btn btn-outline-primary">Nova Questão</a>
                     <button type="button" class="btn btn-outline-primary">PDF</button>
                     <button type="button" class="btn btn-outline-primary">Excel</button>
                 </div>

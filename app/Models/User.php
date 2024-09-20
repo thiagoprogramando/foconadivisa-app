@@ -55,7 +55,7 @@ class User extends Authenticatable {
     public function typeLabel() {
         switch ($this->type) {
             case 0:
-                return 'Usuário';
+                return 'Cliente';
                 break;
             case 1:
                 return 'Administrador';
@@ -64,7 +64,7 @@ class User extends Authenticatable {
                 return 'Colaborador';
                 break;
             default:
-                return 'Usuário';
+                return 'Cliente';
         }
     }
 }

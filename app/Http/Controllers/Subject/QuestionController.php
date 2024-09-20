@@ -16,24 +16,23 @@ class QuestionController extends Controller {
 
         $question   = Question::find($id);
         $subject    = Subject::find($question->subject_id);
-        $topics     = Topic::where('subject_id', $question->subject_id)->get();
+        $topics     = Subject::where('type', 2)->get();
         $options = $question->options->keyBy('option_number');
 
         return view('app.Subject.Question.create-question', [
+            'subject'   => $subject,
             'topics'    => $topics,
             'question'  => $question,
-            'subject'   => $subject,
             'options'   => $options,
         ]);
     }
 
-    public function createQuestion($subject = null, $topic = null) {
+    public function createQuestion($topic) {
 
         $question               = new Question();
-        $question->subject_id   = $subject;
-        $question->topic_id     = $topic;
-        
+        $question->subject_id   = $topic;
         if($question->save()) {
+
             return redirect()->route('questao', ['id' => $question->id])->with('success', 'Preencha todos os dados da questão!');
         }
 

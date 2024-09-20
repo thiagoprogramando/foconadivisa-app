@@ -116,7 +116,7 @@
                     @csrf
                     <input type="hidden" name="plan_id" value="{{ $plan->id }}">
                     <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                        <select id="swal-topic" name="topic_id[]" placeholder="Escolha um tópico">
+                        <select id="swal-topic" name="subject_id[]" placeholder="Escolha um tópico">
                             <option value="" selected>Escolha um tópico</option>
                             @foreach($topics as $topic)
                                 <option value="{{ $topic->id }}">{{ $topic->name }}</option>
@@ -150,7 +150,7 @@
                                     <td class="text-center">
                                         <form action="{{ route('delete-topic-associate') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf
-                                            <input type="hidden" name="topic_id" value="{{ $associate->id }}">
+                                            <input type="hidden" name="subject_id" value="{{ $associate->id }}">
                                             <input type="hidden" name="plan_id" value="{{ $plan->id }}">
                                             <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
                                         </form>

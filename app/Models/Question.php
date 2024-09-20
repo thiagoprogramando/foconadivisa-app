@@ -13,7 +13,6 @@ class Question extends Model {
 
     protected $fillable = [
         'subject_id',
-        'topic_id',
         'question_text',
         'comment_text',
     ];
@@ -23,7 +22,7 @@ class Question extends Model {
     }
 
     public function topic() {
-        return $this->belongsTo(Topic::class);
+        return $this->belongsTo(Subject::class, 'subject_id')->where('type', 2);
     }
 
     public function options() {

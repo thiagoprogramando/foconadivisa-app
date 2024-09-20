@@ -3,15 +3,15 @@
 @section('content')
     <style>
         .form-check-question {
-            font-size: 36px !important;
+            font-size: 18px !important;
         }
 
         .form-check-label {
-            font-size: 30px !important;
+            font-size: 18px !important;
         }
 
         .question {
-            font-size: 30px !important;
+            font-size: 18px !important;
         }
     </style>
 
