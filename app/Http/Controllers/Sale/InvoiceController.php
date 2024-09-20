@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Sale;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Notification;
+use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -29,9 +30,10 @@ class InvoiceController extends Controller {
         $invoices = $query->get();
 
         return view('app.Sale.list-invoice', [
-            'invoices' => $invoices
+            'invoices' => $invoices,
+            'users'    => User::all(),
+            'plans'    => Plan::all()
         ]);
-
     }
 
     public function confirmPayment($id) {

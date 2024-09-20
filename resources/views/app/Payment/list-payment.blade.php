@@ -8,7 +8,9 @@
             <div class="col-12">
                 <div class="btn-group" role="group">
                     <a href="{{ route('planos') }}" class="btn btn-dark">Planos</a>
-                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
+                    <a href="{{ route('invoice-excel', request()->query()) }}" class="btn btn-outline-dark" title="Excel">
+                        <i class="bi bi-file-earmark-excel"></i> Excel
+                    </a> 
                     <a href="{{ route('pagamentos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
             </div>

@@ -24,9 +24,7 @@
             <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
                 
                 <div class="btn-group mt-3" role="group" aria-label="Basic outlined example">
-                    <button type="button" data-bs-toggle="modal" data-bs-target="#newTopic" class="btn btn-outline-primary">Novo Tópico</button>
-                    <button type="button" class="btn btn-outline-primary">PDF</button>
-                    <button type="button" class="btn btn-outline-primary">Excel</button>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#newTopic" class="btn btn-dark">Novo Tópico</button>
                 </div>
 
                 <div class="modal fade" id="newTopic" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -97,9 +95,7 @@
             <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
                 
                 <div class="btn-group mt-3" role="group" aria-label="Basic outlined example">
-                    <a href="{{ route('create-question', ['topic' => $subject->id]) }}" target="_blank" class="btn btn-outline-primary">Nova Questão</a>
-                    <button type="button" class="btn btn-outline-primary">PDF</button>
-                    <button type="button" class="btn btn-outline-primary">Excel</button>
+                    <a href="{{ route('create-question', ['topic' => $subject->id]) }}" target="_blank" class="btn btn-dark">Nova Questão</a>
                 </div>
 
                 <div class="table-responsive">

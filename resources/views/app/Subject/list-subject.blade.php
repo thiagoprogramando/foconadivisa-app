@@ -8,7 +8,6 @@
             <div class="col-12">
                 <div class="btn-group" role="group">
                     <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-dark">Novo Conteúdo</button>
-                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
                     <a href="{{ route('conteudos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
 

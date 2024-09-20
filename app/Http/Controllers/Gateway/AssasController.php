@@ -32,6 +32,16 @@ class AssasController extends Controller {
             return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
         }
 
+        if($plan->value == 0 || $plan->value < 1) {
+            $user       = User::find(Auth::user()->id);
+            $user->plan = $plan->id;
+            if($user->save()) {
+                return redirect()->back()->with('success', 'Plano alterado com sucesso!');
+            }
+
+            return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
+        }
+
         $dataInvoice = $this->createInvoice($customer, $plan->value, $plan->name);
         if($dataInvoice == null) {
             return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');

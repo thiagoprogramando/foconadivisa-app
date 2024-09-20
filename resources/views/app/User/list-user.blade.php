@@ -7,8 +7,50 @@
 
             <div class="col-12">
                 <div class="btn-group" role="group">
-                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
+                    <button type="button" title="Filtros" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <i class="bi bi-filter-circle"></i> Filtros
+                    </button>
+                    <a href="{{ route('user-excel', request()->query()) }}" class="btn btn-outline-dark" title="Excel">
+                        <i class="bi bi-file-earmark-excel"></i> Excel
+                    </a>                    
                     <a href="{{ route('usuarios') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+
+                <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true" style="display: none;">
+                    <div class="modal-dialog">
+                        <form action="{{ route('usuarios') }}" method="GET" class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Pesquisar</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="form-floating mb-2">
+                                            <input type="text" name="name" class="form-control" id="name" placeholder="Nome:">
+                                            <label for="name">Nome</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="form-floating mb-2">
+                                            <input type="email" name="email" class="form-control" id="email" placeholder="Email:">
+                                            <label for="email">Email</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                        <div class="form-floating mb-2">
+                                            <input type="number" name="cpfcnpj" class="form-control" id="cpfcnpj" placeholder="CPF ou CNPJ:">
+                                            <label for="cpfcnpj">CPF ou CNPJ</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                                <button type="submit" class="btn btn-dark">Pesquisar</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
 

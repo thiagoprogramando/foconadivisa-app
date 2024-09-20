@@ -10,9 +10,19 @@ use Illuminate\Http\Request;
 
 class PlanController extends Controller {
     
-    public function plans() {
+    public function plans(Request $request) {
 
-        $plans = Plan::orderBy('value', 'asc')->get();
+        $query = Plan::orderBy('value', 'asc');
+
+        if(!empty($request->name)) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
+        if(!empty($request->description)) {
+            $query->where('description', 'like', '%' . $request->description . '%');
+        }
+
+        $plans = $query->paginate(30);
         return view('app.User.plan', [
             'plans' => $plans
         ]);

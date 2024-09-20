@@ -3,6 +3,7 @@
 use App\Http\Controllers\Access\AccessController;
 use App\Http\Controllers\Access\ForgoutController;
 use App\Http\Controllers\AppController;
+use App\Http\Controllers\Data\ExcelController;
 use App\Http\Controllers\Gateway\AssasController;
 use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
@@ -38,14 +39,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/usuarios', [UserController::class, 'users'])->name('usuarios');
     Route::post('update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
     Route::post('delete-user', [UserController::class, 'deleteUser'])->name('delete-user');
-        //Search
-        Route::get('search', [SearchController::class, 'search'])->name('search');
-        //Faq
-        Route::get('faq', [FaqController::class, 'faq'])->name('faq');
-        Route::post('create-faq', [FaqController::class, 'createFaq'])->name('create-faq');
-        Route::get('delete-faq/{id}', [FaqController::class, 'deleteFaq'])->name('delete-faq');
-        //Notification
-        Route::get('delete-notification/{id}', [NotificationController::class, 'deleteNotification'])->name('delete-notification');
+    //Search
+    Route::get('search', [SearchController::class, 'search'])->name('search');
+    //Faq
+    Route::get('faq', [FaqController::class, 'faq'])->name('faq');
+    Route::post('create-faq', [FaqController::class, 'createFaq'])->name('create-faq');
+    Route::get('delete-faq/{id}', [FaqController::class, 'deleteFaq'])->name('delete-faq');
+    //Notification
+    Route::get('delete-notification/{id}', [NotificationController::class, 'deleteNotification'])->name('delete-notification');
 
     //Plan
     Route::get('/planos', [PlanController::class, 'plans'])->name('planos');
@@ -104,6 +105,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/answer/{id}', [AnswerController::class, 'answer'])->name('answer');
     Route::get('/answer-review/{answer}', [AnswerController::class, 'answerReview'])->name('answer-review');
     Route::post('/notebooks/{notebook}/questions/{question}/{page}/submit', [AnswerController::class, 'submitAnswerAndNext'])->name('submitAnswerAndNext');
+
+    //Excel
+    Route::get('/user-excel', [ExcelController::class, 'userExcel'])->name('user-excel');
+    Route::get('/plan-excel', [ExcelController::class, 'planExcel'])->name('plan-excel');
+    Route::get('/invoice-excel', [ExcelController::class, 'invoiceExcel'])->name('invoice-excel');
     
 });
 
