@@ -124,12 +124,4 @@ class Notebook extends Model {
 
         return implode(' ', $results);
     }
-
-    // protected static function boot() {
-    //     parent::boot();
-
-    //     static::deleting(function ($notebook) {
-    //         $notebook->questions()->detach();
-    //     });
-    // }
 }
