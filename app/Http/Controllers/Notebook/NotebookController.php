@@ -33,7 +33,7 @@ class NotebookController extends Controller {
             $worstPerformanceTopics     = $notebook->getWorstPerformanceTopics();
 
             $selectedSubjects   = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.subject_id')->filter()->toArray();
-            $selectedTopics     = $selectedTopics = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.topic_id')->filter()->toArray();
+            $selectedTopics     = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.subject_id')->filter()->toArray();
 
             $plan = $user->labelPlan;
             if ($plan) {
@@ -129,12 +129,16 @@ class NotebookController extends Controller {
             $topics = [];
         }
 
-        if (!empty($subjects)) {
-            $query->whereIn('subject_id', $subjects);
-        }
-
-        if (!empty($topics)) {
-            $query->whereIn('subject_id', $topics);
+        if (!empty($subjects) || !empty($topics)) {
+            $query->where(function($q) use ($subjects, $topics) {
+                if (!empty($subjects)) {
+                    $q->whereIn('subject_id', $subjects);
+                }
+        
+                if (!empty($topics)) {
+                    $q->orWhereIn('subject_id', $topics);
+                }
+            });
         }
 
         if ($filter == 'remove_question_resolved') {
@@ -235,7 +239,7 @@ class NotebookController extends Controller {
                 }
     
                 if (!empty($topics)) {
-                    $q->orWhereIn('topic_id', $topics);
+                    $q->orWhereIn('subject_id', $topics);
                 }
             });
         }

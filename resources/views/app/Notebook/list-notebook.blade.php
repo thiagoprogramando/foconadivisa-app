@@ -55,7 +55,7 @@
                                                     <select id="swal-topic" name="topics[]" placeholder="Escolha de tópicos (opcional)">
                                                         <option value="" selected>Escolha de tópicos (opcional)</option>
                                                         @foreach($topics as $topic)
-                                                            <option value="{{ $topic->id }}" id-quanty="{{ $topic->countQuestions() }}">{{ $topic->name }}</option>
+                                                            <option value="{{ $topic->id }}" id-quanty="{{ $topic->countQuestions() }}" id-resolved="{{ $topic->questionResolved() }}" id-fail="{{ $topic->questionFail() }}">{{ $topic->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -188,7 +188,17 @@
                 selectedTopics.forEach(function(optionId) {
                     var option = document.querySelector('#swal-topic option[value="' + optionId + '"]');
                     var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
-                    totalQuestions += quanty;
+                    var resolved = parseInt(option.getAttribute('id-resolved')) || 0;
+                    var fail = parseInt(option.getAttribute('id-fail')) || 0;
+
+                    if (filter === 'remove_question_resolved') {
+                        totalQuestions += quanty;
+                        totalQuestions -= resolved;
+                    } else if (filter === 'show_question_fail') {
+                        totalQuestions += fail;
+                    } else {
+                        totalQuestions += quanty;
+                    }
                 });
 
                 document.getElementById('question-count').textContent = `Foram encontradas: ${totalQuestions} questões`;

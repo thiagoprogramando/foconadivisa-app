@@ -13,6 +13,7 @@
                                 <th scope="col">#</th>
                                 <th scope="col">Nome</th>
                                 <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Questões</th>
                                 <th scope="col" class="text-center">Opções</th>
                             </tr>
                         </thead>
@@ -22,6 +23,7 @@
                                     <th scope="row">{{ $topic->id }}</th>
                                     <td>{{ $topic->name }}</td>
                                     <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
+                                    <td class="text-center">{{ $topic->countQuestions() }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf

@@ -66,7 +66,7 @@
                                     <td>{{ $subject->name }}</td>
                                     <td>{{ strlen($subject->description) > 60 ? substr($subject->description, 0, 60) . '...' : $subject->description }}</td>
                                     <td class="text-center">{{ $subject->countTopics() }}</td>
-                                    <td class="text-center">{{ $subject->countQuestions() }}</td>
+                                    <td class="text-center">{{ $subject->countQuestions() + $subject->countTopicQuestions() }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('delete-subject') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf

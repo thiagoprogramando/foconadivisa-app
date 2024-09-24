@@ -23,6 +23,10 @@ class Subject extends Model {
         return $this->hasMany(Question::class);
     }
 
+    public function countQuestions() {
+        return $this->questions()->count();
+    }
+
     public function topics() {
         return $this->hasMany(Subject::class, 'subject_id')->where('type', 2);
     }
@@ -31,8 +35,10 @@ class Subject extends Model {
         return $this->topics()->count();
     }
 
-    public function countQuestions() {
-        return $this->questions()->count();
+    public function countTopicQuestions() {
+        return $this->hasManyThrough(Question::class, Subject::class, 'subject_id', 'subject_id')
+                ->where('type', 2)
+                ->count();
     }
 
     public function questionResolved() {
