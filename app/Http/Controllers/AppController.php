@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Answer;
-use App\Models\Notebook;
 
 use Carbon\Carbon;
 
@@ -16,23 +15,19 @@ class AppController extends Controller {
 
         $userId = Auth::id();
     
-        $notebooks = Notebook::where('user_id', $userId)->pluck('id');
+        $errorsCount = Answer::where('user_id', $userId)
+            ->where('status', 2)
+            ->count();
     
-        $errorsCount = Answer::whereIn('notebook_id', $notebooks)
-            ->whereHas('option', function($query) {
-                $query->where('is_correct', false);
-            })->count();
-    
-        $correctCount = Answer::whereIn('notebook_id', $notebooks)
-            ->whereHas('option', function($query) {
-                $query->where('is_correct', true);
-            })->count();
+        $correctCount = Answer::where('user_id', $userId)
+            ->where('status', 1)
+            ->count();
 
-        $questionsTodayCount = Answer::whereIn('notebook_id', $notebooks)
+        $questionsTodayCount = Answer::where('user_id', $userId)
             ->whereDate('created_at', Carbon::today())
             ->count();
 
-        $totalQuestionsCount = Answer::whereIn('notebook_id', $notebooks)->count();
+        $totalQuestionsCount = Answer::where('user_id', $userId)->count();
 
         $totalQuestions = Auth::user()->meta ?: 100;
         $progress = ($totalQuestionsCount / $totalQuestions) * 100;
