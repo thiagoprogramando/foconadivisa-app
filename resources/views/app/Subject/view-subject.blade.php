@@ -82,6 +82,7 @@
                                         <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $topic->id }}">
+                                            <a title="Detalhes" href="{{ route('conteudo', ['id' => $topic->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
                                             <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
                                         </form>
                                     </td>

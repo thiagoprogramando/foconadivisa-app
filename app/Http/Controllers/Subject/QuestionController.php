@@ -45,7 +45,7 @@ class QuestionController extends Controller {
         if ($question) {
 
             $question->question_text    = $request->input('question_text');
-            $question->topic_id         = $request->input('topic_id');
+            $question->subject_id       = $request->input('subject_id');
             $question->comment_text     = $request->input('comment_text');
             if ($question->save()) {
                 

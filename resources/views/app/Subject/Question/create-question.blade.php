@@ -20,8 +20,8 @@
                     <input type="hidden" name="id" value="{{ $question->id }}">
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <select id="swal-topic" name="topic_id" placeholder="Escolha um tópico (Opcional)">
-                            <option value="{{ $question->subject_id }}" selected>@if(empty($question->subject_id)) Escolha um tópico (Opcional) @else {{ $question->topic->name }} @endif</option>
+                        <select id="swal-topic" name="subject_id" placeholder="Escolha um tópico (Opcional)">
+                            <option value="{{ $question->subject_id }}" selected>@if(empty($question->subject_id)) Escolha um tópico (Opcional) @else {{ $question->topic->name ?? '---' }} @endif</option>
                             @foreach($topics as $topic)
                                 <option value="{{ $topic->id }}">{{ $topic->name }}</option>
                             @endforeach

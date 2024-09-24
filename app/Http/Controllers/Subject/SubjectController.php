@@ -12,7 +12,7 @@ class SubjectController extends Controller {
     
     public function subjects(Request $request) {
 
-        $query = Subject::orderBy('name', 'desc');
+        $query = Subject::orderBy('name', 'desc')->where('type', 1);
 
         if(!empty($request->name)) {
             $query->where('name', 'like', '%' . $request->name . '%');

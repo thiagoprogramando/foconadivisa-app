@@ -27,7 +27,7 @@
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $topic->id }}">
                                             <button title="Excluir Tópico" type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                            <a title="Detalhes" href="{{ route('conteudo', ['id' => $topic->subject_id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
+                                            <a title="Detalhes" href="{{ route('conteudo', ['id' => $topic->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
                                             <a title="Nova Questão associada ao Tópico" href="{{ route('create-question', ['topic' => $topic->id]) }}" class="btn btn-dark"><i class="bi bi-plus-circle"></i></a>
                                         </form>
                                     </td>
