@@ -9,7 +9,7 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('notebooks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
             $table->string('name')->nullable();
             $table->integer('percentage')->default(0);
             $table->integer('status')->default(0); // 0 - is pendent 1 - is completed
