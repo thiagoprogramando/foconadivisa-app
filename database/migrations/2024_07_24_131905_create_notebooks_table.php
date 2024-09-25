@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->integer('percentage')->default(0);
             $table->integer('status')->default(0); // 0 - is pendent 1 - is completed
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

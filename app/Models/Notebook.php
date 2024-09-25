@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Notebook extends Model {
 
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = "notebooks";
 
@@ -17,6 +18,10 @@ class Notebook extends Model {
         'percentage', 
         'status'
     ];
+
+    public function notebookQuestions() {
+        return $this->hasMany(NotebookQuestion::class);
+    }
 
     public function questions() {
         return $this->belongsToMany(Question::class, 'notebook_questions', 'notebook_id', 'question_id');

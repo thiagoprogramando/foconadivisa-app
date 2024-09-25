@@ -310,15 +310,18 @@ class NotebookController extends Controller {
     }    
 
     public function deleteNotebook(Request $request) {
-
+        
         $notebook = Notebook::find($request->id);
-        if($notebook && $notebook->delete()) {
-
-            return redirect()->back()->with('success', 'Caderno excluído com sucesso!');
+        if($notebook) {
+            if ($notebook->delete()) {
+                return redirect()->back()->with('success', 'Caderno movido para a lixeira com sucesso!');
+            }
+    
+            return redirect()->back()->with('error', 'Não foi possível mover o caderno para a lixeira, tente novamente mais tarde!');
         }
-
-        return redirect()->back()->with('error', 'Não foi possível excluir o caderno, tente novamente mais tarde!');
-    }
+    
+        return redirect()->back()->with('error', 'Não foi possível mover o caderno para a lixeira, tente novamente mais tarde!');
+    }    
 
     public function deleteGetNotebook($id) {
 
