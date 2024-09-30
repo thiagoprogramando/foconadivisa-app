@@ -33,6 +33,25 @@ class Question extends Model {
         return $this->hasMany(Answer::class);
     }
 
+    public function responsesCount($userId) {
+        return $this->answers()->where('user_id', $userId)->count();
+    }
+
+    public function correctCount($userId) {
+        return $this->answers()
+            ->where('user_id', $userId)
+            ->whereHas('option', function ($query) {
+                $query->where('is_correct', true);
+            })
+            ->count();
+    }
+
+    public function wrogCount($userId) {
+        $totalResponses = $this->responsesCount($userId);
+        $correctAnswers = $this->correctCount($userId);
+        return $totalResponses - $correctAnswers;
+    }
+
     protected static function boot() {
         parent::boot();
 

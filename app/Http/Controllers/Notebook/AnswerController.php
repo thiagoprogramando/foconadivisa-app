@@ -18,10 +18,27 @@ class AnswerController extends Controller {
         if ($notebook) {
 
             $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)->pluck('notebook_question_id')->toArray();
-            $unansweredQuestions = NotebookQuestion::where('notebook_id', $notebook->id)->whereNotIn('id', $answeredNotebookQuestionIds)->paginate(1);
+
+            $totalQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
+            ->whereHas('question', function ($query) {
+                $query->whereNotNull('question_text')
+                      ->where('question_text', '!=', '');
+            })
+            ->count();
+
+            $unansweredQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
+            ->whereNotIn('id', $answeredNotebookQuestionIds)
+            ->whereHas('question', function ($query) {
+                $query->whereNotNull('question_text')
+                      ->where('question_text', '!=', '');
+            })
+            ->paginate(1);
+
+            $nextQuestionNumber = count($answeredNotebookQuestionIds) + 1;
+
             $menu = 1;
 
-            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'menu'));
+            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber', 'menu'));
         }
     }
 

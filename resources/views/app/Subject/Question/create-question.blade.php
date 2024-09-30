@@ -30,7 +30,7 @@
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-floating mb-2">
-                            <textarea name="question_text" class="form-control" placeholder="Questão" id="question" style="height: 100px;">{{ $question->question_text }}</textarea>
+                            <textarea name="question_text" class="form-control" placeholder="Questão" id="question" style="height: 200px;">{{ $question->question_text }}</textarea>
                             <label for="question">Questão:</label>
                         </div>
                     </div>

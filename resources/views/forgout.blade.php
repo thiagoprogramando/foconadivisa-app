@@ -71,7 +71,7 @@
                                             <form action="{{ route('recovery-password') }}" method="POST" class="row g-3">
                                                 @csrf
                                                 <div class="col-12">
-                                                    <input type="text" name="code" class="form-control" placeholder="Código" value="{{ $code }}" required>
+                                                    <input type="hidden" name="code" class="form-control" placeholder="Código" value="{{ $code }}" required>
                                                 </div>
                                                 <div class="col-12">
                                                     <input type="text" name="password" class="form-control" placeholder="Nova senha:" required>

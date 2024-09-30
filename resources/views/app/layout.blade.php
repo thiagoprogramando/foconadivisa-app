@@ -45,7 +45,10 @@
                 <input type="text" name="search" placeholder="Pesquisar" title="Pesquisar">
                 <button type="submit" title="Pesquisar"><i class="bi bi-search"></i></button>
             </form>
+            
         </div>
+
+        <a href="{{ route('cadernos') }}" class="btn btn-dark d-none d-sm-block">RESOLVER QUESTÕES</a>
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
@@ -146,6 +149,13 @@
                 <a class="nav-link " href="{{ route('app') }}">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('cadernos') }}">
+                    <i class="bi bi-pen"></i>
+                    <span>Resolver Questões</span>
                 </a>
             </li>
 
