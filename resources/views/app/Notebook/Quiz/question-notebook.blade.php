@@ -14,6 +14,71 @@
         .question {
             font-size: 18px !important;
         }
+
+        .custom-radio {
+            position: relative;
+            margin-right: 20px; /* Ajusta a distância entre o input e o label */
+        }
+
+        .custom-radio::before {
+            content: attr(data-letter); /* Insere a letra antes do input */
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #000;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: black;
+            z-index: 1;
+        }
+
+        .option-letter {
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .option-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-radio {
+            position: relative;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .custom-radio::before {
+            content: attr(data-letter);
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 1px solid #000;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: black;
+            z-index: 1;
+        }
+
+        .form-check-label {
+            flex: 1;
+            word-wrap: break-word;
+            margin-left: 10px;
+        }
     </style>
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-3">
@@ -21,6 +86,7 @@
             @foreach($unansweredQuestions as $index => $notebookQuestion)
                 @php
                     $question = $notebookQuestion->question;
+                    $letters = ['A', 'B', 'C', 'D', 'E'];
                 @endphp
 
                 @if($question)
@@ -30,8 +96,8 @@
                                 <h6 class="question">
                                     Questão: {{ $nextQuestionNumber }} de {{ $totalQuestions }}
                                 </h6>
-                                <small><b>Conteúdo/Tópico:</b></small> <br>
-                                <small><b>{{ $question->responsesCount(Auth::user()->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $question->correctCount(Auth::user()->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $question->wrogCount(Auth::user()->id) }}</b> Erros</small>
+                                <small><b>Conteúdo/Tópico:</b> {{ $question->subject->name }}</small> <br>
+                                <small><b>{{ $question->responsesCount(Auth::user()->id, $notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $question->correctCount(Auth::user()->id, $notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $question->wrogCount(Auth::user()->id, $notebook->id) }}</b> Erros</small>
                             </div>
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                                 <div class="btn-group">
@@ -61,17 +127,19 @@
                     </div>
 
                     <div class="card-body">
-                        <h6 class="card-title p-2 mt-2 mb-3 bg-light"> <a href="">#{{ $question->id }}</a> {{ $question->question_text }} </h6>
+                        <h6 class="card-title p-2 mt-2 mb-3 bg-light"> <a href="">#{{ $question->id }}</a> {!! $question->question_text !!} </h6>
                         <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $notebookQuestion->id, $unansweredQuestions->currentPage()]) }}">
                             @csrf
                             
                             <input type="hidden" name="notebook_question_id" value="{{ $notebookQuestion->id }}">
 
                             <div class="bg-light p-3">
-                                @foreach($question->options as $option)
-                                    <div class="form-check-questio form-question option-container mb-3 p-2">
-                                        <input class="form-check-input" type="radio" name="option_id" value="{{ $option->id }}" id="option{{ $option->id }}" onclick="selectOption(this)">
-                                        <label class="form-check-label" for="option{{ $option->id }}"> {{ $option->option_text }} </label>
+                                @foreach($question->options as $index => $option)
+                                    <div class="form-check-questio form-question option-container mb-3 p-2 w-100">
+                                        <input class="form-check-input" type="radio" name="option_id" value="{{ $option->id }}" id="option{{ $option->id }}" onclick="selectOption(this)" ondblclick="toggleStrikethroughOption(this)">
+                                        <label class="form-check-label" for="option{{ $option->id }}">
+                                            <span class="option-letter" ondblclick="toggleStrikethroughOption(this)">{{ $letters[$index] }})</span> {{ $option->option_text }}
+                                        </label>
                                     </div>
                                 @endforeach
                             </div>
@@ -130,5 +198,23 @@
             const selectedContainer = selected.parentElement;
             selectedContainer.classList.add('selected-option');
         }
+
+        function toggleStrikethroughOption(element) {
+            const label = element.tagName === 'LABEL' 
+                ? element 
+                : element.nextElementSibling;
+
+            if (label.style.textDecoration === 'line-through') {
+                label.style.textDecoration = 'none';
+            } else {
+                label.style.textDecoration = 'line-through';
+            }
+        }
+
+        document.querySelectorAll('.form-check-label').forEach((label) => {
+            label.addEventListener('dblclick', function() {
+                toggleStrikethroughOption(this);
+            });
+        });
     </script>
 @endsection

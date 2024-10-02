@@ -18,8 +18,6 @@
         <link href="{{ asset('template/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
         <link href="{{ asset('template/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
         <link href="{{ asset('template/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('template/vendor/quill/quill.snow.css') }}" rel="stylesheet">
-        <link href="{{ asset('template/vendor/quill/quill.bubble.css') }}" rel="stylesheet">
         <link href="{{ asset('template/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
         <link href="{{ asset('template/vendor/simple-datatables/style.css') }}" rel="stylesheet">
         <link href="{{ asset('template/css/style.css') }}" rel="stylesheet">
@@ -268,9 +266,7 @@
     <script src="{{ asset('template/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('template/vendor/chart.js/chart.umd.js') }}"></script>
     <script src="{{ asset('template/vendor/echarts/echarts.min.js') }}"></script>
-    <script src="{{ asset('template/vendor/quill/quill.min.js') }}"></script>
-    <script src="{{ asset('template/vendor/simple-datatables/simple-datatables.js') }}"></script>
-
+    <script src="{{ asset('template/vendor/tinymce/tinymce.min.js') }}"></script>
     <script src="{{ asset('template/js/main.js') }}"></script>
     <script src="{{ asset('template/js/jquery.js') }}"></script>
     <script src="{{ asset('template/js/sweetalert.js') }}"></script>

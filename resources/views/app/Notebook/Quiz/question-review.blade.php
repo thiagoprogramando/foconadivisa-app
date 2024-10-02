@@ -20,7 +20,7 @@
         <hr>
         
         <h6 class="card-title question">
-            Questão: <b>{{ $answer->question->question_text }}</b>
+            Questão: <b>{!! $answer->question->question_text !!}</b>
         </h6>
         <div class="card-body">
             @foreach($answer->question->options as $option)

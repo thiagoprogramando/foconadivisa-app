@@ -29,10 +29,9 @@
                     </div>
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                        <div class="form-floating mb-2">
-                            <textarea name="question_text" class="form-control" placeholder="Questão" id="question" style="height: 200px;">{{ $question->question_text }}</textarea>
-                            <label for="question">Questão:</label>
-                        </div>
+                        <textarea name="question_text" class="tinymce-editor" placeholder="Questão" id="question">
+                            {{ $question->question_text }}
+                        </textarea>
                     </div>
                     @php
                         $letters = ['A', 'B', 'C', 'D', 'E'];
@@ -54,8 +53,9 @@
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-floating mb-2">
-                            <textarea name="comment_text" class="form-control" placeholder="Comentários do Professor:" id="comment_text" style="height: 100px;">{{ $question->comment_text }}</textarea>
-                            <label for="comment_text">Comentários do Professor:</label>
+                            <textarea name="comment_text" class="tinymce-editor" placeholder="Comentários do Professor:" id="comment_text">
+                                {{ $question->comment_text }}
+                            </textarea>
                         </div>
                     </div>
 

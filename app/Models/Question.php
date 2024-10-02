@@ -33,24 +33,35 @@ class Question extends Model {
         return $this->hasMany(Answer::class);
     }
 
-    public function responsesCount($userId) {
-        return $this->answers()->where('user_id', $userId)->count();
+    public function responsesCount($userId, $notebookId = null) {
+        $query = $this->answers()->where('user_id', $userId);
+    
+        if ($notebookId) {
+            $query->where('notebook_id', $notebookId);
+        }
+    
+        return $query->count();
     }
-
-    public function correctCount($userId) {
-        return $this->answers()
-            ->where('user_id', $userId)
+    
+    public function correctCount($userId, $notebookId = null) {
+        $query = $this->answers()->where('user_id', $userId)
             ->whereHas('option', function ($query) {
                 $query->where('is_correct', true);
-            })
-            ->count();
+            });
+    
+        if ($notebookId) {
+            $query->where('notebook_id', $notebookId);
+        }
+    
+        return $query->count();
     }
-
-    public function wrogCount($userId) {
-        $totalResponses = $this->responsesCount($userId);
-        $correctAnswers = $this->correctCount($userId);
+    
+    public function wrogCount($userId, $notebookId = null) {
+        $totalResponses = $this->responsesCount($userId, $notebookId);
+        $correctAnswers = $this->correctCount($userId, $notebookId);
+    
         return $totalResponses - $correctAnswers;
-    }
+    }    
 
     protected static function boot() {
         parent::boot();
