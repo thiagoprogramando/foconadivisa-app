@@ -94,6 +94,7 @@ Route::middleware('auth')->group(function () {
 
     //Notebook
     Route::get('/caderno/{id}', [NotebookController::class, 'notebook'])->name('caderno');
+    Route::get('/caderno-filtros/{id}', [NotebookController::class, 'notebookFilter'])->name('caderno-filtros');
     Route::get('/cadernos', [NotebookController::class, 'notebooks'])->name('cadernos');
     Route::get('/completing-notebook/{id}', [NotebookController::class, 'completingNotebook'])->name('completing-notebook');
     Route::post('create-notebook', [NotebookController::class, 'createNotebook'])->name('create-notebook');

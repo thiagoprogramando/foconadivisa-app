@@ -8,7 +8,7 @@
             <div class="col-12">
                 <div class="btn-group" role="group">
                     <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-dark modal-swal">Novo Caderno</button>
-                    <a href="{{ route('usuarios') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    <a href="{{ route('cadernos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
 
                 <div class="modal fade" id="newPlan" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -40,7 +40,7 @@
                                                     <select id="swal-subject" name="subject[]" placeholder="Escolha de conteúdos">
                                                         <option value="" selected>Escolha de conteúdos</option>
                                                         @foreach($subjects as $subject)
-                                                            <option value="{{ $subject->id }}" id-quanty="{{ $subject->countQuestions() }}" id-resolved="{{ $subject->questionResolved() }}" id-fail="{{ $subject->questionFail() }}">{{ $subject->name }}</option>
+                                                            <option value="{{ $subject->id }}" data-topics='@json($subject->topics)' id-quanty="{{ $subject->totalQuestions() }}" id-resolved="{{ $subject->questionResolved() }}" id-fail="{{ $subject->questionFail() }}">{{ $subject->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -53,11 +53,8 @@
                                             <div class="row">
                                                 <div class="col-8 col-sm-8 col-md-8">
                                                     <select id="swal-topic" name="topics[]" placeholder="Escolha de tópicos (opcional)">
-                                                        <option value="" selected>Escolha de tópicos (opcional)</option>
-                                                        @foreach($topics as $topic)
-                                                            <option value="{{ $topic->id }}" id-quanty="{{ $topic->countQuestions() }}" id-resolved="{{ $topic->questionResolved() }}" id-fail="{{ $topic->questionFail() }}">{{ $topic->name }}</option>
-                                                        @endforeach
-                                                    </select>
+                                                        <option value="">Escolha de tópicos (opcional)</option>
+                                                    </select> 
                                                 </div>
                                                 <div class="col-4 col-sm-4 col-md-4">
                                                     <button type="button" id="select-all-topics" title="Selecionar todos os tópicos" class="btn btn-block btn-dark"><i class="bi bi-ui-checks"></i> Todos</button>
@@ -107,8 +104,8 @@
                         <tbody>
                             @foreach ($notebooks as $notebook)
                                 <tr>
-                                    <th scope="row">{{ $notebook->id }}</th>
-                                    <td>{{ $notebook->name }}</td>
+                                    <th scope="row"><a href="{{ route('caderno', ['id' => $notebook->id]) }}"> {{ $notebook->id }} </a></th>
+                                    <td><a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="text-dark"> {{ $notebook->name }} </a></td>
                                     <td>
                                         @foreach ($notebook->getSubjectsNames() as $subject)
                                             <span class="badge bg-dark">{{ $subject }}</span>
@@ -140,15 +137,6 @@
 
     <script>
         $('.modal-swal').click(function(){
-            var subject = new TomSelect("#swal-subject", {
-                create: false,
-                sortField: {
-                    field: "text",
-                    direction: "asc"
-                },
-                maxItems: 1000,
-                onChange: updateQuestionCount
-            });
 
             var topic = new TomSelect("#swal-topic", {
                 create: false,
@@ -156,37 +144,51 @@
                     field: "text",
                     direction: "asc"
                 },
+                plugins: ['remove_button'],
+                persist: false,
                 maxItems: 1000,
-                onChange: updateQuestionCount
+            });
+
+            var subject = new TomSelect("#swal-subject", {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                plugins: ['remove_button'],
+	            persist: false,
+                maxItems: 1000,
+                onChange: function() {
+                    updateTopics();
+                    updateQuestionCount();
+                },
+                onDelete: function(values) {
+
+                    var topicSelect = document.getElementById('swal-topic');
+
+                    values.forEach(function(value) {
+                        var subjectIdToRemove = value.trim(); 
+    
+                        var currentOptions = Array.from(topicSelect.options);
+                        currentOptions.forEach(function(option) {
+                            if (option.getAttribute('data-subject') === subjectIdToRemove) {
+                                option.remove(); 
+                            }
+                        });
+                    });
+
+                    topicSelect.dispatchEvent(new Event('change'));
+                }
             });
 
             function updateQuestionCount() {
 
                 var selectedSubjects = Array.from(subject.getValue());
-                var selectedTopics = Array.from(topic.getValue());
-
                 var filter = $('input[name="filter"]:checked').val();
-
                 var totalQuestions = 0;
 
                 selectedSubjects.forEach(function(optionId) {
                     var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
-                    var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
-                    var resolved = parseInt(option.getAttribute('id-resolved')) || 0;
-                    var fail = parseInt(option.getAttribute('id-fail')) || 0;
-
-                    if (filter === 'remove_question_resolved') {
-                        totalQuestions += quanty;
-                        totalQuestions -= resolved;
-                    } else if (filter === 'show_question_fail') {
-                        totalQuestions += fail;
-                    } else {
-                        totalQuestions += quanty;
-                    }
-                });
-
-                selectedTopics.forEach(function(optionId) {
-                    var option = document.querySelector('#swal-topic option[value="' + optionId + '"]');
                     var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
                     var resolved = parseInt(option.getAttribute('id-resolved')) || 0;
                     var fail = parseInt(option.getAttribute('id-fail')) || 0;
@@ -209,6 +211,35 @@
                 if (parseInt(inputQuestions.value) > totalQuestions) {
                     inputQuestions.value = totalQuestions;
                 }
+            }
+
+            function updateTopics() {
+
+                var selectedSubjects = Array.from(subject.getValue());
+                var topicSelect = document.getElementById('swal-topic');
+                var addedTopicIds = new Set();
+                
+                selectedSubjects.forEach(function(optionId) {
+                    var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
+                    var topics = JSON.parse(option.getAttribute('data-topics'));
+
+                    topics.forEach(function(topic) {
+                        if (!addedTopicIds.has(topic.id)) {
+                            var newOption = document.createElement('option');
+                            newOption.value = topic.id;
+                            newOption.setAttribute('data-subject', topic.subject_id);
+                            newOption.innerHTML = topic.name;
+                            topicSelect.appendChild(newOption);
+                            addedTopicIds.add(topic.id);
+                        }
+                    });
+                });
+
+                if (selectedSubjects.length === 0) {
+                    topicSelect.innerHTML = '<option value="" selected>Escolha de tópicos (opcional)</option>';
+                }
+
+                topic.sync();
             }
 
             $('#select-all-subjects').on('click', function() {
@@ -237,7 +268,20 @@
             });
 
             updateQuestionCount();
+
+            $('input[type="radio"]').click(function() {
+                var $radio = $(this);
+
+                if ($radio.data('wasChecked') === true) {
+                    $radio.prop('checked', false);
+                    $radio.data('wasChecked', false);
+                } else {
+                    $('input[type="radio"]').data('wasChecked', false);
+                    $radio.data('wasChecked', true);
+                }
+
+                updateQuestionCount();
+            });
         });
     </script>
-
 @endsection

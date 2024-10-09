@@ -17,6 +17,7 @@ class Answer extends Model {
         'notebook_question_id',
         'question_id',
         'option_id',
+        'status'
     ];
 
     public function user() {
@@ -26,6 +27,10 @@ class Answer extends Model {
     public function notebook() {
         return $this->belongsTo(Notebook::class, 'notebook_id');
     }
+
+    public function notebookQuestion() {
+        return $this->belongsTo(NotebookQuestion::class, 'notebook_question_id');
+    }    
 
     public function question() {
         return $this->belongsTo(Question::class, 'question_id');

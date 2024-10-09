@@ -34,7 +34,7 @@ class AnswerController extends Controller {
             })
             ->paginate(1);
 
-            $nextQuestionNumber = count($answeredNotebookQuestionIds) + 1;
+            $nextQuestionNumber = $totalQuestions - $unansweredQuestions->total() + 1;
 
             $menu = 1;
 

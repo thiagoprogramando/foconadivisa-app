@@ -18,7 +18,7 @@ class Question extends Model {
     ];
 
     public function subject() {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 
     public function topic() {
@@ -34,27 +34,28 @@ class Question extends Model {
     }
 
     public function responsesCount($userId, $notebookId = null) {
-        $query = $this->answers()->where('user_id', $userId);
-    
+        $query = Answer::where('user_id', $userId);
+        
         if ($notebookId) {
-            $query->where('notebook_id', $notebookId);
+            $query->whereHas('notebookQuestion', function ($q) use ($notebookId) {
+                $q->where('notebook_id', $notebookId);
+            });
         }
-    
+        
         return $query->count();
-    }
+    }    
     
     public function correctCount($userId, $notebookId = null) {
-        $query = $this->answers()->where('user_id', $userId)
-            ->whereHas('option', function ($query) {
-                $query->where('is_correct', true);
+        $query = Answer::where('user_id', $userId)->where('status', 1);
+        
+        if (!is_null($notebookId)) {
+            $query->whereHas('notebookQuestion', function ($q) use ($notebookId) {
+                $q->where('notebook_id', $notebookId);
             });
-    
-        if ($notebookId) {
-            $query->where('notebook_id', $notebookId);
         }
-    
+        
         return $query->count();
-    }
+    }    
     
     public function wrogCount($userId, $notebookId = null) {
         $totalResponses = $this->responsesCount($userId, $notebookId);

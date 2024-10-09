@@ -13,7 +13,7 @@ class Subject extends Model {
 
     protected $table = 'subjects';
 
-    protected $fillable = ['subject_id', 'name', 'description'];
+    protected $fillable = ['subject_id', 'type', 'name', 'description'];
 
     public function plans() {
         return $this->belongsToMany(Plan::class, 'plan_subject');
@@ -21,6 +21,15 @@ class Subject extends Model {
 
     public function questions() {
         return $this->hasMany(Question::class);
+    }
+
+    public function totalQuestions() {
+        $count = $this->questions()->count();
+        foreach ($this->topics as $subsubject) {
+            $count += $subsubject->totalQuestions();
+        }
+
+        return $count;
     }
 
     public function countQuestions() {
@@ -45,20 +54,33 @@ class Subject extends Model {
         
         $userId = Auth::id();
         
-        return $this->questions()
-            ->whereHas('answers', function($query) use ($userId) {
-                $query->where('user_id', $userId);
-            })->count();
+        $topicIds = $this->topics()->pluck('id')->toArray();
+        $subjectIds = array_merge([$this->id], $topicIds);
+
+        $questionIds = Question::whereIn('subject_id', $subjectIds)->pluck('id');
+        $count = Answer::whereIn('question_id', $questionIds)
+                   ->where('user_id', $userId)
+                   ->distinct('question_id')
+                   ->count('question_id');
+
+        return $count;
     }
 
     public function questionFail() {
-
+        
         $userId = Auth::id();
+    
+        $topicIds = $this->topics()->pluck('id')->toArray();
+        $subjectIds = array_merge([$this->id], $topicIds);
 
-        return $this->questions()
-            ->whereHas('answers', function($query) use ($userId) {
-                $query->where('user_id', $userId)
-                      ->where('status', 2);
-            })->count();
-    }
+        $questionIds = Question::whereIn('subject_id', $subjectIds)->pluck('id');
+
+        $count = Answer::whereIn('question_id', $questionIds)
+                   ->where('user_id', $userId)
+                   ->where('status', 2)
+                   ->distinct('question_id')
+                   ->count('question_id');
+
+        return $count;
+    }    
 }

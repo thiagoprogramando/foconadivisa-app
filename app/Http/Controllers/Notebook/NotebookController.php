@@ -32,8 +32,23 @@ class NotebookController extends Controller {
             $bestPerformanceTopics      = $notebook->getBestPerformanceTopics();
             $worstPerformanceTopics     = $notebook->getWorstPerformanceTopics();
 
-            $selectedSubjects   = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.subject_id')->filter()->toArray();
-            $selectedTopics     = NotebookQuestion::where('notebook_id', $notebook->id)->with('question')->get()->pluck('question.subject_id')->filter()->toArray();
+            $selectedSubjects = NotebookQuestion::where('notebook_id', $notebook->id)
+                ->with('question')
+                ->get()
+                ->pluck('question.subject_id')
+                ->filter(function($subjectId) {
+                    return Subject::find($subjectId)->type === 1;
+                })
+                ->toArray();
+
+            $selectedTopics = NotebookQuestion::where('notebook_id', $notebook->id)
+                ->with('question')
+                ->get()
+                ->pluck('question.subject_id')
+                ->filter(function($subjectId) {
+                    return Subject::find($subjectId)->type === 2;
+                })
+                ->toArray();
 
             $plan = $user->labelPlan;
             if ($plan) {
@@ -78,6 +93,56 @@ class NotebookController extends Controller {
             'correct' => $correctAnswers,
             'incorrect' => $incorrectAnswers
         ];
+    }   
+    
+    public function notebookFilter($id) {
+        $notebook = Notebook::find($id);
+        if (!$notebook) {
+            return redirect()->back()->with('error', 'Caderno não localizado na base de dados!');
+        }
+    
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->route('logout')->with('error', 'Faça login para acessar sua conta!');
+        }
+    
+        $plan = $user->labelPlan;
+        $subjectsFromPlan = $plan ? $plan->subjects : collect();
+        $topicsFromPlan = $plan ? $plan->topics : collect();
+    
+        $associatedSubjects = $notebook->questions->map(function ($question) {
+            return $question->subject;
+        })->filter(function ($subject) {
+            return $subject !== null;
+        });
+    
+        $contents = $associatedSubjects->filter(function ($subject) {
+            return $subject->type == 1;
+        });
+
+        $topics = $associatedSubjects->filter(function ($subject) {
+            return $subject->type == 2;
+        });
+    
+        $parentsOfTopics = $associatedSubjects->filter(function ($subject) {
+            return $subject->type == 2;
+        })->map(function ($topic) {
+            return Subject::find($topic->subject_id); 
+        })->filter(function ($parent) {
+            return $parent && $parent->type == 1;
+        });
+    
+        $uniqueAssociatedSubjects = $contents->merge($parentsOfTopics)->unique('id');
+        $selectedSubjectIds = $uniqueAssociatedSubjects->pluck('id')->toArray();
+        $selectedTopicIds = $topics->pluck('id')->toArray();
+    
+        return view('app.Notebook.filter-notebook', [
+            'notebook'              => $notebook,
+            'subjectsFromPlan'      => $subjectsFromPlan,
+            'selectedSubjectIds'    => $selectedSubjectIds,
+            'topicsFromPlan'        => $topicsFromPlan,
+            'selectedTopicIds'      => $selectedTopicIds
+        ]);
     }    
     
     public function notebooks() {
@@ -89,20 +154,16 @@ class NotebookController extends Controller {
 
         $plan = $user->labelPlan;
         if ($plan) {
-
             $subjects   = $plan->subjects;
-            $topics     = $plan->topics;
         } else {
-
             $subjects   = collect();
-            $topics     = collect();
         }
 
         $notebooks = Notebook::where('user_id', Auth::id())->get();
         return view('app.Notebook.list-notebook', [
             'notebooks' => $notebooks,
             'subjects'  => $subjects,
-            'topics'    => $topics
+            'topics'    => collect()
         ]);
     }
 
@@ -215,10 +276,12 @@ class NotebookController extends Controller {
         if (!$notebook->save()) {
             return redirect()->back()->with('error', 'Caderno de questões não foi encontrado!');
         }
+
+        NotebookQuestion::where('notebook_id', $notebook->id)->delete();
         
         $subjects = $request->input('subject', []);
-        $topics = $request->input('topics', []);
-        $number = max(1, $request->input('number'));
+        $topics   = $request->input('topic', []);
+        $number   = max(1, $request->input('number'));
     
         $filter = $request->input('filter', false);
     

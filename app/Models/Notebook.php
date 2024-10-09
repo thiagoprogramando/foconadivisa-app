@@ -20,7 +20,7 @@ class Notebook extends Model {
     ];
 
     public function notebookQuestions() {
-        return $this->hasMany(NotebookQuestion::class);
+        return $this->hasManyThrough(Question::class, NotebookQuestion::class, 'notebook_id', 'id', 'id', 'question_id');
     }
 
     public function questions() {

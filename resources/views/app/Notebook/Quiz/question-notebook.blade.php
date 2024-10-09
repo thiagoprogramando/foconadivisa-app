@@ -17,11 +17,11 @@
 
         .custom-radio {
             position: relative;
-            margin-right: 20px; /* Ajusta a distância entre o input e o label */
+            margin-right: 20px;
         }
 
         .custom-radio::before {
-            content: attr(data-letter); /* Insere a letra antes do input */
+            content: attr(data-letter);
             position: absolute;
             top: 50%;
             left: 0;
@@ -101,7 +101,8 @@
                             </div>
                             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                                 <div class="btn-group">
-                                    <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i></a>
+                                    <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
+                                    <a href="{{ route('caderno-filtros', ['id' => $notebook->id]) }}" class="btn btn-outline-dark" title="Modificar filtros"><i class="bx bx-filter"></i> Filtros</a>
                                     <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#commentModal" title="Comentário do Professor"><i class="bi bi-chat-text"></i></button>
                                 </div>
 
