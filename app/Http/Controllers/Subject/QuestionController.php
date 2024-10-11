@@ -45,7 +45,7 @@ class QuestionController extends Controller {
         if ($question) {
 
             $question->question_text    = $request->input('question_text');
-            $question->subject_id       = $request->input('subject_id');
+            $question->subject_id       = $request->input('subject_id') ?? $request->input('subject_id_question');
             $question->comment_text     = $request->input('comment_text');
             if ($question->save()) {
                 
@@ -72,7 +72,7 @@ class QuestionController extends Controller {
                     $option->save();
                 }
     
-                return redirect()->back()->with('success', 'Dados salvos com sucesso!');
+                return redirect()->route('create-question', ['topic' => $request->input('subject_id') ?? $request->input('subject_id_question')])->with('success', 'Dados salvos com sucesso!');
             }
         }
     

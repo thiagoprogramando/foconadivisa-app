@@ -3,9 +3,9 @@
 @section('content')
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
-        <h3>{{ $subject->name }}</h3>
-        <hr>
-        
+
+        <h6 class="card-title">Conteúdo/Tópico: {{ $subject->name }}</h6>
+
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Questão</button>
@@ -18,6 +18,7 @@
                 <form action="{{ route('update-question') }}" method="POST" class="row mt-3 m-5">
                     @csrf
                     <input type="hidden" name="id" value="{{ $question->id }}">
+                    <input type="hidden" name="subject_id_question" value="{{ $question->subject_id }}">
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
                         <select id="swal-topic" name="subject_id" placeholder="Escolha um tópico (Opcional)">
@@ -28,7 +29,7 @@
                         </select>
                     </div>
 
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3 mb-3">
                         <textarea name="question_text" class="tinymce-editor" placeholder="Questão" id="question">
                             {{ $question->question_text }}
                         </textarea>
@@ -51,7 +52,7 @@
                         </div>
                     @endfor
 
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3 mb-3">
                         <div class="form-floating mb-2">
                             <textarea name="comment_text" class="tinymce-editor" placeholder="Comentários do Professor:" id="comment_text">
                                 {{ $question->comment_text }}
@@ -61,7 +62,6 @@
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <button type="submit" class="btn btn-outline-success w-100 mb-2">Salvar</button>
-                        <a href="{{ route('create-question', ['topic' => $subject->id]) }}" class="btn btn-outline-primary w-100 mb-2">Nova Questão</a>
                     </div>
                 </form>
             </div>

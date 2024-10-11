@@ -7,10 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Answer;
 use App\Models\Notebook;
 use App\Models\NotebookQuestion;
-use App\Models\Notification;
 use App\Models\Question;
 use App\Models\Subject;
-use App\Models\Topic;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,35 +31,6 @@ class NotebookController extends Controller {
             $bestPerformanceTopics      = $notebook->getBestPerformanceTopics();
             $worstPerformanceTopics     = $notebook->getWorstPerformanceTopics();
 
-            $selectedSubjects = NotebookQuestion::where('notebook_id', $notebook->id)
-                ->with('question')
-                ->get()
-                ->pluck('question.subject_id')
-                ->filter(function($subjectId) {
-                    return Subject::find($subjectId)->type === 1;
-                })
-                ->toArray();
-
-            $selectedTopics = NotebookQuestion::where('notebook_id', $notebook->id)
-                ->with('question')
-                ->get()
-                ->pluck('question.subject_id')
-                ->filter(function($subjectId) {
-                    return Subject::find($subjectId)->type === 2;
-                })
-                ->toArray();
-
-            $plan = $user->labelPlan;
-            if ($plan) {
-
-                $subjects   = $plan->subjects;
-                $topics     = $plan->topics;
-            } else {
-
-                $subjects   = collect();
-                $topics     = collect();
-            }
-
             $answers = Answer::where('notebook_id', $notebook->id)->get();
             return view('app.Notebook.view-notebook', [
                 'notebook'                  => $notebook,
@@ -69,31 +39,11 @@ class NotebookController extends Controller {
                 'worstPerformanceSubjects'  => $worstPerformanceSubjects,
                 'bestPerformanceTopics'     => $bestPerformanceTopics,
                 'worstPerformanceTopics'    => $worstPerformanceTopics,
-                'overallProgress'           => $this->getOverallProgress(),
-                'selectedSubjects'          => $selectedSubjects,
-                'selectedTopics'            => $selectedTopics,
-                'subjects'                  => $subjects,
-                'topics'                    => $topics,
             ]);
         }
 
         redirect()->back()->with('error', 'Não foram encontrados dados do caderno!');
-    }
-
-    private function getOverallProgress() {
-
-        $totalAnswers = Answer::count();
-        $correctAnswers = Answer::whereHas('option', function($query) {
-            $query->where('is_correct', true);
-        })->count();
-    
-        $incorrectAnswers = $totalAnswers - $correctAnswers;
-    
-        return [
-            'correct' => $correctAnswers,
-            'incorrect' => $incorrectAnswers
-        ];
-    }   
+    }  
     
     public function notebookFilter($id) {
         $notebook = Notebook::find($id);
@@ -249,14 +199,6 @@ class NotebookController extends Controller {
         });
 
         if (!$selectedQuestions->isEmpty()) {
-
-            $notification               = new Notification();
-            $notification->user_id      = Auth::user()->id;
-            $notification->type         = 1;
-            $notification->title        = 'Caderno de questões criado!';
-            $notification->description  = 'Você já pode acessar e responder às questões responder do seu novo caderno!';
-            $notification->save();
-
             return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno criado com sucesso!');
         } else {
             return redirect()->back()->with('error', 'Erro ao criar o caderno. Nenhuma questão encontrada.');
@@ -358,14 +300,6 @@ class NotebookController extends Controller {
         });
 
         if (!$selectedQuestions->isEmpty()) {
-
-            $notification               = new Notification();
-            $notification->user_id      = Auth::user()->id;
-            $notification->type         = 1;
-            $notification->title        = 'Caderno de atualizado!';
-            $notification->description  = 'Você já pode acessar e responder às novas questões responder do seu caderno!';
-            $notification->save();
-
             return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno atualizado com sucesso! Foram adicionados '.$selectedQuestions->count().' novas questões');
         } else {
             return redirect()->back()->with('error', 'Erro ao criar o caderno. Nenhuma questão encontrada.');

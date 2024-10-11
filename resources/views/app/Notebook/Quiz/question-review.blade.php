@@ -78,12 +78,20 @@
             word-wrap: break-word;
             margin-left: 10px;
         }
+
+        #resolution {
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
     </style>
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-3">
         <div class="card-header">
             <div class="row mb-3">
                 <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                    <h6 class="question">
+                        Questão: {{ $currentQuestionNumber }} de {{ $totalQuestions }}
+                    </h6>                    
                     <small><b>Conteúdo/Tópico:</b> {{ $answer->question->subject->name }}</small> <br>
                     <small><b>{{ $answer->question->responsesCount(Auth::user()->id, $answer->notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $answer->question->correctCount(Auth::user()->id, $answer->notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $answer->question->wrogCount(Auth::user()->id, $answer->notebook->id) }}</b> Erros</small>
                 </div>
@@ -91,19 +99,16 @@
                     <div class="btn-group">
                         <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
                         <a href="{{ route('caderno-filtros', ['id' => $answer->notebook->id]) }}" class="btn btn-outline-dark" title="Modificar filtros"><i class="bx bx-filter"></i> Filtros</a>
-                        <button class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bi bi-chat-text"></i></button>
+                        <button class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bx bxs-book-reader"></i></button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            <div id="resolution" class="card p-2 mt-2 mb-3 d-none">
-                <div class="card-header">
-                    <h6 class="card-title">Resolução</h6>
-                </div>
-                <div class="card-body">
-                    {!! $answer->question->comment_text !!}
-                </div>
+
+            <div id="resolution" class="d-none p-3 mt-3 mb-3">
+                <p class="lead">Resolução</p>
+                {!! $answer->question->comment_text !!}
             </div>
 
             <h6 class="card-title p-2 mt-2 mb-3 bg-light"> <a href="">#{{ $answer->question->id }}</a> {!! $answer->question->question_text !!} </h6>

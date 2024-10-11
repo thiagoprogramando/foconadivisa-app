@@ -36,7 +36,24 @@ class Notebook extends Model {
     }
 
     public function getAnsweredQuestionsCount() {
-        return $this->answers()->count();
+        return $this->answers()->whereIn('notebook_question_id', function ($query) {
+            $query->select('id')
+                  ->from('notebook_questions')
+                  ->where('notebook_id', $this->id);
+        })
+        ->count();
+    }
+
+    public function getPendingQuestionsCount() {
+        $totalQuestions = $this->questions()
+        ->whereIn('notebook_questions.id', function ($query) {
+            $query->select('id')
+                  ->from('notebook_questions')
+                  ->where('notebook_id', $this->id);
+        })
+        ->count();
+
+        return $totalQuestions - $this->getAnsweredQuestionsCount();
     }
 
     public function getSubjectsNames() {
@@ -53,28 +70,39 @@ class Notebook extends Model {
                 })->pluck('subject.name')->unique()->toArray();
     }
 
-    public function getPendingQuestionsCount() {
-        return $this->questions()->count() - $this->getAnsweredQuestionsCount();
-    }
-
     public function getCorrectAnswersCount() {
-        return $this->answers->filter(function($answer) {
-            return $answer->isCorrect();
-        })->count();
-    }
+        return $this->answers()->whereIn('notebook_question_id', function ($query) {
+            $query->select('id')
+                  ->from('notebook_questions')
+                  ->where('notebook_id', $this->id);
+        })
+        ->whereHas('question', function ($query) {
+            $query->where('status', 1);
+        })
+        ->count();
+    }        
 
     public function getIncorrectAnswersCount() {
         return $this->getAnsweredQuestionsCount() - $this->getCorrectAnswersCount();
     }
 
     public function getPerformanceEvaluation() {
-        $totalQuestions = $this->questions()->count();
-        $correctAnswers = $this->getCorrectAnswersCount();
+        $totalQuestions = $this->questions()
+            ->whereIn('notebook_questions.id', function ($query) {
+                $query->select('id')
+                      ->from('notebook_questions')
+                      ->where('notebook_id', $this->id);
+            })
+            ->count();
         
-        if ($totalQuestions === 0) return 'Nenhuma questão respondida';
-
+        $correctAnswers = $this->getCorrectAnswersCount();
+        $incorrectAnswers = $this->getIncorrectAnswersCount();
+        
+        if ($correctAnswers == 0 && $incorrectAnswers == 0) {
+            return '<span class="badge bg-dark">Neutro</span>';
+        }
+        
         $percentage = ($correctAnswers / $totalQuestions) * 100;
-
         if ($percentage < 30) {
             return '<span class="badge bg-danger">Ruim</span>';
         } elseif ($percentage < 60) {
@@ -82,29 +110,39 @@ class Notebook extends Model {
         } else {
             return '<span class="badge bg-success">Muito bom</span>';
         }
-    }
+    }        
 
     public function getBestPerformanceSubjects() {
         return $this->calculatePerformanceByContent('subject', true);
     }
-
+    
     public function getWorstPerformanceSubjects() {
         return $this->calculatePerformanceByContent('subject', false);
     }
-
+    
     public function getBestPerformanceTopics() {
         return $this->calculatePerformanceByContent('topic', true);
     }
-
+    
     public function getWorstPerformanceTopics() {
         return $this->calculatePerformanceByContent('topic', false);
     }
-
+    
     private function calculatePerformanceByContent($type, $best = true) {
-        $contents = [];
 
-        foreach ($this->questions as $question) {
-            $content = ($type == 'subject') ? $question->subject : $question->topic;
+        $contents = [];
+        $notebookQuestionIds = NotebookQuestion::where('notebook_id', $this->id)->pluck('question_id');
+
+        $questions = Question::select('questions.*')
+        ->join('notebook_questions as nq', 'questions.id', '=', 'nq.question_id')
+        ->where('nq.notebook_id', $this->id)
+        ->get();
+    
+        foreach ($questions as $question) {
+            $content = ($type == 'subject') 
+            ? ($question->subject_id && $question->subject->type === 1 ? $question->subject : null)
+            : ($question->subject_id && $question->subject->type === 2 ? $question->subject : null);
+
             if ($content) {
                 if (!isset($contents[$content->name])) {
                     $contents[$content->name] = [
@@ -118,7 +156,7 @@ class Notebook extends Model {
                 }
             }
         }
-
+    
         $results = [];
         foreach ($contents as $name => $data) {
             $percentage = ($data['correct'] / $data['total']) * 100;
@@ -126,7 +164,7 @@ class Notebook extends Model {
                 $results[] = "<span class='badge bg-dark'>{$name}</span>";
             }
         }
-
+    
         return implode(' ', $results);
-    }
+    }    
 }

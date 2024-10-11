@@ -41,6 +41,10 @@ class Answer extends Model {
     }
 
     public function isCorrect() {
-        return $this->option && $this->option->is_correct;
+        if($this->status == 1) {
+            return true;
+        }
+
+        return false;
     }
 }

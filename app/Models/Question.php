@@ -33,6 +33,10 @@ class Question extends Model {
         return $this->hasMany(Answer::class);
     }
 
+    public function comments() {
+        return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
+    }
+
     public function responsesCount($userId, $notebookId = null) {
         $query = Answer::where('user_id', $userId);
         

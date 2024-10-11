@@ -9,6 +9,7 @@ use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
 use App\Http\Controllers\Payment\PaymentController;
 use App\Http\Controllers\Sale\InvoiceController;
+use App\Http\Controllers\Subject\CommentController;
 use App\Http\Controllers\Subject\QuestionController;
 use App\Http\Controllers\Subject\SubjectController;
 use App\Http\Controllers\User\FaqController;
@@ -91,6 +92,7 @@ Route::middleware('auth')->group(function () {
     Route::post('update-question', [QuestionController::class, 'updateQuestion'])->name('update-question');
     Route::post('delete-question', [QuestionController::class, 'deleteQuestion'])->name('delete-question');
     Route::get('delete-question-answer/{notebook}/{question}', [QuestionController::class, 'deleteQuestionAnswer'])->name('delete-question-answer');
+    Route::post('create-comment', [CommentController::class, 'createComment'])->name('create-comment');
 
     //Notebook
     Route::get('/caderno/{id}', [NotebookController::class, 'notebook'])->name('caderno');

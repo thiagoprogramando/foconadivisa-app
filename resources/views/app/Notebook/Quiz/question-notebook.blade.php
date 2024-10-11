@@ -79,6 +79,16 @@
             word-wrap: break-word;
             margin-left: 10px;
         }
+
+        #comments {
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
+
+        #resolution {
+            border: 1px solid #000;
+            border-radius: 5px;
+        }
     </style>
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-3">
@@ -103,31 +113,38 @@
                                 <div class="btn-group">
                                     <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
                                     <a href="{{ route('caderno-filtros', ['id' => $notebook->id]) }}" class="btn btn-outline-dark" title="Modificar filtros"><i class="bx bx-filter"></i> Filtros</a>
-                                    <button class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#commentModal" title="Comentário do Professor"><i class="bi bi-chat-text"></i></button>
+                                    <button type="button" class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bx bxs-book-reader"></i></button>
+                                    <button type="button" class="btn btn-outline-dark btn-comment" title="Comentários sobre a questão"><i class="bi bi-chat-square-text"></i></button>
                                 </div>
-
-                                <div class="modal fade" id="commentModal" tabindex="-1" aria-hidden="true" style="display: none;">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Comentário do Professor</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                {!! $question->comment_text !!}
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Fechar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
 
                     <div class="card-body">
+
+                        <div id="resolution" class="d-none p-3 mt-3 mb-3">
+                            <p class="lead">Resolução</p>
+                            {!! $question->comment_text !!}
+                        </div>
+
+                        <div id="comments" class="d-none p-3 mt-3">
+                            <p class="lead">Comentários</p>
+
+                            <form action="{{ route('create-comment') }}" method="POST" class="d-flex btn-group w-50 mb-3">
+                                @csrf
+                                <input type="hidden" name="question_id" value="{{ $question->id }}">
+                                <input type="text" name="comment" class="form-control" placeholder="Faça seu comentário...">
+                                <button class="btn btn-dark"><i class="bi bi-plus-circle"></i></button>
+                            </form>
+
+                            @foreach ($question->comments as $comment)
+                                <div class="alert alert-dark bg-dark text-light border-0 alert-dismissible fade show" role="alert">
+                                    {{ $comment->user->name }} <br> {{ $comment->comment }}
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                                  </div>
+                            @endforeach
+                        </div>
+
                         <h6 class="card-title p-2 mt-2 mb-3 bg-light"> <a href="">#{{ $question->id }}</a> {!! $question->question_text !!} </h6>
                         <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $notebookQuestion->id, $unansweredQuestions->currentPage()]) }}">
                             @csrf
@@ -216,6 +233,14 @@
             label.addEventListener('dblclick', function() {
                 toggleStrikethroughOption(this);
             });
+        });
+
+        $('.btn-comment').on('click', function() {
+            $('#comments').toggleClass('d-none');
+        });
+
+        $('.btn-resolution').on('click', function() {
+            $('#resolution').toggleClass('d-none');
         });
     </script>
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Notebook;
 
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
+use App\Models\Comment;
 use App\Models\Notebook;
 use App\Models\NotebookQuestion;
 use App\Models\Question;
@@ -35,7 +36,6 @@ class AnswerController extends Controller {
             ->paginate(1);
 
             $nextQuestionNumber = $totalQuestions - $unansweredQuestions->total() + 1;
-
             $menu = 1;
 
             return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber', 'menu'));
@@ -46,9 +46,32 @@ class AnswerController extends Controller {
 
         $answer = Answer::find($answer);
         if($answer) {
+
+            $notebook = $answer->notebook;
+
+            $totalQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
+            ->whereHas('question', function ($query) {
+                $query->whereNotNull('question_text')
+                      ->where('question_text', '!=', '');
+            })
+            ->count();
+
+            $answeredQuestions = Answer::where('notebook_id', $notebook->id)
+            ->whereIn('notebook_question_id', function ($query) use ($notebook) {
+                $query->select('id')
+                      ->from('notebook_questions')
+                      ->where('notebook_id', $notebook->id);
+            })
+            ->orderBy('created_at')
+            ->pluck('notebook_question_id')
+            ->toArray();
+            
+            $currentQuestionNumber = array_search($answer->notebook_question_id, $answeredQuestions) + 1;
             
             return view('app.Notebook.Quiz.question-review', [
                 'answer' => $answer,
+                'totalQuestions' => $totalQuestions,
+                'currentQuestionNumber' => $currentQuestionNumber,
                 'menu'   => 1
             ]);
         }

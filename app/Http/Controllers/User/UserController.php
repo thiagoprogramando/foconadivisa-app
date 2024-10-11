@@ -71,14 +71,6 @@ class UserController extends Controller {
         }
         
         if($user && $user->update($data)) {
-
-            $notification               = new Notification();
-            $notification->user_id      = $user->id;
-            $notification->type         = 1;
-            $notification->title        = 'Dados alterados!';
-            $notification->description  = 'Seus dados foram atualizados com sucesso!';
-            $notification->save();
-
             return redirect()->back()->with('success', 'Dados atualizados com sucesso!');
         }
 
