@@ -24,8 +24,8 @@
                                     <div class="row">
                                         <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                                             <div class="form-floating mb-2">
-                                                <input type="text" name="name" class="form-control" id="name" placeholder="Nome:" required>
-                                                <label for="name">Nome</label>
+                                                <input type="text" name="name" class="form-control" id="name" placeholder="Nomeie seu caderno:" required>
+                                                <label for="name">Nomeie seu caderno</label>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-4 col-lg-4">

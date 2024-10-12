@@ -123,7 +123,7 @@
                     <div class="card-body">
 
                         <div id="resolution" class="d-none p-3 mt-3 mb-3">
-                            <p class="lead">Resolução</p>
+                            <p class="lead">Resolução - <small>{{ $question->updated_at->format('d/m/Y') }}</p>
                             {!! $question->comment_text !!}
                         </div>
 
@@ -133,13 +133,13 @@
                             <form action="{{ route('create-comment') }}" method="POST" class="d-flex btn-group w-50 mb-3">
                                 @csrf
                                 <input type="hidden" name="question_id" value="{{ $question->id }}">
-                                <input type="text" name="comment" class="form-control" placeholder="Faça seu comentário...">
+                                <input type="text" name="comment" class="form-control" placeholder="Faça seu comentário..." required>
                                 <button class="btn btn-dark"><i class="bi bi-plus-circle"></i></button>
                             </form>
 
                             @foreach ($question->comments as $comment)
                                 <div class="alert alert-dark bg-dark text-light border-0 alert-dismissible fade show" role="alert">
-                                    {{ $comment->user->name }} <br> {{ $comment->comment }}
+                                    {{ $comment->user->name }} - <small>{{ $comment->created_at->format('d/m/Y') }}</small> <br> {{ $comment->comment }}
                                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                                   </div>
                             @endforeach

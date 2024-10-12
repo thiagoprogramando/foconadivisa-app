@@ -19,8 +19,8 @@
                     <input type="hidden" name="id" value="{{ $notebook->id }}">
                     <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-floating mb-2">
-                            <input type="text" name="name" class="form-control" id="name" placeholder="Nome:" value="{{ $notebook->name }}">
-                            <label for="name">Nome</label>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Nomeie seu caderno:" value="{{ $notebook->name }}">
+                            <label for="name">Nomeie seu caderno</label>
                         </div>
                     </div>
                     <div class="col-12 col-sm-12 col-md-4 col-lg-4">

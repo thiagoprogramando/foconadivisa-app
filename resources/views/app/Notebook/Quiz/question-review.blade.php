@@ -79,6 +79,14 @@
             margin-left: 10px;
         }
 
+        .iscorrect {
+            background-color: rgba(0, 128, 0, 0.2);
+        }
+
+        .isincorrect {
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+
         #resolution {
             border: 1px solid #000;
             border-radius: 5px;
@@ -100,6 +108,7 @@
                         <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
                         <a href="{{ route('caderno-filtros', ['id' => $answer->notebook->id]) }}" class="btn btn-outline-dark" title="Modificar filtros"><i class="bx bx-filter"></i> Filtros</a>
                         <button class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bx bxs-book-reader"></i></button>
+                        <button type="button" class="btn btn-outline-dark btn-comment" title="Comentários sobre a questão"><i class="bi bi-chat-square-text"></i></button>
                     </div>
                 </div>
             </div>
@@ -107,8 +116,26 @@
         <div class="card-body">
 
             <div id="resolution" class="d-none p-3 mt-3 mb-3">
-                <p class="lead">Resolução</p>
+                <p class="lead">Resolução - <small>{{ $answer->question->updated_at->format('d/m/Y') }}</small></p>
                 {!! $answer->question->comment_text !!}
+            </div>
+
+            <div id="comments" class="d-none p-3 mt-3">
+                <p class="lead">Comentários</p>
+
+                <form action="{{ route('create-comment') }}" method="POST" class="d-flex btn-group w-50 mb-3">
+                    @csrf
+                    <input type="hidden" name="question_id" value="{{ $answer->question->id }}">
+                    <input type="text" name="comment" class="form-control" placeholder="Faça seu comentário..." required>
+                    <button class="btn btn-dark"><i class="bi bi-plus-circle"></i></button>
+                </form>
+
+                @foreach ($answer->question->comments as $comment)
+                    <div class="alert alert-dark bg-dark text-light border-0 alert-dismissible fade show" role="alert">
+                        {{ $comment->user->name }} - <small>{{ $comment->created_at->format('d/m/Y') }}</small> <br> {{ $comment->comment }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                @endforeach
             </div>
 
             <h6 class="card-title p-2 mt-2 mb-3 bg-light"> <a href="">#{{ $answer->question->id }}</a> {!! $answer->question->question_text !!} </h6>
@@ -117,7 +144,7 @@
                     $letters = ['A', 'B', 'C', 'D', 'E'];
                 @endphp
                 @foreach($answer->question->options as $index => $option)
-                    <div class="form-check-questio form-question option-container mb-3 p-2 w-100">
+                    <div class="form-check-questio form-question option-container mb-3 p-2 w-100 @if($option->is_correct) iscorrect @endif @if($answer->option_id == $option->id && !$option->is_correct) isincorrect @endif">
                         <input class="form-check-input" type="radio" name="option_id" value="{{ $option->id }}" id="option{{ $option->id }}" @checked($answer->option_id == $option->id)  disabled>
                         <label class="form-check-label" for="option{{ $option->id }}"> 
 
@@ -143,6 +170,10 @@
     </div>
 
     <script>
+       $('.btn-comment').on('click', function() {
+            $('#comments').toggleClass('d-none');
+        });
+
         $('.btn-resolution').on('click', function() {
             $('#resolution').toggleClass('d-none');
         });

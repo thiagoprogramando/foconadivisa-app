@@ -33,7 +33,7 @@ class QuestionController extends Controller {
         $question->subject_id   = $topic;
         if($question->save()) {
 
-            return redirect()->route('questao', ['id' => $question->id])->with('success', 'Preencha todos os dados da questão!');
+            return redirect()->route('questao', ['id' => $question->id])->with('success', 'Preencha todos os dados da nova questão!');
         }
 
         return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');
@@ -43,6 +43,29 @@ class QuestionController extends Controller {
 
         $question = Question::find($request->id);
         if ($question) {
+
+            $optionCount = 0;
+            $correctCount = 0;
+    
+            for ($i = 1; $i <= 5; $i++) {
+                $optionText = $request->input("option_{$i}");
+                $isCorrect = $request->input("is_correct_{$i}") ? true : false;
+    
+                if ($optionText) {
+                    $optionCount++;
+                    if ($isCorrect) {
+                        $correctCount++;
+                    }
+                }
+            }
+
+            if ($optionCount < 2) {
+                return redirect()->back()->with('error', 'Você deve fornecer pelo menos duas opções.');
+            }
+    
+            if ($correctCount === 0) {
+                return redirect()->back()->with('error', 'Você deve marcar pelo menos uma opção como correta.');
+            }
 
             $question->question_text    = $request->input('question_text');
             $question->subject_id       = $request->input('subject_id') ?? $request->input('subject_id_question');

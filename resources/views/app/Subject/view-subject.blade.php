@@ -8,11 +8,13 @@
 
         
         <ul class="nav nav-tabs" id="myTab" role="tablist">
+            @if($subject->type == 1)
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link @if($subject->type == 1) active @endif" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Tópicos</button>
+                </li>
+            @endif
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Tópicos</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Questões</button>
+                <button class="nav-link @if($subject->type <> 1) active @endif" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Questões</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Dados</button>
@@ -21,7 +23,7 @@
 
         <div class="tab-content pt-2" id="myTabContent">
             
-            <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <div class="tab-pane fade @if($subject->type == 1)active show @endif" id="home" role="tabpanel" aria-labelledby="home-tab">
                 
                 <div class="btn-group mt-3" role="group" aria-label="Basic outlined example">
                     <button type="button" data-bs-toggle="modal" data-bs-target="#newTopic" class="btn btn-dark">Novo Tópico</button>
@@ -93,7 +95,7 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+            <div class="tab-pane fade @if($subject->type <> 1)active show @endif" id="contact" role="tabpanel" aria-labelledby="contact-tab">
                 
                 <div class="btn-group mt-3" role="group" aria-label="Basic outlined example">
                     <a href="{{ route('create-question', ['topic' => $subject->id]) }}" target="_blank" class="btn btn-dark">Nova Questão</a>

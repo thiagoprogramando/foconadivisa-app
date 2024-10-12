@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Answer;
-
+use App\Models\MktBanner;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -31,6 +31,8 @@ class AppController extends Controller {
 
         $totalQuestions = Auth::user()->meta ?: 100;
         $progress = ($totalQuestionsCount / $totalQuestions) * 100;
+
+        $banners = MktBanner::orderBy('created_at', 'asc')->get();
     
         return view('app.app', [
             'errorsCount'           => $errorsCount,
@@ -38,6 +40,7 @@ class AppController extends Controller {
             'questionsTodayCount'   => $questionsTodayCount,
             'totalQuestionsCount'   => $totalQuestionsCount,
             'progress'              => min($progress, 100),
+            'banners'               => $banners
         ]);
     }
 

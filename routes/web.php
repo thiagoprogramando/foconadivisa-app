@@ -5,6 +5,7 @@ use App\Http\Controllers\Access\ForgoutController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\Data\ExcelController;
 use App\Http\Controllers\Gateway\AssasController;
+use App\Http\Controllers\Mkt\BannerController;
 use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
 use App\Http\Controllers\Payment\PaymentController;
@@ -108,6 +109,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/answer/{id}', [AnswerController::class, 'answer'])->name('answer');
     Route::get('/answer-review/{answer}', [AnswerController::class, 'answerReview'])->name('answer-review');
     Route::post('/notebooks/{notebook}/questions/{question}/{page}/submit', [AnswerController::class, 'submitAnswerAndNext'])->name('submitAnswerAndNext');
+
+    //MKT
+    Route::get('banners', [BannerController::class, 'banners'])->name('banners');
+    Route::post('create-banner', [BannerController::class, 'createBanner'])->name('create-banner');
+    Route::get('/delete-banner/{id}', [BannerController::class, 'deleteBanner'])->name('delete-banner');
 
     //Excel
     Route::get('/user-excel', [ExcelController::class, 'userExcel'])->name('user-excel');

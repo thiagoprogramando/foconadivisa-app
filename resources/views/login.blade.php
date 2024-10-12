@@ -51,15 +51,18 @@
                           <div class="col-12">
                             <input type="email" name="email" class="form-control" placeholder="E-mail:" required>
                           </div>
-                          <div class="col-12">
-                            <input type="password" name="password" class="form-control" placeholder="Senha:" required>
+                          <div class="col-12 position-relative">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Senha:" required>
+                            <button type="button" id="togglePassword" class="btn position-absolute top-50 end-0 translate-middle-y" style="right: 10px;">
+                                <i id="toggleIcon" class="ri-eye-line"></i>
+                            </button>
                           </div>
-                          <div class="col-12">
+                          {{-- <div class="col-12">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe">
                                 <label class="form-check-label" for="rememberMe">Lembrar acesso</label>
                             </div>
-                          </div>
+                          </div> --}}
                           <div class="col-12">
                             <button class="btn btn-dark w-100" type="submit">Acessar</button>
                           </div>
@@ -113,6 +116,23 @@
                 timer: 2000
             })
         @endif
+
+        document.getElementById('togglePassword').addEventListener('click', function (e) {
+          
+          const passwordField = document.getElementById('password');
+          const toggleIcon = document.getElementById('toggleIcon');
+          const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordField.setAttribute('type', type);
+
+
+          if (type === 'password') {
+              toggleIcon.classList.remove('ri-eye-off-line');
+              toggleIcon.classList.add('ri-eye-line');
+          } else {
+              toggleIcon.classList.remove('ri-eye-line');
+              toggleIcon.classList.add('ri-eye-off-line');
+          }
+      });
     </script>
   </body>
 </html>
