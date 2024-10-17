@@ -25,7 +25,7 @@
                     </div>
                     <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="form-floating mb-2">
-                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" required>
+                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" value="{{ $notebook->countQuestions() }}">
                             <label for="questions">N° questões</label>
                         </div>
                     </div>

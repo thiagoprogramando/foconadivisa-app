@@ -117,18 +117,21 @@
                                     <span>Perfil</span>
                                 </a>
                             </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
+                            <li> <hr class="dropdown-divider"> </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center" href="{{ route('faq') }}">
                                     <i class="bi bi-question-circle"></i>
                                     <span>Precisa de ajuda?</span>
                                 </a>
                             </li>
+                            <li> <hr class="dropdown-divider"> </li>
                             <li>
-                                <hr class="dropdown-divider">
+                                <a class="dropdown-item d-flex align-items-center" href="{{ route('tickets') }}">
+                                    <i class="ri-alarm-warning-line"></i>
+                                    <span>Tickets</span>
+                                </a>
                             </li>
+                            <li> <hr class="dropdown-divider"> </li>
                             <li>
                                 <a class="dropdown-item d-flex align-items-center" href="{{ route('logout') }}">
                                     <i class="bi bi-box-arrow-right"></i>
@@ -158,26 +161,16 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-book-half"></i><span>Cadernos</span><i class="bi bi-chevron-down ms-auto"></i>
+                    <a class="nav-link collapsed" href="{{ route('cadernos') }}">
+                        <i class="bi bi-book-half"></i>
+                        <span>Meus Cadernos</span>
                     </a>
-                    <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                        <li>
-                            <a href="{{ route('cadernos') }}">
-                                <i class="bi bi-circle"></i><span>Meus Cadernos</span>
-                            </a>
-                        </li>
-                        @foreach ($myNotebooks as $notebook)
-                            <li>
-                                <a href="{{ route('caderno', ['id' => $notebook->id]) }}">
-                                    <i class="bi bi-circle"></i><span>{{ $notebook->name }}</span>
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
                 </li>
 
                 <li class="nav-heading">Meus Dados</li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estátisticas</span></a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('planos') }}"><i class="bi bi-cart"></i><span>Planos</span></a>
                 </li>
@@ -193,19 +186,10 @@
                         </a>
                         <ul id="components-materiais" class="nav-content collapse " data-bs-parent="#sidebar-materiais">
                             <li>
-                                <a href="{{ route('conteudos') }}">
-                                    <i class="bi bi-circle"></i><span>Conteúdos</span>
-                                </a>
+                                <a href="{{ route('conteudos') }}"><i class="bi bi-circle"></i><span>Conteúdos</span></a>
                             </li>
                             <li>
-                                <a href="{{ route('topicos') }}">
-                                    <i class="bi bi-circle"></i><span>Tópicos</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="components-accordion.html">
-                                    <i class="bi bi-circle"></i><span>Relatórios</span>
-                                </a>
+                                <a href="{{ route('topicos') }}"><i class="bi bi-circle"></i><span>Tópicos</span></a>
                             </li>
                         </ul>
                     </li>
@@ -215,14 +199,10 @@
                         </a>
                         <ul id="components-cart" class="nav-content collapse " data-bs-parent="#sidebar-cart">
                             <li>
-                                <a href="{{ route('planos') }}">
-                                    <i class="bi bi-circle"></i><span>Planos</span>
-                                </a>
+                                <a href="{{ route('planos') }}"><i class="bi bi-circle"></i><span>Planos</span></a>
                             </li>
                             <li>
-                                <a href="{{ route('vendas') }}">
-                                    <i class="bi bi-circle"></i><span>Vendas</span>
-                                </a>
+                                <a href="{{ route('vendas') }}"><i class="bi bi-circle"></i><span>Vendas</span></a>
                             </li>
                         </ul>
                     </li>
@@ -232,9 +212,7 @@
                         </a>
                         <ul id="components-mkt" class="nav-content collapse " data-bs-parent="#sidebar-cart">
                             <li>
-                                <a href="{{ route('banners') }}">
-                                    <i class="bi bi-circle"></i><span>Banners</span>
-                                </a>
+                                <a href="{{ route('banners') }}"><i class="bi bi-circle"></i><span>Banners</span></a>
                             </li>
                         </ul>
                     </li>

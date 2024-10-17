@@ -19,10 +19,14 @@
             <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <div class="row">
                     <div class="col-sm-12 col-md-4 col-lg-4">
-                        @if($notebook->status == 1) 
+                        @if($notebook->status == 1)
                             <a id="result" class="btn btn-outline-success mt-3 mb-3 w-100">RESULTADO</a>
                         @else
-                            <a href="{{ route('answer', ['id' => $notebook->id]) }}" class="btn btn-dark mt-3 w-100">COMEÇAR</a>
+                            @if($notebook->getAnsweredQuestionsCount() >= 1) 
+                                <a href="{{ route('answer', ['id' => $notebook->id]) }}" class="btn btn-dark mt-3 w-100">RETOMAR CADERNO</a>
+                            @else
+                                <a href="{{ route('answer', ['id' => $notebook->id]) }}" class="btn btn-dark mt-3 w-100">COMEÇAR</a>
+                            @endif
                         @endif
 
                         <a href="{{ route('caderno-filtros', ['id' => $notebook->id]) }}" class="btn btn-outline-dark mt-1 w-100"><i class="bx bx-filter"></i> FILTROS</a>

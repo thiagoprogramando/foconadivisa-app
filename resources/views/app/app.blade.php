@@ -6,9 +6,9 @@
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-3">
             <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
                 <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    @foreach ($banners as $index => $banner)
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ $index }}"  @if($index == 0) class="active" aria-current="true" @endif></button>
+                    @endforeach
                 </div>
 
                 <div class="carousel-inner">
@@ -85,7 +85,7 @@
                     <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                         <div class="card info-card sales-card">
                             <div class="card-body">
-                                <h5 class="card-title text-center">Progresso</h5>
+                                <h5 class="card-title text-center">Progresso <span>| Meta</span></h5>
                                 <div class="d-flex align-items-center justify-content-center">
                                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="bi bi-bar-chart-fill"></i> </div>
                                     <div class="ps-3">

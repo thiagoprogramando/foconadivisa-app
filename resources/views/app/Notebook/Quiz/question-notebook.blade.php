@@ -102,19 +102,48 @@
                 @if($question)
                     <div class="card-header">
                         <div class="row mb-3">
-                            <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                            <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                                 <h6 class="question">
                                     Questão: {{ $nextQuestionNumber }} de {{ $totalQuestions }}
                                 </h6>
                                 <small><b>Conteúdo/Tópico:</b> {{ $question->subject->name }}</small> <br>
                                 <small><b>{{ $question->responsesCount(Auth::user()->id, $notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $question->correctCount(Auth::user()->id, $notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $question->wrogCount(Auth::user()->id, $notebook->id) }}</b> Erros</small>
                             </div>
-                            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                            <div class="col-12 col-sm-12 col-md-5 col-lg-5">
                                 <div class="btn-group">
                                     <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
-                                    <a href="{{ route('caderno-filtros', ['id' => $notebook->id]) }}" class="btn btn-outline-dark" title="Modificar filtros"><i class="bx bx-filter"></i> Filtros</a>
+                                    <a href="#" class="btn btn-outline-dark" id="updateNotebook" title="Modificar filtros">
+                                        <i class="bx bx-filter"></i> Filtros
+                                    </a>
+                                    <button class="btn btn-outline-dark" title="Relatar problema" data-bs-toggle="modal" data-bs-target="#newTicket"><i class="ri-alarm-warning-fill"></i> Relatar problema</button>
                                     <button type="button" class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bx bxs-book-reader"></i></button>
                                     <button type="button" class="btn btn-outline-dark btn-comment" title="Comentários sobre a questão"><i class="bi bi-chat-square-text"></i></button>
+                                </div>
+
+                                <div class="modal fade" id="newTicket" tabindex="-1" aria-hidden="true" style="display: none;">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Detalhes:</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form action="{{ route('create-ticket') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="question_id" value="{{ $question->id }}">
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                                            <textarea name="comment" class="form-control" rows="4" placeholder="Descreva o problema:"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                                                    <button type="submit" class="btn btn-outline-success">Enviar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -123,7 +152,7 @@
                     <div class="card-body">
 
                         <div id="resolution" class="d-none p-3 mt-3 mb-3">
-                            <p class="lead">Resolução - <small>{{ $question->updated_at->format('d/m/Y') }}</p>
+                            <p class="lead">Resolução - <small style="font-size: 14px;">Data do comentário: {{ $question->updated_at->format('d/m/Y') }}</small></p>
                             {!! $question->comment_text !!}
                         </div>
 
@@ -166,7 +195,9 @@
                             <div class="text-center">
                                 <div class="btn-group mt-3" role="group" style="width: 70%;">
                                     <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-dark">SAIR</a>
-                                    <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger"><i class="bi bi-trash"></i></a>
+                                    <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i> ELIMINAR QUESTÃO
+                                    </a>
                                     <button type="submit" class="btn btn-outline-success">RESPONDER</button>
                                 </div>
                             </div>
@@ -237,10 +268,38 @@
 
         $('.btn-comment').on('click', function() {
             $('#comments').toggleClass('d-none');
+
+            $('html, body').animate({
+                scrollTop: $('#comments').offset().top - 100
+            }, 400);
         });
 
         $('.btn-resolution').on('click', function() {
             $('#resolution').toggleClass('d-none');
+
+            $('html, body').animate({
+                scrollTop: $('#resolution').offset().top - 100
+            }, 400);
+        });
+
+        document.getElementById('updateNotebook').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Deseja atualizar caderno?',
+                text: 'Você perderá todas as questões resolvidas até o momento.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'SIM',
+                cancelButtonText: 'NÃO'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Se o usuário clicar em "SIM", redireciona para a rota
+                    window.location.href = "{{ route('caderno-filtros', ['id' => $notebook->id]) }}";
+                }
+            });
         });
     </script>
 @endsection

@@ -115,7 +115,7 @@
                             @foreach ($questions as $question)
                                 <tr>
                                     <th scope="row">{{ $question->id }}</th>
-                                    <td>{{ $question->question_text }}</td>
+                                    <td>{!! $question->question_text !!}</td>
                                     <td>{{ optional($question->topic)->name ?? '---' }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('delete-question') }}" method="POST" class="btn-group delete" role="group">

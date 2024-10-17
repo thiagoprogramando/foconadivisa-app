@@ -31,6 +31,14 @@ class Notebook extends Model {
         return $this->questions()->count();
     }
 
+    public function countQuestionsNotebook() {
+        return $this->notebookQuestions()
+                    ->whereHas('answers', function($query) {
+                        $query->whereColumn('notebook_question_id', 'notebook_questions.id');
+                    })
+                    ->count();
+    }       
+
     public function answers() {
         return $this->hasMany(Answer::class, 'notebook_id');
     }

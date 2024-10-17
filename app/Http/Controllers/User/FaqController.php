@@ -4,7 +4,9 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faq;
+use App\Models\Notification;
 use App\Models\Plan;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -72,5 +74,81 @@ class FaqController extends Controller {
         }
 
         return redirect()->back()->with('error', 'Não foi possível excluir FAQ!');
+    }
+
+    public function tickets(Request $request) {
+
+        $query = Ticket::orderBy('response_comment', 'asc');
+
+        if (Auth::user()->type <> 1) {
+            $query->where('user_id', Auth::user()->id);
+        }
+
+        if(!empty($request->search)) {
+            $query->where('comment', 'LIKE', '%'.$request->search.'%');
+        }
+
+        if(!empty($request->search)) {
+            $query->where('response_comment', 'LIKE', '%'.$request->search.'%');
+        }
+    
+        return view('app.Faq.ticket', [
+            'tickets' => $query->get()
+        ]);
+    }
+
+    public function updateTicket(Request $request) {
+
+        $ticket = Ticket::find($request->id);
+        if(!$ticket) {
+            return redirect()->back()->with('error', 'Ticket não encontrado!');
+        }
+
+        $ticket->response_comment = $request->response_comment;
+        if($ticket->save()) {
+
+            $notification               = new Notification();
+            $notification->user_id      = $ticket->user_id;
+            $notification->type         = 1;
+            $notification->title        = 'Ticket respondido!';
+            $notification->description  = 'Olá, o suporte acabou de responde sua dúvida/relato!';
+            $notification->save();
+
+            return redirect()->back()->with('success', 'Ticket atualizado com sucesso!');
+        }
+
+        return redirect()->back()->with('error', 'Não foi possível atualizar o Ticket!');
+    }
+
+    public function createTicket(Request $request) {
+
+        $ticket                 = new Ticket();
+        $ticket->user_id        = Auth::user()->id;
+        $ticket->faq_id         = $request->faq_id;
+        $ticket->question_id    = $request->question_id;
+        $ticket->comment        = $request->comment;
+        if($ticket->save()) {
+
+            $notification               = new Notification();
+            $notification->user_id      = 1;
+            $notification->type         = 1;
+            $notification->title        = 'Novo Ticket aberto!';
+            $notification->description  = 'Olá, foi aberto um Ticket de suporte!';
+            $notification->save();
+
+            return redirect()->back()->with('success', 'Ticket aberto com sucesso!');
+        }
+
+        return redirect()->back()->with('error', 'Não foi possível enviar o Ticket!');
+    }
+
+    public function deleteTicket($id) {
+
+        $ticket = Ticket::find($id);
+        if($ticket && $ticket->delete()) {
+            return redirect()->back()->with('success', 'Ticket excluído com sucesso!');
+        }
+
+        return redirect()->back()->with('error', 'Não foi possível excluir Ticket!');
     }
 }

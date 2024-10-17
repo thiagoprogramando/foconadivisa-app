@@ -115,14 +115,20 @@
                                             <span class="badge bg-secondary">{{ $topic }}</span>
                                         @endforeach
                                     </td>
-                                    <td class="text-center">{{ $notebook->percentage }}%</td>
+                                    <td class="text-center">
+                                        @if($notebook->countQuestions() > 0)
+                                            {{ number_format(($notebook->countQuestionsNotebook() / $notebook->countQuestions()) * 100, 2) }}%
+                                        @else
+                                            0%
+                                        @endif
+                                    </td>                                    
                                     <td class="text-center">{{ $notebook->countQuestions() }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('delete-notebook') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $notebook->id }}">
-                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                            <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-outline-success"><i class="bi bi-arrow-bar-right"></i></a>
+                                            <button type="submit" title="Excluir Caderno" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <a title="Retormar Caderno" href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-outline-success"><i class="bi bi-arrow-bar-right"></i></a>
                                         </form>
                                     </td>
                                 </tr>
