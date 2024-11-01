@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Answer;
 use App\Models\MktBanner;
+use App\Models\Product;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
@@ -33,14 +34,14 @@ class AppController extends Controller {
         $progress = ($totalQuestionsCount / $totalQuestions) * 100;
 
         $banners = MktBanner::orderBy('created_at', 'asc')->get();
-    
+        
         return view('app.app', [
             'errorsCount'           => $errorsCount,
             'correctCount'          => $correctCount,
             'questionsTodayCount'   => $questionsTodayCount,
             'totalQuestionsCount'   => $totalQuestionsCount,
             'progress'              => min($progress, 100),
-            'banners'               => $banners
+            'banners'               => $banners,
         ]);
     }
 

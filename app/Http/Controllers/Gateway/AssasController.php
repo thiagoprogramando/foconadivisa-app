@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\Gateway;
 
 use App\Http\Controllers\Controller;
+use App\Mail\Product;
 use App\Models\Invoice;
 use App\Models\Notification;
 use App\Models\Plan;
+use App\Models\Sale;
 use App\Models\User;
 
 use GuzzleHttp\Client;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class AssasController extends Controller {
     
@@ -42,7 +45,7 @@ class AssasController extends Controller {
             return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
         }
 
-        $dataInvoice = $this->createInvoice($customer, $plan->value, $plan->name);
+        $dataInvoice = $this->createInvoice(null, null, $customer, $plan->value, $plan->name);
         if($dataInvoice == null) {
             return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');
         }
@@ -73,7 +76,7 @@ class AssasController extends Controller {
         return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');
     }
 
-    private function createCustomer($id) {
+    public function createCustomer($id) {
 
         $user = User::find($id);
         if(!$user) {
@@ -115,7 +118,7 @@ class AssasController extends Controller {
         }
     }
 
-    private function createInvoice($customer, $value, $description) {
+    public function createInvoice($method, $installments, $customer, $value, $description) {
         	
         $client = new Client();
 
@@ -127,10 +130,12 @@ class AssasController extends Controller {
             ],
             'json' => [
                 'customer'          => $customer,
-                'billingType'       => 'UNDEFINED',
+                'billingType'       => $method ?? 'PIX',
                 'value'             => number_format($value, 2, '.', ''),
                 'dueDate'           => now()->addDay(),
                 'description'       => $description,
+                'installmentCount'  => $installments != null ? $installments : 1,
+                'installmentValue'  => $installments != null ? number_format(($value / intval($installments)), 2, '.', '') : $value,
                 // 'callback'          => [
                 //     'successUrl'    => env('APP_URL'),
                 //     'autoRedirect'  => true
@@ -178,6 +183,32 @@ class AssasController extends Controller {
                 }
 
                 return response()->json(['status' => 'success', 'message' => 'Processo concluído com sucesso!']);
+            }
+            
+            $sale = Sale::where('payment_token', $token)->first();
+            if($sale) {
+                
+                $send = Mail::to($sale->user->email, $sale->user->name)->send(new Product([
+                    'toName'    => $sale->user->name,
+                    'toEmail'   => $sale->user->email,
+                    'fromName'  => env('MAIL_FROM_NAME'),
+                    'fromEmail' => env('MAIL_FROM_ADDRESS'),
+                    'subject'   => 'Seu pedido chegou✅',
+                    'message'   => "<b>Você comprou e chegou rapidinho!</b> Segue abaixo o produto: {$sale->product->name}. Obrigado pela compra! Para acessar o seu conteúdo/material, siga os seguintes passos: <br>
+                                    1 - <a href='{env('APP_URL')}'>Acesse nosso site</a> <br>
+                                    2 - Informe seu Email e senha (sua senha sempre será o CPF ou CNPJ informado na hora da compra) <br>
+                                    3 - Aproveite o Produto <br>"
+                ]));
+
+                if($send) {
+                    $sale->delivery = 1;
+                    $sale->payment_status = 1;
+                    $sale->save();
+
+                    return response()->json(['status' => 'success', 'message' => 'Venda recebida e Produto enviado!']);
+                }
+
+                return response()->json(['status' => 'error', 'message' => 'Produto não enviado!']);
             }
             
             return response()->json(['status' => 'success', 'message' => 'Nenhuma fatura encontrada!']);

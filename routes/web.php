@@ -5,12 +5,16 @@ use App\Http\Controllers\Access\ForgoutController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\Data\ExcelController;
 use App\Http\Controllers\Data\StatisticsController;
+use App\Http\Controllers\Ecommerce\EcommerceController;
+use App\Http\Controllers\Ecommerce\ShopController;
 use App\Http\Controllers\Gateway\AssasController;
 use App\Http\Controllers\Mkt\BannerController;
 use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
 use App\Http\Controllers\Payment\PaymentController;
+use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Sale\InvoiceController;
+use App\Http\Controllers\Sale\SaleController;
 use App\Http\Controllers\Subject\CommentController;
 use App\Http\Controllers\Subject\QuestionController;
 use App\Http\Controllers\Subject\SubjectController;
@@ -22,7 +26,7 @@ use App\Http\Controllers\User\UserController;
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [AccessController::class, 'login'])->name('index');
+Route::get('/', [AccessController::class, 'welcome'])->name('index');
 Route::get('/login', [AccessController::class, 'login'])->name('login');
 Route::post('logon', [AccessController::class, 'logon'])->name('logon');
 
@@ -32,6 +36,11 @@ Route::post('registrer', [AccessController::class, 'registrer'])->name('registre
 Route::get('/recuperar-conta/{code?}', [ForgoutController::class, 'forgout'])->name('recuperar-conta');
 Route::post('/send-recovery', [ForgoutController::class, 'sendRecovery'])->name('send-recovery');
 Route::post('/recovery-password', [ForgoutController::class, 'recoveryPassword'])->name('recovery-password');
+
+Route::get('/ecommerce', [EcommerceController::class, 'ecommerce'])->name('ecommerce');
+Route::get('/product/{id}', [EcommerceController::class, 'product'])->name('product');
+Route::get('/order/{id}', [EcommerceController::class, 'order'])->name('order');
+Route::post('pay-product', [EcommerceController::class, 'payProduct'])->name('pay-product');
 
 Route::middleware('auth')->group(function () {
 
@@ -57,7 +66,6 @@ Route::middleware('auth')->group(function () {
     Route::post('create-ticket', [FaqController::class, 'createTicket'])->name('create-ticket');
     Route::post('update-ticket', [FaqController::class, 'updateTicket'])->name('update-ticket');
 
-
     //Notification
     Route::get('delete-notification/{id}', [NotificationController::class, 'deleteNotification'])->name('delete-notification');
 
@@ -68,11 +76,26 @@ Route::middleware('auth')->group(function () {
     Route::post('update-plan', [PlanController::class, 'updatePlan'])->name('update-plan');
     Route::post('delete-plan', [PlanController::class, 'deletePlan'])->name('delete-plan');
 
+    //Produtcs
+    Route::get('/produtos', [ProductController::class, 'products'])->name('produtos');
+    Route::get('/form-create-product', [ProductController::class, 'formCreateProduct'])->name('form-create-product');
+    Route::get('/form-update-product/{id}', [ProductController::class, 'formUpdateProduct'])->name('form-update-product');
+    Route::post('create-product', [ProductController::class, 'createProduct'])->name('create-product');
+    Route::post('update-product', [ProductController::class, 'updateProduct'])->name('update-product');
+    Route::post('delete-product', [ProductController::class, 'deleteProduct'])->name('delete-product');
+
     //Payment
     Route::get('/pagamentos', [PaymentController::class, 'payments'])->name('pagamentos');
     Route::post('/delete-payment', [PaymentController::class, 'deletePayment'])->name('delete-payment');
 
-    //Sale
+    //Sales
+    Route::get('/produtos-vendas', [SaleController::class, 'sales'])->name('produtos-vendas');
+    Route::get('/confirm-sale/{id}', [SaleController::class, 'confirmSale'])->name('confirm-sale');
+    Route::post('delete-sale', [SaleController::class, 'deleteSale'])->name('delete-sale');
+
+    //Shopping
+    Route::get('/minhas-compras', [ShopController::class, 'shop'])->name('minhas-compras');
+    
     Route::get('/vendas', [InvoiceController::class, 'invoices'])->name('vendas');
     Route::get('/confirm-invoice/{id}', [InvoiceController::class, 'confirmPayment'])->name('confirm-invoice');
     Route::post('/delete-invoice', [InvoiceController::class, 'deletePayment'])->name('delete-invoice');
@@ -130,6 +153,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-excel', [ExcelController::class, 'userExcel'])->name('user-excel');
     Route::get('/plan-excel', [ExcelController::class, 'planExcel'])->name('plan-excel');
     Route::get('/invoice-excel', [ExcelController::class, 'invoiceExcel'])->name('invoice-excel');
+    Route::get('/sale-excel', [ExcelController::class, 'saleExcel'])->name('sale-excel');
 
     //Data
     Route::get('/statistic', [StatisticsController::class, 'statistic'])->name('statistic');

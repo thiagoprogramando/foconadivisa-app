@@ -22,9 +22,9 @@
         <link href="{{ asset('template/vendor/simple-datatables/style.css') }}" rel="stylesheet">
         <link href="{{ asset('template/css/style.css') }}" rel="stylesheet">
 
-        <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+        <link href="{{ asset('template/css/tom-select.css') }}" rel="stylesheet">
+        <script src="{{ asset('template/js/jquery.js') }}"></script>
+        <script src="{{ asset('template/js/tom-select.complete.min.js') }}"></script>
     </head>
 
     <body @if(!empty($menu) && $menu == 1) class="toggle-sidebar" @endif>
@@ -43,10 +43,7 @@
                     <input type="text" name="search" placeholder="Pesquisar" title="Pesquisar">
                     <button type="submit" title="Pesquisar"><i class="bi bi-search"></i></button>
                 </form>
-                
             </div>
-
-            <a href="{{ route('cadernos') }}" class="btn btn-dark d-none d-sm-block">RESOLVER QUESTÕES</a>
 
             <nav class="header-nav ms-auto">
                 <ul class="d-flex align-items-center">
@@ -153,6 +150,7 @@
                     </a>
                 </li>
 
+                @if(Auth::user()->type == 1)
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('cadernos') }}">
                         <i class="bi bi-pen"></i>
@@ -166,7 +164,16 @@
                         <span>Meus Cadernos</span>
                     </a>
                 </li>
+                @endif
 
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="{{ route('minhas-compras') }}">
+                        <i class="bi bi-shop"></i>
+                        <span>Minhas Compras</span>
+                    </a>
+                </li>
+
+                @if(Auth::user()->type == 1)
                 <li class="nav-heading">Meus Dados</li>
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estátisticas</span></a>
@@ -177,6 +184,7 @@
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('pagamentos') }}"><i class="bi bi-arrow-down-square-fill"></i><span>Pendências</span></a>
                 </li>
+                @endif
 
                 @if(Auth::user()->type == 1)
                     <li class="nav-heading">Gestão</li>
@@ -203,6 +211,19 @@
                             </li>
                             <li>
                                 <a href="{{ route('vendas') }}"><i class="bi bi-circle"></i><span>Vendas</span></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" data-bs-target="#components-product-digital" data-bs-toggle="collapse" href="#">
+                        <i class="bi bi-bag-plus"></i><span>Produtos</span><i class="bi bi-chevron-down ms-auto"></i>
+                        </a>
+                        <ul id="components-product-digital" class="nav-content collapse " data-bs-parent="#sidebar-cart">
+                            <li>
+                                <a href="{{ route('produtos') }}"><i class="bi bi-circle"></i><span>Produtos</span></a>
+                            </li>
+                            <li>
+                                <a href="{{ route('produtos-vendas') }}"><i class="bi bi-circle"></i><span>Vendas</span></a>
                             </li>
                         </ul>
                     </li>
@@ -246,7 +267,7 @@
                 &copy; Copyright <strong><span>{{ env('APP_NAME') }}</span></strong>. Todos os direitos reservados
             </div>
             <div class="credits">
-                Desenvolvido por <a href="https://ifuture.cloud/">ifuture.cloud</a>
+                Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
             </div>
         </footer>
 
@@ -311,7 +332,6 @@
                         });
                     });
                 });
-
             });
         </script>
     </body>

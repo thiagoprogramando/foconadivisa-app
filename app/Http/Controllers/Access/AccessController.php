@@ -3,11 +3,28 @@
 namespace App\Http\Controllers\Access;
 
 use App\Http\Controllers\Controller;
+use App\Models\MktBanner;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AccessController extends Controller {
+
+    public function welcome() {
+
+        if(Auth::check()) {
+            return redirect()->route('app');
+        }
+
+        $banners = MktBanner::orderBy('created_at', 'asc')->get();
+        $products = Product::where('status', 1)->orderBy('created_at', 'asc')->get();
+
+        return view('welcome', [
+            'banners'  => $banners,
+            'products' => $products
+        ]);
+    }
     
     public function login() {
 

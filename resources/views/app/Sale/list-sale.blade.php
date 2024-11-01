@@ -1,5 +1,5 @@
 @extends('app.layout')
-@section('title') Planos - Vendas @endsection
+@section('title') Produtos - Vendas @endsection
 @section('content')
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
@@ -10,15 +10,15 @@
                     <button type="button" title="Filtros" class="btn btn-dark modal-swal" data-bs-toggle="modal" data-bs-target="#filterModal">
                         <i class="bi bi-filter-circle"></i> Filtros
                     </button>
-                    <a href="{{ route('invoice-excel', request()->query()) }}" class="btn btn-outline-dark" title="Excel">
+                    <a href="{{ route('sale-excel', request()->query()) }}" class="btn btn-outline-dark" title="Excel">
                         <i class="bi bi-file-earmark-excel"></i> Excel
                     </a>  
-                    <a href="{{ route('pagamentos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    <a href="{{ route('produtos-vendas') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
 
                 <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true" style="display: none;">
                     <div class="modal-dialog">
-                        <form action="{{ route('vendas') }}" method="GET" class="modal-content">
+                        <form action="{{ route('produtos-vendas') }}" method="GET" class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Pesquisar</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -34,18 +34,33 @@
                                         </select>
                                     </div>
                                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                                        <select id="swal-plans" name="plan_id" placeholder="Escolha um Plano">
-                                            <option value="" selected>Escolha um Plano</option>
-                                            @foreach($plans as $plan)
-                                                <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                                        <select id="swal-products" name="product_id" placeholder="Escolha um Produto">
+                                            <option value="" selected>Escolha um Produto</option>
+                                            @foreach($products as $product)
+                                                <option value="{{ $product->id }}">{{ $product->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                                        <select name="payment_status" class="form-control" placeholder="Escolha uma Situação">
-                                            <option value="" selected>Escolha uma Situação</option>
+                                    <div class="col-12 col-sm-12 col-md-6 col-lg-6 mb-2">
+                                        <select name="payment_method" class="form-control" placeholder="Métodos de Pagamento">
+                                            <option value="" selected>Métodos de Pagamento</option>
+                                            <option value="PIX">PIX</option>
+                                            <option value="CREDIT_CARD">Cartão de crédito</option>
+                                            <option value="BOLETO">Boleto</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-6 col-lg-6 mb-2">
+                                        <select name="payment_status" class="form-control" placeholder="Escolha um status">
+                                            <option value="" selected>Escolha um status</option>
                                             <option value="1">Aprovado</option>
                                             <option value="0">Pendente</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                                        <select name="type" class="form-control" placeholder="Tipo">
+                                            <option value="" selected>Tipo</option>
+                                            <option value="1">Produto Digital</option>
+                                            <option value="2">Simulado</option>
                                         </select>
                                     </div>
                                 </div>
@@ -66,31 +81,33 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Cliente</th>
-                                <th scope="col">Plano</th>
+                                <th scope="col">Produto</th>
                                 <th scope="col">Link de Pagamento</th>
                                 <th scope="col" class="text-center">Status</th>
                                 <th scope="col" class="text-center">Opções</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($invoices as $invoice)
+                            @foreach ($sales as $sale)
                                 <tr>
-                                    <th scope="row">{{ $invoice->id }}</th>
-                                    <td>{{ $invoice->labelUser->name }}</td>
-                                    <td>{{ $invoice->labelPlan->name }}</td>
+                                    <th scope="row">{{ $sale->id }}</th>
+                                    <td>{{ $sale->user->name }}</td>
+                                    <td>{{ $sale->product->name }}</td>
                                     <td> 
-                                        <a href="{{ $invoice->payment_url }}" target="_blank">
-                                            <span class="badge bg-dark">{{ $invoice->payment_url }}</span>
+                                        <a href="{{ $sale->payment_url }}" target="_blank">
+                                            <span class="badge bg-dark">{{ $sale->payment_url }}</span>
                                         </a>
                                     </td>
-                                    <td class="text-center">{{ $invoice->statusLabel() }}</td>
                                     <td class="text-center">
-                                        <form action="{{ route('delete-invoice') }}" method="POST" class="btn-group delete" role="group">
+                                        {{ $sale->statusLabel() }} <br>
+                                        {!! $sale->deliveryLabel() !!}
+                                    </td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-sale') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf
-                                            <input type="hidden" name="id" value="{{ $invoice->id }}">
-                                            <button title="Excluir Fatura" type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                            <a title="Confirmar Pagamento" href="{{ route('confirm-invoice', ['id' => $invoice->id]) }}" class="btn btn-outline-success"><i class="bi bi-check2-all"></i></a>
-                                            <a title="Abrir Link" href="{{ $invoice->payment_url }}" target="_blank" class="btn btn-dark"><i class="bi bi-credit-card-2-back"></i></a>
+                                            <input type="hidden" name="id" value="{{ $sale->id }}">
+                                            <button title="Excluir Venda" type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <a title="Confirmar Pagamento" href="{{ route('confirm-sale', ['id' => $sale->id]) }}" class="btn btn-outline-success"><i class="bi bi-check2-all"></i></a>
                                         </form>
                                     </td>
                                 </tr>
@@ -113,7 +130,7 @@
                 },
             });
 
-            var topic = new TomSelect("#swal-plans", {
+            var topic = new TomSelect("#swal-products", {
                 create: false,
                 sortField: {
                     field: "text",
