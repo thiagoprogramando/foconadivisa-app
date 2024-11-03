@@ -31,8 +31,11 @@
                                     <th scope="row">{{ $product->id }}</th>
                                     <td>
                                         {{ $product->name }} <br>
+                                        <span class="badge bg-dark">{{ Str::limit(strip_tags($product->description), 40) }}...</span>
                                     </td>
-                                    <td> <a href="">XXXXXXXXXX</a> </td>
+                                    <td> 
+                                        <span class="badge bg-dark"><a href="{{ env('APP_URL') }}order/2" target="_blank">{{ env('APP_URL') }}order/2</a></span>
+                                    </td>
                                     <td class="text-center">R$ {{ number_format($product->value, 2, ',', '.') }}</td>
                                     <th scope="row" class="text-center">{{ $product->views }}</th>
                                     <td class="text-center">

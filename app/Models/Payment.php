@@ -16,4 +16,20 @@ class Payment extends Model {
         'method',
         'installments',
     ];
+
+    public function methodLabel() {
+        switch ($this->method) {
+            case 'CREDIT_CARD':
+                return 'Cartão de Crédito';
+                break;
+            case 'PIX':
+                return 'PIX';
+                break;
+            case 'BOLETO':
+                return 'BOLETO';
+                break;
+            default:
+                return 'PIX';
+        }
+    }
 }

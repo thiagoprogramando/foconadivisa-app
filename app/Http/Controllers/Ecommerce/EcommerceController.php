@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Gateway\AssasController;
+use App\Models\Payment;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
@@ -48,7 +49,7 @@ class EcommerceController extends Controller {
 
         return view('order', [
             'product'               => $product,
-            'paymentMethods'        => $product->payments->pluck('method'), 
+            'paymentMethods'        => Payment::where('product_id', $product->id)->get(), 
             'installmentsOptions'   => $product->payments->mapWithKeys(function ($payment) {
                                             return [$payment->method => $payment->installments];
                                         }),

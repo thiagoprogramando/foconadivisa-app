@@ -18,9 +18,9 @@
             @foreach ($products as $product)
                 <div class="col-6 col-sm-6 col-md-6 col-lg-3 mb-3">
                     <div class="card">
-                        <img src="{{ asset('storage/'.$product->photo) }}" class="card-img-top" alt="What is Lorem Ipsum?" style="width: 100%; max-height: 200px !important; min-height: 200px !important; object-fit: coven;"/>
+                        <img src="{{ asset('storage/'.$product->photo) }}" class="card-img-top" alt="{{ $product->name }}" style="width: 100%; max-height: 200px !important; min-height: 200px !important; object-fit: coven;"/>
                         <div class="card-body">
-                            <p class="card-text mt-3">What is Lorem Ipsum?</p>
+                            <p class="card-text mt-3">{{ $product->name }}</p>
                             <small>{{ Str::limit(strip_tags($product->description), 90) }}</small>
                             <h5 class="card-title mb-3"><a href="#">R$ {{ number_format($product->value, 2, ',', '.') }}</a></h5>
                             

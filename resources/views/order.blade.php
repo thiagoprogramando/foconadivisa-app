@@ -52,7 +52,7 @@
                         <select name="method" class="form-select" id="paymentMethod">
                             <option selected>Forma de pagamento</option>
                             @foreach($paymentMethods as $method)
-                                <option value="{{ $method }}">{{ ucfirst(strtolower(str_replace('_', ' ', $method))) }}</option>
+                                <option value="{{ $method }}">{{ $method->methodLabel() }}</option>
                             @endforeach
                         </select>
                 
