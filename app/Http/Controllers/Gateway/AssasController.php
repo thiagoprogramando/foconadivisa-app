@@ -187,6 +187,8 @@ class AssasController extends Controller {
             
             $sale = Sale::where('payment_token', $token)->first();
             if($sale) {
+
+                $url = env('APP_URL');
                 
                 $send = Mail::to($sale->user->email, $sale->user->name)->send(new Product([
                     'toName'    => $sale->user->name,
@@ -195,7 +197,7 @@ class AssasController extends Controller {
                     'fromEmail' => env('MAIL_FROM_ADDRESS'),
                     'subject'   => 'Seu pedido chegou✅',
                     'message'   => "<b>Você comprou e chegou rapidinho!</b> Segue abaixo o produto: {$sale->product->name}. Obrigado pela compra! Para acessar o seu conteúdo/material, siga os seguintes passos: <br>
-                                    1 - <a href='{env('APP_URL')}'>Acesse nosso site</a> <br>
+                                    1 - <a href='{$url}'>Acesse nosso site</a> <br>
                                     2 - Informe seu Email e senha (sua senha sempre será o CPF ou CNPJ informado na hora da compra) <br>
                                     3 - Aproveite o Produto <br>"
                 ]));

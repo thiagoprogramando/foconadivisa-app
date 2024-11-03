@@ -1,8 +1,8 @@
 @extends('layout')
 @section('ecommerce')
 <div class="row mt-5">
-    <div class="col-12 col-sm-12 col-md-5 col-lg-4 mb-3">
-        <img src="{{ asset('storage/'.$product->photo) }}" class="d-block w-100" alt="{{ $product->name }}" style="object-fit: contain; max-height: 800px; width: auto;"/>
+    <div class="col-12 col-sm-12 col-md-5 col-lg-4 mb-3 d-flex justify-content-center">
+        <img src="{{ asset('storage/'.$product->photo) }}" class="d-block w-75" alt="{{ $product->name }}" style="object-fit: contain; max-height: 600px; width: auto;"/>
     </div>
 
     <div class="col-12 col-sm-12 col-md-7 col-lg-8 card p-5">
