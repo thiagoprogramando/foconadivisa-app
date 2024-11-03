@@ -44,22 +44,23 @@
         <div class="container">
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="text-center mt-5 mb-5">
-                        <h3>Estamos finalizando a plataforma para você!</h1>
-                        <p class="lead">Em breve um banco de questões completo para a sua jornada.</p>
-                        <small>enquanto aguarda, veja outros produtos:</small>
+                    <div class="text-center mt-5">
+                        <p class="lead"> 
+                            Estamos finalizando a plataforma para você! <br>
+                            Em breve um banco de questões completo para a sua jornada.
+                        </p>
                     </div>
                 </div>
 
                 @if($products->count() > 0)
                     @foreach ($products as $product)
-                        <div class="col-6 col-sm-6 col-md-6 col-lg-3 mb-3">
+                        <div class="col-12 col-sm-12 col-md-4 col-lg-3 mb-3">
                             <div class="card">
                                 <img src="{{ asset('storage/'.$product->photo) }}" class="card-img-top" alt="{{ $product->name }}" style="width: 100%; max-height: 200px !important; min-height: 200px !important; object-fit: coven;"/>
                                 <div class="card-body">
                                     <p class="card-text mt-3">{{ $product->name }}</p>
-                                    <small>{{ Str::limit(strip_tags(html_entity_decode($product->description)), 90) }}</small>
-                                    <h5 class="card-title mb-3"><a href="#">R$ {{ number_format($product->value, 2, ',', '.') }}</a></h5>
+                                    <small>{{ Str::limit(strip_tags(html_entity_decode($product->description)), 40) }}</small>
+                                    <h5 class="card-title mb-1"><a href="#">R$ {{ number_format($product->value, 2, ',', '.') }}</a></h5>
                                     
                                     <form action="" method="POST" class="text-center card-footer">
                                         @csrf
