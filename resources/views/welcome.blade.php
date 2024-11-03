@@ -13,7 +13,7 @@
 </style>
 
 <div class="row">
-    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
         <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-indicators">
                 @foreach ($banners as $index => $banner)
@@ -24,7 +24,7 @@
             <div class="carousel-inner">
                 @foreach ($banners as $index => $banner)
                     <div class="carousel-item @if($index == 0) active @endif">
-                        <img src="{{ asset('storage/'.$banner->file) }}" class="d-block w-100" alt="{{ $banner->name }}" style="max-height: 120px !important;">
+                        <img src="{{ asset('storage/'.$banner->file) }}" class="d-block w-100" alt="{{ $banner->name }}" style="max-height: 150px !important;">
                     </div>
                 @endforeach
             </div>
@@ -40,7 +40,7 @@
         </div>
     </div>
 
-    <div class="col-12 col-sm-12 col-md-12 col-lg-12 card">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
         <div class="container">
             <div class="row mb-2">
                 @if($products->count() > 0)
