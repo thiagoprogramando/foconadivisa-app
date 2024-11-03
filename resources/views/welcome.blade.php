@@ -24,7 +24,7 @@
             <div class="carousel-inner">
                 @foreach ($banners as $index => $banner)
                     <div class="carousel-item @if($index == 0) active @endif">
-                        <img src="{{ asset('storage/'.$banner->file) }}" class="d-block w-100" alt="{{ $banner->name }}">
+                        <img src="{{ asset('storage/'.$banner->file) }}" class="d-block w-100" alt="{{ $banner->name }}" style="max-height: 120px !important;">
                     </div>
                 @endforeach
             </div>
@@ -47,7 +47,7 @@
                     @foreach ($products as $product)
                         <div class="col-12 col-sm-12 col-md-4 col-lg-3 mb-3">
                             <div class="card">
-                                <img src="{{ asset('storage/'.$product->photo) }}" class="card-img-top" alt="{{ $product->name }}" style="width: 100%; max-height: 200px !important; min-height: 200px !important; object-fit: coven;"/>
+                                <img src="{{ asset('storage/'.$product->photo) }}" class="card-img-top" alt="{{ $product->name }}" style="width: 100%; max-height: 150px !important; min-height: 150px !important; object-fit: coven;"/>
                                 <div class="card-body">
                                     <p class="card-text mt-3">{{ $product->name }}</p>
                                     <small>{{ Str::limit(strip_tags(html_entity_decode($product->description)), 40) }}</small>
