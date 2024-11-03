@@ -21,7 +21,7 @@
                         <img src="{{ asset('storage/'.$product->photo) }}" class="card-img-top" alt="{{ $product->name }}" style="width: 100%; max-height: 200px !important; min-height: 200px !important; object-fit: coven;"/>
                         <div class="card-body">
                             <p class="card-text mt-3">{{ $product->name }}</p>
-                            <small>{{ Str::limit(strip_tags($product->description), 90) }}</small>
+                            <small>{{ Str::limit(strip_tags(html_entity_decode($product->description)), 90) }}</small>
                             <h5 class="card-title mb-3"><a href="#">R$ {{ number_format($product->value, 2, ',', '.') }}</a></h5>
                             
                             <form action="" method="POST" class="text-center card-footer">

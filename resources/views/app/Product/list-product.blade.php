@@ -29,10 +29,7 @@
                             @foreach ($products as $product)
                                 <tr>
                                     <th scope="row">{{ $product->id }}</th>
-                                    <td>
-                                        {{ $product->name }} <br>
-                                        <span class="badge bg-dark">{{ Str::limit(strip_tags($product->description), 40) }}...</span>
-                                    </td>
+                                    <td> {{ $product->name }}</td>
                                     <td> 
                                         <span class="badge bg-dark"><a href="{{ env('APP_URL') }}order/2" target="_blank">{{ env('APP_URL') }}order/2</a></span>
                                     </td>
