@@ -31,7 +31,7 @@
                                     <th scope="row">{{ $product->id }}</th>
                                     <td> {{ $product->name }}</td>
                                     <td> 
-                                        <span class="badge bg-dark"><a href="{{ env('APP_URL') }}order/2" target="_blank">{{ env('APP_URL') }}order/2</a></span>
+                                        <span class="badge bg-dark"><a href="{{ env('APP_URL') }}order/{{ $product->id }}" target="_blank">{{ env('APP_URL') }}order/2</a></span>
                                     </td>
                                     <td class="text-center">R$ {{ number_format($product->value, 2, ',', '.') }}</td>
                                     <th scope="row" class="text-center">{{ $product->views }}</th>

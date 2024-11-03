@@ -188,7 +188,7 @@ class AssasController extends Controller {
             $sale = Sale::where('payment_token', $token)->first();
             if($sale) {
 
-                $url = env('APP_URL');
+                $url = env('APP_URL').'login';
                 
                 $send = Mail::to($sale->user->email, $sale->user->name)->send(new Product([
                     'toName'    => $sale->user->name,
