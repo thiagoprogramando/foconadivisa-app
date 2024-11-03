@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Subject;
 
 use App\Http\Controllers\Controller;
+use App\Models\NotebookQuestion;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Subject;
@@ -14,25 +15,25 @@ class QuestionController extends Controller {
     public function viewQuestion($id) {
 
         $question   = Question::find($id);
-        $options    = Option::where('question_id', $question->id)->get();
         $subject    = Subject::find($question->subject_id);
-        $topics     = Topic::where('subject_id', $question->subject_id)->get();
+        $topics     = Subject::where('type', 2)->get();
+        $options = $question->options->keyBy('option_number');
 
         return view('app.Subject.Question.create-question', [
+            'subject'   => $subject,
             'topics'    => $topics,
             'question'  => $question,
-            'subject'   => $subject,
-            'options'   => $options
+            'options'   => $options,
         ]);
     }
 
-    public function createQuestion($subject) {
+    public function createQuestion($topic) {
 
-        $question = new Question();
-        $question->subject_id = $subject;
-        
+        $question               = new Question();
+        $question->subject_id   = $topic;
         if($question->save()) {
-            return redirect()->route('questao', ['id' => $question->id])->with('success', 'Preencha todos os dados da questão!');
+
+            return redirect()->route('questao', ['id' => $question->id])->with('success', 'Preencha todos os dados da nova questão!');
         }
 
         return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');
@@ -41,13 +42,64 @@ class QuestionController extends Controller {
     public function updateQuestion(Request $request) {
 
         $question = Question::find($request->id);
-        $question->question_text = $request->question_text;
-        $question->topic_id = $request->topic_id;
-        if($question->save()) {
-            return redirect()->back()->with('success', 'Dados salvos com sucesso!');
-        }
+        if ($question) {
 
-        return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');
+            $optionCount = 0;
+            $correctCount = 0;
+    
+            for ($i = 1; $i <= 5; $i++) {
+                $optionText = $request->input("option_{$i}");
+                $isCorrect = $request->input("is_correct_{$i}") ? true : false;
+    
+                if ($optionText) {
+                    $optionCount++;
+                    if ($isCorrect) {
+                        $correctCount++;
+                    }
+                }
+            }
+
+            if ($optionCount < 2) {
+                return redirect()->back()->with('error', 'Você deve fornecer pelo menos duas opções.');
+            }
+    
+            if ($correctCount === 0) {
+                return redirect()->back()->with('error', 'Você deve marcar pelo menos uma opção como correta.');
+            }
+
+            $question->question_text    = $request->input('question_text');
+            $question->subject_id       = $request->input('subject_id') ?? $request->input('subject_id_question');
+            $question->comment_text     = $request->input('comment_text');
+            if ($question->save()) {
+                
+                for ($i = 1; $i <= 5; $i++) {
+
+                    $optionText = $request->input("option_{$i}") ?: '---';;
+                    $isCorrect = $request->input("is_correct_{$i}") ? true : false;
+    
+                    $option = Option::where('question_id', $question->id)
+                                    ->where('option_number', $i)
+                                    ->first();
+                    
+                    if ($option) {
+                        $option->option_text = $optionText;
+                        $option->is_correct = $isCorrect;
+                    } else {
+                        $option = new Option();
+                        $option->question_id = $question->id;
+                        $option->option_number = $i;
+                        $option->option_text = $optionText;
+                        $option->is_correct = $isCorrect;
+                    }
+    
+                    $option->save();
+                }
+    
+                return redirect()->route('create-question', ['topic' => $request->input('subject_id') ?? $request->input('subject_id_question')])->with('success', 'Dados salvos com sucesso!');
+            }
+        }
+    
+        return redirect()->back()->with('error', 'Ops! Não foram encontrados dados da Questão.');
     }
 
     public function deleteQuestion(Request $request) {
@@ -61,6 +113,20 @@ class QuestionController extends Controller {
         
         if($question && $question->delete()) {
             return redirect()->route('conteudo', ['id' => $subject])->with('success', 'Questão excluída com sucesso!');
+        }
+
+        return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');
+    }
+
+    public function deleteQuestionAnswer($notebook, $question) {
+
+        $question = NotebookQuestion::where('question_id', $question);
+        if(!$question) {
+            return redirect()->back()->with('error', 'Ops! Não foram encontrados dados da Questão.');
+        }
+        
+        if($question && $question->delete()) {
+            return redirect()->route('answer', ['id' => $notebook])->with('success', 'Questão eliminada com sucesso!');
         }
 
         return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');

@@ -7,9 +7,8 @@
 
             <div class="col-12">
                 <div class="btn-group" role="group">
-                    <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-outline-primary">Novo Conteúdo</button>
-                    <button type="button" class="btn btn-outline-primary">Middle</button>
-                    <button type="button" class="btn btn-outline-primary">Right</button>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#newPlan" class="btn btn-dark">Novo Conteúdo</button>
+                    <a href="{{ route('conteudos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
                 </div>
 
                 <div class="modal fade" id="newPlan" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -39,7 +38,7 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
-                                    <button type="submit" class="btn btn-outline-success">Criar Conteúdo</button>
+                                    <button type="submit" class="btn btn-dark">Criar Conteúdo</button>
                                 </div>
                             </form>
                         </div>
@@ -48,37 +47,39 @@
             </div>
 
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-center">Tópicos</th>
-                            <th scope="col" class="text-center">Questões</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($subjects as $subject)
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $subject->id }}</th>
-                                <td>{{ $subject->name }}</td>
-                                <td>{{ strlen($subject->description) > 60 ? substr($subject->description, 0, 60) . '...' : $subject->description }}</td>
-                                <td class="text-center">{{ $subject->countTopics() }}</td>
-                                <td class="text-center">{{ $subject->countQuestions() }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-subject') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $subject->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                        <a href="{{ route('conteudo', ['id' => $subject->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Tópicos</th>
+                                <th scope="col" class="text-center">Questões</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>   
+                        </thead>
+                        <tbody>
+                            @foreach ($subjects as $subject)
+                                <tr>
+                                    <th scope="row">{{ $subject->id }}</th>
+                                    <td>{{ $subject->name }}</td>
+                                    <td>{{ strlen($subject->description) > 60 ? substr($subject->description, 0, 60) . '...' : $subject->description }}</td>
+                                    <td class="text-center">{{ $subject->countTopics() }}</td>
+                                    <td class="text-center">{{ $subject->countQuestions() + $subject->countTopicQuestions() }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-subject') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $subject->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            <a href="{{ route('conteudo', ['id' => $subject->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>   
             </div>
 
         </div>

@@ -21,10 +21,12 @@ class User extends Authenticatable {
         'status',
         'plan',
         'type',
+        'meta',
         
         'email',
         'password',
-        'code'
+        'code',
+        'customer',
     ];
 
     protected $hidden = [
@@ -43,7 +45,7 @@ class User extends Authenticatable {
 
     public function secondName() {
         $nameParts = explode(' ', $this->name);
-        return $nameParts[1];
+        return isset($nameParts[1]) ? $nameParts[1] : '';
     }
 
     public function labelPlan() {
@@ -53,7 +55,7 @@ class User extends Authenticatable {
     public function typeLabel() {
         switch ($this->type) {
             case 0:
-                return 'Usuário';
+                return 'Cliente';
                 break;
             case 1:
                 return 'Administrador';
@@ -62,7 +64,7 @@ class User extends Authenticatable {
                 return 'Colaborador';
                 break;
             default:
-                return 'Usuário';
+                return 'Cliente';
         }
     }
 }

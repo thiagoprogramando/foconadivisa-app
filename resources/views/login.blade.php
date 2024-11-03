@@ -5,11 +5,11 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <title>{{ env('APP_NAME') }} - {{ env('APP_DESCRIPTION') }}</title>
-    <meta content="" name="description">
-    <meta content="" name="keywords">
+    <meta content="{{ env('META_DESCRIPTION') }}" name="description">
+    <meta content="{{ env('META_KEYWORDS') }}" name="keywords">
 
     <link href="{{ asset('template/img/favicon.png') }}" rel="icon">
-    <link href="{{ asset('template/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset('template/img/favicon.png') }}" rel="apple-touch-icon">
 
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -33,7 +33,7 @@
                 <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
                   <div class="d-flex justify-content-center py-4">
-                      <a href="index.html" class="logo d-flex align-items-center w-auto">
+                      <a href="{{ route('login') }}" class="logo d-flex align-items-center w-auto">
                         <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
                         <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                       </a>
@@ -51,20 +51,25 @@
                           <div class="col-12">
                             <input type="email" name="email" class="form-control" placeholder="E-mail:" required>
                           </div>
-                          <div class="col-12">
-                            <input type="password" name="password" class="form-control" placeholder="Senha:" required>
+                          <div class="col-12 position-relative">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="Senha:" required>
+                            <button type="button" id="togglePassword" class="btn position-absolute top-50 end-0 translate-middle-y" style="right: 10px;">
+                                <i id="toggleIcon" class="ri-eye-line"></i>
+                            </button>
                           </div>
-                          <div class="col-12">
+                          {{-- <div class="col-12">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe">
                                 <label class="form-check-label" for="rememberMe">Lembrar acesso</label>
                             </div>
-                          </div>
+                          </div> --}}
                           <div class="col-12">
-                            <button class="btn btn-primary w-100" type="submit">Acessar</button>
+                            <button class="btn btn-dark w-100" type="submit">Acessar</button>
                           </div>
-                          <div class="col-12">
+                          <div class="col-12 text-center">
                             <p class="small mb-0">Não tem uma conta? <a href="{{ route('cadastro') }}">Criar Conta</a></p>
+                            ou
+                            <p class="small mb-0"><a href="{{ route('recuperar-conta') }}">Recuperar conta</a></p>
                           </div>
                       </form>
                     </div>
@@ -91,5 +96,43 @@
     <script src="{{ asset('template/vendor/tinymce/tinymce.min.js') }}"></script>
     <script src="{{ asset('template/vendor/php-email-form/validate.js') }}"></script>
     <script src="{{ asset('template/js/main.js') }}"></script>
+    <script src="{{ asset('template/js/jquery.js') }}"></script>
+    <script src="{{ asset('template/js/sweetalert.js') }}"></script>
+    <script>
+      @if(session('error'))
+            Swal.fire({
+                title: 'Erro!',
+                text: '{{ session('error') }}',
+                icon: 'error',
+                timer: 2000
+            })
+        @endif
+        
+        @if(session('success'))
+            Swal.fire({
+                title: 'Sucesso!',
+                text: '{{ session('success') }}',
+                icon: 'success',
+                timer: 2000
+            })
+        @endif
+
+        document.getElementById('togglePassword').addEventListener('click', function (e) {
+          
+          const passwordField = document.getElementById('password');
+          const toggleIcon = document.getElementById('toggleIcon');
+          const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+          passwordField.setAttribute('type', type);
+
+
+          if (type === 'password') {
+              toggleIcon.classList.remove('ri-eye-off-line');
+              toggleIcon.classList.add('ri-eye-line');
+          } else {
+              toggleIcon.classList.remove('ri-eye-line');
+              toggleIcon.classList.add('ri-eye-off-line');
+          }
+      });
+    </script>
   </body>
 </html>

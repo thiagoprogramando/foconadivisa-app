@@ -5,11 +5,11 @@
         <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
         <title>{{ env('APP_NAME') }} - {{ env('APP_DESCRIPTION') }}</title>
-        <meta content="" name="description">
-        <meta content="" name="keywords">
+        <meta content="{{ env('META_DESCRIPTION') }}" name="description">
+        <meta content="{{ env('META_KEYWORDS') }}" name="keywords">
 
         <link href="{{ asset('template/img/favicon.png') }}" rel="icon">
-        <link href="{{ asset('template/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+        <link href="{{ asset('template/img/favicon.png') }}" rel="apple-touch-icon">
 
         <link href="https://fonts.gstatic.com" rel="preconnect">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
@@ -32,7 +32,7 @@
                         <div class="row justify-content-center">
                             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                                 <div class="d-flex justify-content-center py-4">
-                                    <a href="index.html" class="logo d-flex align-items-center w-auto">
+                                    <a href="{{ route('cadastro') }}" class="logo d-flex align-items-center w-auto">
                                         <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
                                         <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                                     </a>
@@ -57,7 +57,10 @@
                                                 <input type="password" name="password" class="form-control" placeholder="Senha:" required>
                                             </div>
                                             <div class="col-12">
-                                                <button class="btn btn-primary w-100" type="submit">Cadastrar-me</button>
+                                                <input type="number" name="meta" class="form-control" placeholder="Qual sua meta de Questões?">
+                                            </div>
+                                            <div class="col-12">
+                                                <button class="btn btn-dark w-100" type="submit">Cadastrar-me</button>
                                             </div>
                                             <div class="col-12">
                                                 <p class="small mb-0">Já tem uma conta? <a href="{{ route('login') }}">Acessar</a></p>
@@ -87,5 +90,26 @@
         <script src="{{ asset('template/vendor/tinymce/tinymce.min.js') }}"></script>
         <script src="{{ asset('template/vendor/php-email-form/validate.js') }}"></script>
         <script src="{{ asset('template/js/main.js') }}"></script>
+        <script src="{{ asset('template/js/jquery.js') }}"></script>
+        <script src="{{ asset('template/js/sweetalert.js') }}"></script>
+        <script>
+            @if(session('error'))
+                  Swal.fire({
+                      title: 'Erro!',
+                      text: '{{ session('error') }}',
+                      icon: 'error',
+                      timer: 2000
+                  })
+              @endif
+              
+              @if(session('success'))
+                  Swal.fire({
+                      title: 'Sucesso!',
+                      text: '{{ session('success') }}',
+                      icon: 'success',
+                      timer: 2000
+                  })
+              @endif
+          </script>
     </body>
 </html>

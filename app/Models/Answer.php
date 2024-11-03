@@ -12,17 +12,28 @@ class Answer extends Model {
     protected $table = "answers";
 
     protected $fillable = [
+        'user_id',
         'notebook_id',
+        'notebook_question_id',
         'question_id',
         'option_id',
+        'status'
     ];
 
-    public function notebook() {
-        return $this->belongsTo(Notebook::class);
+    public function user() {
+        return $this->belongsTo(User::class);
     }
 
+    public function notebook() {
+        return $this->belongsTo(Notebook::class, 'notebook_id');
+    }
+
+    public function notebookQuestion() {
+        return $this->belongsTo(NotebookQuestion::class, 'notebook_question_id');
+    }    
+
     public function question() {
-        return $this->belongsTo(Question::class);
+        return $this->belongsTo(Question::class, 'question_id');
     }
 
     public function option() {
@@ -30,6 +41,10 @@ class Answer extends Model {
     }
 
     public function isCorrect() {
-        return $this->option && $this->option->is_correct;
+        if($this->status == 1) {
+            return true;
+        }
+
+        return false;
     }
 }

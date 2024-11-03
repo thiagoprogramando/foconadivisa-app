@@ -26,61 +26,77 @@
                     @csrf
                     <input type="hidden" name="plan_id" value="{{ $plan->id }}">
                     <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                        <select id="swal-subject" name="subject_id" placeholder="Escolha um conteúdo">
+                        <select id="swal-subject" name="subject_id[]" placeholder="Escolha um conteúdo">
                             <option value="" selected>Escolha um conteúdo</option>
                             @foreach($subjects as $subject)
                                 <option value="{{ $subject->id }}">{{ $subject->name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-2 col-lg-2">
-                        <button type="submit" class="btn btn-outline-success w-100">Adicionar</button>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-outline-success">Adicionar</button>
+                            <button type="button" id="select-all-subjects" class="btn btn-dark">Selecionar Tudo</button>
+                        </div>
                     </div>
                 </form>
 
-                <table class="table table-hover mt-5">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($associatedSubjects as $associate)
+                <div class="table-responsive">
+                    <table class="table table-hover mt-5">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $associate->id }}</th>
-                                <td>{{ $associate->name }}</td>
-                                <td>{{ $associate->description }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-subject-associate') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="subject_id" value="{{ $associate->id }}">
-                                        <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>   
+                        </thead>
+                        <tbody>
+                            @foreach ($associatedSubjects as $associate)
+                                <tr>
+                                    <th scope="row">{{ $associate->id }}</th>
+                                    <td>{{ $associate->name }}</td>
+                                    <td>{{ $associate->description }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-subject-associate') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="subject_id" value="{{ $associate->id }}">
+                                            <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>   
+                </div>
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <form action="{{ route('update-plan') }}" method="POST" class="row">
                     @csrf
                     <input type="hidden" name="id" value="{{ $plan->id }}">
-                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                         <div class="form-floating mb-2">
                             <input type="text" name="name" class="form-control" id="name" placeholder="Nome:" value="{{ $plan->name }}">
                             <label for="name">Nome</label>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <div class="col-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-floating mb-2">
                             <input type="number" name="value" class="form-control" id="value" placeholder="Valor:" value="{{ $plan->value }}">
                             <label for="value">Valor</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+                        <div class="form-floating mb-2">
+                            <select name="type" class="form-select" id="type">
+                                <option value="" selected>Forma de cobrança</option>
+                                <option value="1" @if($plan->type == 1) selected @endif>Mensal</option>
+                                <option value="2" @if($plan->type == 2) selected @endif>Anual</option>
+                                <option value="3" @if($plan->type == 3) selected @endif>Vitalício</option>
+                            </select>
+                            <label for="type">Forma de cobrança</label>
                         </div>
                     </div>
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
@@ -100,65 +116,85 @@
                     @csrf
                     <input type="hidden" name="plan_id" value="{{ $plan->id }}">
                     <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                        <select id="swal-topic" name="topic_id" placeholder="Escolha um tópico">
+                        <select id="swal-topic" name="subject_id[]" placeholder="Escolha um tópico">
                             <option value="" selected>Escolha um tópico</option>
                             @foreach($topics as $topic)
                                 <option value="{{ $topic->id }}">{{ $topic->name }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-2 col-lg-2">
-                        <button type="submit" class="btn btn-outline-success w-100">Adicionar</button>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-outline-success">Adicionar</button>
+                            <button type="button" id="select-all-topics" class="btn btn-dark">Selecionar Tudo</button>
+                        </div>
                     </div>
                 </form>
 
-                <table class="table table-hover mt-5">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Descrição</th>
-                            <th scope="col" class="text-center">Opções</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($associatedTopics as $associate)
+                <div class="table-responsive">
+                    <table class="table table-hover mt-5">
+                        <thead>
                             <tr>
-                                <th scope="row">{{ $associate->id }}</th>
-                                <td>{{ $associate->name }}</td>
-                                <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('delete-topic-associate') }}" method="POST" class="btn-group delete" role="group">
-                                        @csrf
-                                        <input type="hidden" name="topic_id" value="{{ $associate->id }}">
-                                        <input type="hidden" name="plan_id" value="{{ $plan->id }}">
-                                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                    </form>
-                                </td>
+                                <th scope="col">#</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Descrição</th>
+                                <th scope="col" class="text-center">Opções</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>  
+                        </thead>
+                        <tbody>
+                            @foreach ($associatedTopics as $associate)
+                                <tr>
+                                    <th scope="row">{{ $associate->id }}</th>
+                                    <td>{{ $associate->name }}</td>
+                                    <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-topic-associate') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="subject_id" value="{{ $associate->id }}">
+                                            <input type="hidden" name="plan_id" value="{{ $plan->id }}">
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>  
+                </div>
             </div>
         </div>
         
     </div>
 
     <script>
-        new TomSelect("#swal-subject",{
-            create: false,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            }
-        });
+        document.addEventListener('DOMContentLoaded', function () {
 
-        new TomSelect("#swal-topic",{
-            create: false,
-            sortField: {
-                field: "text",
-                direction: "asc"
-            }
+            var subject = new TomSelect("#swal-subject",{
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                maxItems: 1000
+            });
+
+            var topic = new TomSelect("#swal-topic",{
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                maxItems: 1000
+            });
+
+            document.getElementById('select-all-subjects').addEventListener('click', function () {
+                var allOptions = Array.from(document.querySelectorAll('#swal-subject option')).map(option => option.value);
+                subject.setValue(allOptions);
+            });
+
+            document.getElementById('select-all-topics').addEventListener('click', function () {
+                var allOptions = Array.from(document.querySelectorAll('#swal-topic option')).map(option => option.value);
+                topic.setValue(allOptions);
+            });
         });
     </script>
 

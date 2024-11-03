@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\Notification;
 use App\Models\User;
 
 use Illuminate\Http\Request;
@@ -46,6 +46,8 @@ class UserController extends Controller {
             'cpfcnpj'   => $request->cpfcnpj,
             'email'     => $request->email,
             'phone'     => $request->phone,
+            'meta'      => $request->meta,
+            'password'  => bcrypt($request->password)
         ];
 
         $data = array_filter($data, function($value) {
@@ -79,7 +81,6 @@ class UserController extends Controller {
         
         $user = User::find($request->id);
         if($user && $user->delete()) {
-
             return redirect()->back()->with('success', 'Usuário excluído com sucesso!');
         }
 

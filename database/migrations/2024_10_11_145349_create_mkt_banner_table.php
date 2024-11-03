@@ -7,15 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
 
     public function up(): void {
-        Schema::create('plan_topic', function (Blueprint $table) {
+        Schema::create('mkt_banner', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('plan_id')->constrained('plan')->onDelete('cascade');
-            $table->foreignId('topic_id')->constrained('topics')->onDelete('cascade');
+            $table->string('name')->nullable();
+            $table->longText('description')->nullable();
+            $table->longText('file');
             $table->timestamps();
         });
     }
 
     public function down(): void {
-        Schema::dropIfExists('plan_topics');
+        Schema::dropIfExists('banner');
     }
 };
