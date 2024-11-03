@@ -66,17 +66,22 @@
         </div>
     </div>
 </section>
+
 <script>
     const installmentsOptions = @json($installmentsOptions);
-
     document.getElementById('paymentMethod').addEventListener('change', function () {
-        const paymentMethod = this.value;
+        const paymentMethodJson = this.value;
+        const paymentMethod = JSON.parse(paymentMethodJson);
+
+        const method = paymentMethod.method;
         const installmentsSelect = document.getElementById('installments');
-        
         installmentsSelect.innerHTML = '';
-        if (installmentsOptions[paymentMethod]) {
-            const maxInstallments = installmentsOptions[paymentMethod];
+
+        if (installmentsOptions[method]) {
+            const maxInstallments = installmentsOptions[method];
             
+            console.log('Max Installments:', maxInstallments);
+
             for (let i = 1; i <= maxInstallments; i++) {
                 const option = document.createElement('option');
                 option.value = i;
@@ -84,6 +89,7 @@
                 installmentsSelect.appendChild(option);
             }
         } else {
+
             const option = document.createElement('option');
             option.value = 1;
             option.textContent = '1x';
@@ -91,6 +97,8 @@
         }
     });
 </script>
+
+
 @endsection
 
     

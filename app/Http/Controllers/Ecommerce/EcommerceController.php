@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Ecommerce;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Gateway\AssasController;
-use App\Models\Payment;
+
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class EcommerceController extends Controller {
     
@@ -47,13 +47,12 @@ class EcommerceController extends Controller {
             return redirect()->back()->with('info', 'Ops, Produto não encontrado ou disponível!');
         }
 
-        return view('order', [
-            'product'               => $product,
-            'paymentMethods'        => Payment::where('product_id', $product->id)->get(), 
-            'installmentsOptions'   => $product->payments->mapWithKeys(function ($payment) {
-                                            return [$payment->method => $payment->installments];
-                                        }),
-        ]);
+        $paymentMethods = $product->payments;
+        $installmentsOptions = $paymentMethods->mapWithKeys(function ($payment) {
+            return [$payment->method => $payment->installments];
+        });
+
+        return view('order', compact('product', 'paymentMethods', 'installmentsOptions'));
     }
 
     public function payProduct(Request $request) {

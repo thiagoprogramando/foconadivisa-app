@@ -28,9 +28,7 @@
                             @foreach ($sales as $sale)
                                 <tr>
                                     <th scope="row">{{ $sale->id }}</th>
-                                    <td>{{ $sale->product->name }} <br>
-                                        <span class="badge bg-dark">{{ Str::limit(strip_tags($sale->product->description), 120) }}</span>
-                                    </td>
+                                    <td>{{ $sale->product->name }}</td>
                                     <td class="text-center">
                                         <a title="Acessar" href="{{ asset('storage/'.$sale->product->file) }}" target="_blank" class="btn btn-outline-success"><i class="bi bi-check2-all"></i> Acessar</a>
                                     </td>
