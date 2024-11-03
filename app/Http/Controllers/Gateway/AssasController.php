@@ -199,7 +199,8 @@ class AssasController extends Controller {
                     'message'   => "<b>Você comprou e chegou rapidinho!</b> Segue abaixo o produto: {$sale->product->name}. Obrigado pela compra! Para acessar o seu conteúdo/material, siga os seguintes passos: <br>
                                     1 - <a href='{$url}'>Acesse nosso site</a> <br>
                                     2 - Informe seu Email e senha (sua senha sempre será o CPF ou CNPJ informado na hora da compra) <br>
-                                    3 - Aproveite o Produto <br>"
+                                    3 - vá até <b>Minhas Compras</b> <br>
+                                    4 - Aproveite o Produto <br>"
                 ]));
 
                 if($send) {
