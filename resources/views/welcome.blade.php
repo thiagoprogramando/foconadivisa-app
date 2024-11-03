@@ -42,16 +42,7 @@
 
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 card">
         <div class="container">
-            <div class="row">
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="text-center mt-5">
-                        <p class="lead"> 
-                            Estamos finalizando a plataforma para você! <br>
-                            Em breve um banco de questões completo para a sua jornada.
-                        </p>
-                    </div>
-                </div>
-
+            <div class="row mb-2">
                 @if($products->count() > 0)
                     @foreach ($products as $product)
                         <div class="col-12 col-sm-12 col-md-4 col-lg-3 mb-3">
