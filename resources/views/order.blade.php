@@ -52,7 +52,7 @@
                         <select name="method" class="form-select" id="paymentMethod">
                             <option selected>Forma de pagamento</option>
                             @foreach($paymentMethods as $method)
-                                <option value="{{ $method }}">{{ $method->methodLabel() }}</option>
+                                <option value="{{ $method->method }}">{{ $method->methodLabel() }}</option>
                             @endforeach
                         </select>
                 
@@ -66,22 +66,17 @@
         </div>
     </div>
 </section>
-
 <script>
     const installmentsOptions = @json($installmentsOptions);
+
     document.getElementById('paymentMethod').addEventListener('change', function () {
-        const paymentMethodJson = this.value;
-        const paymentMethod = JSON.parse(paymentMethodJson);
-
-        const method = paymentMethod.method;
+        const paymentMethod = this.value;
         const installmentsSelect = document.getElementById('installments');
+        
         installmentsSelect.innerHTML = '';
-
-        if (installmentsOptions[method]) {
-            const maxInstallments = installmentsOptions[method];
+        if (installmentsOptions[paymentMethod]) {
+            const maxInstallments = installmentsOptions[paymentMethod];
             
-            console.log('Max Installments:', maxInstallments);
-
             for (let i = 1; i <= maxInstallments; i++) {
                 const option = document.createElement('option');
                 option.value = i;
@@ -89,7 +84,6 @@
                 installmentsSelect.appendChild(option);
             }
         } else {
-
             const option = document.createElement('option');
             option.value = 1;
             option.textContent = '1x';
@@ -97,8 +91,6 @@
         }
     });
 </script>
-
-
 @endsection
 
     

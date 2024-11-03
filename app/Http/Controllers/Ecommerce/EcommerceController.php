@@ -57,6 +57,8 @@ class EcommerceController extends Controller {
 
     public function payProduct(Request $request) {
 
+        return $request;
+
         $product = Product::find($request->product_id);
         if(!$product) {
             return redirect()->back()->with('info', 'Ops, Produto não encontrado ou disponível!');
