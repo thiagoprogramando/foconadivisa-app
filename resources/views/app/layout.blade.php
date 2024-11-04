@@ -32,7 +32,7 @@
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-between">
                 <a href="{{ route('app') }}" class="logo d-flex align-items-center">
-                    <img src="{{ asset('template/img/logo.png') }}" alt="Logo">
+                    <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="w-25">
                     <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                 </a>
                 <i class="bi bi-list toggle-sidebar-btn"></i>

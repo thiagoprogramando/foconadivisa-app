@@ -28,7 +28,7 @@
         <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ route('index') }}">
-                    <img src="{{ asset('template/img/favicon.png') }}" alt="{{ env('APP_NAME') }}" width="30" height="24" class="d-inline-block align-text-top">
+                    <img src="{{ asset('template/img/logo_branca.png') }}" alt="{{ env('APP_NAME') }}" width="90" height="36" class="d-inline-block align-text-top">
                     {{ env('APP_NAME') }}
                 </a>
 

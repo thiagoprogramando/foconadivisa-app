@@ -34,7 +34,6 @@
                                 <div class="d-flex justify-content-center py-4">
                                     <a href="{{ route('cadastro') }}" class="logo d-flex align-items-center w-auto">
                                         <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
-                                        <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                                     </a>
                                 </div>
 
@@ -91,7 +90,7 @@
                                 @endif
 
                                 <div class="credits">
-                                    Desenvolvido por <a href="https://ifuture.cloud/">ifuture.cloud</a>
+                                    Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
                                 </div>
                             </div>
                         </div>
