@@ -282,6 +282,20 @@
         <script src="{{ asset('template/js/jquery.js') }}"></script>
         <script src="{{ asset('template/js/sweetalert.js') }}"></script>
         <script>
+            @if ($errors->any())
+                let errorMessages = '';
+                @foreach ($errors->all() as $error)
+                    errorMessages += '{{ $error }}\n';
+                @endforeach
+                
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: errorMessages,
+                    icon: 'info',
+                    timer: 5000,
+                });
+            @endif
+            
             @if(session('error'))
                 Swal.fire({
                     title: 'Erro!',

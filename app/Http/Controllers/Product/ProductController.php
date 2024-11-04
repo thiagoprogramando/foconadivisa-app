@@ -47,10 +47,10 @@ class ProductController extends Controller {
     public function createProduct(Request $request) {
 
         $request->validate([
-            'photo'       => 'file|max:10240',
+            'photo'       => 'file|max:25600',
             'file'        => 'file|max:25600',
         ], [
-            'photo.max' => 'Tamanho máximo para Capa (photo) = 10MB.',
+            'photo.max' => 'Tamanho máximo para Capa (photo) = 250MB.',
             'file.max'  => 'Tamanho máximo para Arquivo (file) = 25MB.',
         ]);
 
