@@ -35,7 +35,6 @@
                   <div class="d-flex justify-content-center py-4">
                       <a href="{{ route('login') }}" class="logo d-flex align-items-center w-auto">
                         <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
-                        <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                       </a>
                   </div>
 
@@ -43,7 +42,7 @@
                     <div class="card-body">
                       <div class="pt-4 pb-2">
                           <h5 class="card-title text-center pb-0 fs-4">Bem-vindo(a)!</h5>
-                          <p class="text-center small">Faça login para ter acesso.</p>
+                          <p class="text-center small">Faça login para ter acesso aos benefícios da sua conta.</p>
                       </div>
 
                       <form action="{{ route('logon') }}" method="POST" class="row g-3">
@@ -57,12 +56,6 @@
                                 <i id="toggleIcon" class="ri-eye-line"></i>
                             </button>
                           </div>
-                          {{-- <div class="col-12">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe">
-                                <label class="form-check-label" for="rememberMe">Lembrar acesso</label>
-                            </div>
-                          </div> --}}
                           <div class="col-12">
                             <button class="btn btn-dark w-100" type="submit">Acessar</button>
                           </div>
@@ -76,7 +69,7 @@
                   </div>
 
                   <div class="credits">
-                      Desenvolvido por <a href="https://ifuture.cloud/">ifuture.cloud</a>
+                      Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
                   </div>
                 </div>
             </div>
