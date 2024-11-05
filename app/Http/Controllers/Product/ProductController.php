@@ -118,34 +118,32 @@ class ProductController extends Controller {
 
         if ($request->hasFile('photo')) {
             if ($product->photo) {
-                Storage::delete($product->photo);
+                Storage::disk('public')->delete($product->photo); 
             }
 
-            $product->photo = $request->file('photo')->store('products/photos');
+            $fileName = 'product_' . $product->id . '.' . $request->file('photo')->extension();
+            $product->photo = $request->file('photo')->storeAs('products/photos', $fileName, 'public');
         }
 
         if ($request->hasFile('file')) {
             if ($product->file) {
-                Storage::delete($product->file);
+                Storage::disk('public')->delete($product->file); // exclui do disco 'public'
             }
-
-            $product->file = $request->file('file')->store('products/files');
+            $fileDocName = 'product_file_' . $product->id . '.' . $request->file('file')->extension();
+            $product->file = $request->file('file')->storeAs('products/files', $fileDocName, 'public');
         }
 
         $product->save();
 
         $paymentMethods = ['credit_card', 'pix', 'boleto'];
         foreach ($paymentMethods as $method) {
-            
             if ($request->has($method)) {
-                
                 $installments = $request->input("installments_{$method}", 1);
                 $product->payments()->updateOrCreate(
                     ['method' => strtoupper($method)],
                     ['installments' => $installments]
                 );
             } else {
-                
                 $product->payments()->where('method', strtoupper($method))->delete();
             }
         }
