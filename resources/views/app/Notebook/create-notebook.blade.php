@@ -1,22 +1,22 @@
 @extends('app.layout')
-@section('title') Caderno: {{ $notebook->name }} @endsection
+@section('title') Novo Caderno @endsection
 @section('content')
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">        
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Filtros</button>
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Dados do Caderno</button>
             </li>
         </ul>
 
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
-                <form action="{{ route('update-notebook') }}" method="POST" class="row mt-3">
+                <form action="{{ route('create-notebook') }}" method="POST" class="row mt-3">
                     @csrf
-                    <input type="hidden" name="id" value="{{ $notebook->id }}">
+
                     <div class="col-12 col-sm-12 col-md-8 col-lg-8">
                         <div class="form-floating mb-3">
-                            <input type="text" name="name" class="form-control" id="name" placeholder="Nomeie seu caderno:" value="{{ $notebook->name }}" required>
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Nomeie seu caderno:" required>
                             <label for="name">Nomeie seu caderno</label>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                             <button type="button" class="btn btn-dark" title="Pesquisar"><i class="bi bi-search"></i></button>
                         </div>
 
-                        @foreach ($subjectsFromPlan as $subject)
+                        @foreach ($subjects as $subject)
                             <div class="form-check">
                                 <input class="form-check-input subject-checkbox" type="checkbox" 
                                     name="subjects[]" value="{{ $subject->id }}"
@@ -41,23 +41,20 @@
                                     id='subject-{{ $subject->id }}'
                                     data-topics='@json($subject->topics)'
                                     id-resolved='{{ $subject->questionResolved() }}' 
-                                    id-fail='{{ $subject->questionFail() }}'
-                                    @if (in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) checked @endif>
+                                    id-fail='{{ $subject->questionFail() }}'>
                                 <label class="form-check-label" for="subject-{{ $subject->id }}">{{ $subject->name }}</label>
                             </div>
-
+                    
                             <div class="ps-3 topics" id="topics-{{ $subject->id }}" style="display: none;">
                                 @foreach ($subject->topics as $topic)
                                     <div class="form-check">
                                         <input class="form-check-input topic-checkbox" type="checkbox"
-                                            name="topics[]" value="{{ $topic->id }}"
+                                            name="topics[{{ $subject->id }}][]" value="{{ $topic->id }}"
                                             data-subject="{{ $subject->id }}"
                                             data-questions="{{ $topic->totalQuestions() }}"
                                             id="topic-{{ $topic->id }}"
                                             id-resolved='{{ $topic->questionResolved() }}' 
-                                            id-fail='{{ $topic->questionFail() }}'
-                                            @if (in_array($topic->id, $notebookTopics->pluck('id')->toArray())) checked @endif
-                                            @if (in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) checked @endif>
+                                            id-fail='{{ $topic->questionFail() }}'>
                                         <label class="form-check-label" for="topic-{{ $topic->id }}">{{ $topic->name }}</label>
                                     </div>
                                 @endforeach
@@ -79,7 +76,7 @@
                     </div>                    
 
                     <div class="col-12 col-sm-12 offset-md-4 col-md-4 offset-lg-4 col-lg-4 mt-3">
-                        <button type="submit" class="btn btn-outline-dark w-100">Atualizar Caderno</button>
+                        <button type="submit" class="btn btn-outline-dark w-100">Criar Caderno</button>
                     </div>
                 </form>
             </div>
@@ -88,12 +85,22 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-
-            const questionCountElement = document.getElementById("question-count");
             let totalQuestions = 0;
             let lastChecked = null;
-            let filterResolved = false;
-            let filterFail = false;
+            const questionCountElement = document.getElementById("question-count");
+
+            document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
+                radio.addEventListener('click', function () {
+                    if (lastChecked === this) {
+                        this.checked = false;
+                        lastChecked = null;
+                    } else {
+                        lastChecked = this;
+                    }
+
+                    updateQuestionCount();
+                });
+            });
 
             const searchButton = document.querySelector('.btn.btn-dark');
             searchButton.addEventListener("click", function (event) {
@@ -110,19 +117,6 @@
                     } else {
                         subjectItem.style.display = "none";
                     }
-                });
-            });
-
-            document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
-                radio.addEventListener('click', function () {
-                    if (lastChecked === this) {
-                        this.checked = false;
-                        lastChecked = null;
-                    } else {
-                        lastChecked = this;
-                    }
-
-                    updateQuestionCount();
                 });
             });
 
@@ -191,8 +185,8 @@
                 questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
             }
 
-            document.querySelectorAll('.subject-checkbox').forEach(function(subjectCheckbox) {
-                subjectCheckbox.addEventListener('change', function() {
+            document.querySelectorAll('.subject-checkbox').forEach(function (subjectCheckbox) {
+                subjectCheckbox.addEventListener('change', function () {
                     const subjectId = subjectCheckbox.value;
                     const topicsDiv = document.getElementById('topics-' + subjectId);
 
@@ -200,7 +194,7 @@
                         topicsDiv.style.display = 'block';
                     } else {
                         topicsDiv.style.display = 'none';
-                        topicsDiv.querySelectorAll('.topic-checkbox').forEach(function(topicCheckbox) {
+                        topicsDiv.querySelectorAll('.topic-checkbox').forEach(function (topicCheckbox) {
                             topicCheckbox.checked = false;
                         });
                     }
@@ -209,31 +203,11 @@
                 });
             });
 
-            @foreach ($subjectsFromPlan as $subject)
-            
-                if (document.getElementById('subject-{{ $subject->id }}')) {
-                    document.getElementById('subject-{{ $subject->id }}').checked = @if(in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) true @else false @endif;
-
-                    const topicsDiv = document.getElementById('topics-{{ $subject->id }}');
-                    if (document.getElementById('subject-{{ $subject->id }}').checked) {
-                        topicsDiv.style.display = 'block';
-                    } else {
-                        topicsDiv.style.display = 'none';
-                    }
-                }
-
-                @foreach ($subject->topics as $topic)
-                    if (document.getElementById('topic-{{ $topic->id }}')) {
-                        document.getElementById('topic-{{ $topic->id }}').checked = @if(in_array($topic->id, $notebookTopics->pluck('id')->toArray())) true @else false @endif;
-                    }
-                @endforeach
-            @endforeach
-
-            document.querySelectorAll('.subject-checkbox, .topic-checkbox').forEach(function(checkbox) {
+            document.querySelectorAll('.subject-checkbox, .topic-checkbox').forEach(function (checkbox) {
                 checkbox.addEventListener('change', updateQuestionCount);
             });
 
-            document.querySelectorAll('input[name="filter"]').forEach(function(radio) {
+            document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
                 radio.addEventListener('change', updateQuestionCount);
             });
 

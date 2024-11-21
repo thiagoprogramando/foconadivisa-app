@@ -23,6 +23,10 @@ class Subject extends Model {
         return $this->hasMany(Question::class);
     }
 
+    public function parent() {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
     public function totalQuestions() {
         $count = $this->questions()->count();
         foreach ($this->topics as $subsubject) {
@@ -39,6 +43,21 @@ class Subject extends Model {
     public function topics() {
         return $this->hasMany(Subject::class, 'subject_id')->where('type', 2);
     }
+
+    public function topicsWithComputedData() {
+        return $this->topics->map(function ($topic) {
+            return [
+                'id' => $topic->id,
+                'subject_id' => $topic->subject_id,
+                'type' => $topic->type,
+                'name' => $topic->name,
+                'description' => $topic->description,
+                'totalQuestions' => $topic->totalQuestions(),
+                'questionResolved' => $topic->questionResolved(),
+                'questionFail' => $topic->questionFail(),
+            ];
+        });
+    }    
     
     public function countTopics() {
         return $this->topics()->count();
@@ -49,6 +68,20 @@ class Subject extends Model {
                 ->where('type', 2)
                 ->count();
     }
+
+    public function totalQuestionsForTopic($topicId = null) {
+        
+        if ($topicId) {
+            return $this->questions()->where('subject_id', $topicId)->count();
+        }
+        
+        return $this->totalQuestions();
+    }
+    
+    public function topicsForSubject($subjectId) {
+        return $this->topics()->where('subject_id', $subjectId)->get();
+    }
+    
 
     public function questionResolved() {
         

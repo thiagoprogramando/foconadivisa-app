@@ -19,6 +19,40 @@ class Notebook extends Model {
         'status'
     ];
 
+    public function subjects() {
+        $subjects = $this->questions->load('subject')
+            ->filter(function($question) {
+                return $question->subject->type === 1;
+            })
+            ->pluck('subject')
+            ->unique();
+
+        $parentSubjectsForTopics = $this->getParentSubjectsForTopics();
+        return $subjects->merge($parentSubjectsForTopics)->unique();
+    }
+
+    public function topics() {
+        return $this->questions->load('subject')
+                ->filter(function($question) {
+                    return $question->subject->type === 2;
+                })->pluck('subject')->unique();
+    }
+
+    private function getParentSubjectsForTopics() {
+        
+        $topicSubjectIds = $this->questions->load('subject')
+            ->filter(function($question) {
+                return $question->subject->type === 2;
+            })
+            ->pluck('subject.subject_id')
+            ->toArray();
+
+        return Subject::whereIn('id', $topicSubjectIds)
+            ->where('type', 1)
+            ->with('parent')
+            ->get();
+    }
+
     public function notebookQuestions() {
         return $this->hasManyThrough(Question::class, NotebookQuestion::class, 'notebook_id', 'id', 'id', 'question_id');
     }

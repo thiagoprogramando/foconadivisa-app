@@ -43,138 +43,122 @@ class NotebookController extends Controller {
         }
 
         redirect()->back()->with('error', 'Não foram encontrados dados do caderno!');
-    }  
+    }
+    
+    public function createNotebookForm() {
+
+        $user = Auth::user();
+        if(!$user) {
+            return redirect()->route('logout')->with('error', 'Faça login para acessar sua conta!');
+        }
+
+        $plan = $user->labelPlan;
+        $subjects = $plan 
+            ? $plan->subjects()->where('type', 1)->get() 
+            : collect();
+
+        return view('app.Notebook.create-notebook', [
+            'subjects' => $subjects
+        ]);
+    }
     
     public function notebookFilter($id) {
+
         $notebook = Notebook::find($id);
         if (!$notebook) {
             return redirect()->back()->with('error', 'Caderno não localizado na base de dados!');
         }
-    
+
         $user = Auth::user();
         if (!$user) {
             return redirect()->route('logout')->with('error', 'Faça login para acessar sua conta!');
         }
-    
-        $plan = $user->labelPlan;
-        $subjectsFromPlan = $plan ? $plan->subjects : collect();
-        $topicsFromPlan = $plan ? $plan->topics : collect();
-    
-        $associatedSubjects = $notebook->questions->map(function ($question) {
-            return $question->subject;
-        })->filter(function ($subject) {
-            return $subject !== null;
-        });
-    
-        $contents = $associatedSubjects->filter(function ($subject) {
-            return $subject->type == 1;
-        });
 
-        $topics = $associatedSubjects->filter(function ($subject) {
-            return $subject->type == 2;
-        });
-    
-        $parentsOfTopics = $associatedSubjects->filter(function ($subject) {
-            return $subject->type == 2;
-        })->map(function ($topic) {
-            return Subject::find($topic->subject_id); 
-        })->filter(function ($parent) {
-            return $parent && $parent->type == 1;
-        });
-    
-        $uniqueAssociatedSubjects = $contents->merge($parentsOfTopics)->unique('id');
-        $selectedSubjectIds = $uniqueAssociatedSubjects->pluck('id')->toArray();
-        $selectedTopicIds = $topics->pluck('id')->toArray();
-    
+        $plan               = $user->labelPlan;
+        $subjectsFromPlan   = $plan ? $plan->subjects : collect();
+        $notebookSubjects   = $notebook->subjects();
+        $notebookTopics     = $notebook->topics();
+
         return view('app.Notebook.filter-notebook', [
-            'notebook'              => $notebook,
-            'subjectsFromPlan'      => $subjectsFromPlan,
-            'selectedSubjectIds'    => $selectedSubjectIds,
-            'topicsFromPlan'        => $topicsFromPlan,
-            'selectedTopicIds'      => $selectedTopicIds
+            'notebook'          => $notebook,
+            'notebookSubjects'  => $notebookSubjects,
+            'notebookTopics'    => $notebookTopics,
+            'subjectsFromPlan'  => $subjectsFromPlan,
         ]);
-    }    
+    }
     
     public function notebooks() {
 
         $user = Auth::user();
         if(!$user) {
-            redirect()->route('logout')->with('error', 'Faça login para acessar sua conta!');
-        }
-
-        $plan = $user->labelPlan;
-        if ($plan) {
-            $subjects   = $plan->subjects;
-        } else {
-            $subjects   = collect();
+            return redirect()->route('logout')->with('error', 'Faça login para acessar sua conta!');
         }
 
         $notebooks = Notebook::where('user_id', Auth::id())->get();
         return view('app.Notebook.list-notebook', [
             'notebooks' => $notebooks,
-            'subjects'  => $subjects,
-            'topics'    => collect()
         ]);
-    }
+    }   
 
     public function createNotebook(Request $request) {
-
         $notebook = Notebook::create([
-            'name'      => $request->input('name'),
-            'user_id'   => Auth::id(),
+            'name'    => $request->input('name'),
+            'user_id' => Auth::id(),
         ]);
-
-        $subjects   = $request->input('subject', []);
-        $topics     = $request->input('topics', []);
-        $number     = max(1, $request->input('number'));
-
+    
+        $subjects = $request->input('subjects', []);
+        $topics = $request->input('topics', []);
+        $number = max(1, $request->input('number'));
         $filter = $request->input('filter', false);
-
+    
         $query = Question::query();
-
-        if (!is_array($subjects)) {
-            $subjects = [];
+    
+        $allSubjects = $subjects;
+        $allTopics = $topics;
+    
+        if (!empty($topics)) {
+            $topicSubjectIds = Subject::whereIn('id', $topics)
+                                      ->where('type', 2)
+                                      ->pluck('subject_id')
+                                      ->toArray();
+    
+            $allSubjects = array_merge($allSubjects, $topicSubjectIds);
+    
+            $parentSubjects = Subject::whereIn('id', $topicSubjectIds)->pluck('subject_id')->toArray();
+    
+            $allSubjects = array_diff($allSubjects, $parentSubjects);
         }
     
-        if (!is_array($topics)) {
-            $topics = [];
-        }
-
-        if (!empty($subjects) || !empty($topics)) {
-            $query->where(function($q) use ($subjects, $topics) {
-                if (!empty($subjects)) {
-                    $q->whereIn('subject_id', $subjects);
-                }
-        
-                if (!empty($topics)) {
-                    $q->orWhereIn('subject_id', $topics);
-                }
-            });
-        }
-
-        if ($filter == 'remove_question_resolved') {
+        $query->where(function ($q) use ($allSubjects, $allTopics) {
+            if (!empty($allTopics)) {
+                $q->whereIn('subject_id', $allTopics);
+            }
             
-            $resolvedQuestions = Answer::where('user_id', Auth::id())->pluck('question_id')->toArray();
+            if (!empty($allSubjects)) {
+                $q->orWhereIn('subject_id', $allSubjects);
+            }
+        });
+    
+        if ($filter === 'remove_question_resolved') {
+            $resolvedQuestions = Answer::where('user_id', Auth::id())
+                ->pluck('question_id')->toArray();
             $query->whereNotIn('id', $resolvedQuestions);
         }
-
-        if ($filter == 'show_question_fail') {
-            
+    
+        if ($filter === 'show_question_fail') {
             $failedQuestions = Answer::join('options', 'answers.option_id', '=', 'options.id')
-            ->where('options.is_correct', false)->where('answers.user_id', Auth::id())
-            ->pluck('answers.question_id')->toArray();
+                ->where('options.is_correct', false)
+                ->where('answers.user_id', Auth::id())
+                ->pluck('answers.question_id')->toArray();
             $query->whereIn('id', $failedQuestions);
         }
-
+    
         $questionsBySubject = $query->get()->groupBy('subject_id');
-        $totalQuestions = [];
-        foreach ($questionsBySubject as $subjectId => $questions) {
-            $totalQuestions[$subjectId] = $questions->count();
-        }
-
+        $totalQuestions = $questionsBySubject->map(fn($questions) => $questions->count());
+    
         $questionsNeeded = $number;
         $selectedQuestions = collect();
-
+    
         foreach ($totalQuestions as $subjectId => $count) {
             if ($questionsNeeded <= 0) break;
     
@@ -182,13 +166,14 @@ class NotebookController extends Controller {
             $selectedQuestions = $selectedQuestions->merge($questionsBySubject[$subjectId]->random($questionsToSelect));
             $questionsNeeded -= $questionsToSelect;
         }
-
+    
         if ($questionsNeeded > 0) {
             $remainingQuestions = $query->inRandomOrder()->take($questionsNeeded)->get();
             $selectedQuestions = $selectedQuestions->merge($remainingQuestions);
         }
-
+    
         $selectedQuestions = $selectedQuestions->shuffle()->take($number);
+    
         DB::transaction(function () use ($notebook, $selectedQuestions) {
             foreach ($selectedQuestions as $question) {
                 NotebookQuestion::create([
@@ -197,99 +182,85 @@ class NotebookController extends Controller {
                 ]);
             }
         });
-
-        if (!$selectedQuestions->isEmpty()) {
-            return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno criado com sucesso!');
-        } else {
+    
+        if ($selectedQuestions->isEmpty()) {
             return redirect()->back()->with('error', 'Erro ao criar o caderno. Nenhuma questão encontrada.');
         }
-    }
-
+    
+        return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno criado com sucesso!');
+    }    
+    
     public function updateNotebook(Request $request) {
 
         $notebook = Notebook::find($request->id);
         if (!$notebook) {
             return redirect()->back()->with('error', 'Caderno de questões não foi encontrado!');
         }
-
+    
         $notebook->status       = 0;
         $notebook->name         = $request->name;
         $notebook->percentage   = 0;
         if (!$notebook->save()) {
-            return redirect()->back()->with('error', 'Caderno de questões não foi encontrado!');
+            return redirect()->back()->with('error', 'Erro ao salvar as informações do caderno!');
         }
-
-        NotebookQuestion::where('notebook_id', $notebook->id)->delete();
-        
-        $subjects = $request->input('subject', []);
-        $topics   = $request->input('topic', []);
-        $number   = max(1, $request->input('number'));
     
-        $filter = $request->input('filter', false);
+        NotebookQuestion::where('notebook_id', $notebook->id)->delete();
+    
+        $subjects = $request->input('subjects', []);
+        $topics   = $request->input('topics', []);
+        $number   = max(1, $request->input('number'));
+        $filter   = $request->input('filter', false);
     
         $query = Question::query();
     
-        if (!is_array($subjects)) {
-            $subjects = [];
-        }
-    
-        if (!is_array($topics)) {
-            $topics = [];
-        }
-    
-        if (!empty($topics) || !empty($subjects)) {
-            $query->where(function ($q) use ($subjects, $topics) {
-                if (!empty($subjects)) {
-                    $q->whereIn('subject_id', $subjects);
-                }
-    
-                if (!empty($topics)) {
-                    $q->orWhereIn('subject_id', $topics);
-                }
-            });
-        }
+        $allSubjects = $subjects;
+        $allTopics = $topics;
 
-        if ($filter == 'remove_question_resolved') {
+        if (!empty($topics)) {
+            $topicSubjectIds = Subject::whereIn('id', $topics)
+                                      ->where('type', 2)
+                                      ->pluck('subject_id')
+                                      ->toArray();
             
+            $allSubjects = array_merge($allSubjects, $topicSubjectIds);
+            $parentSubjects = Subject::whereIn('id', $topicSubjectIds)->pluck('id')->toArray();
+            $allSubjects = array_diff($allSubjects, $parentSubjects);
+        }
+  
+        $query->where(function ($q) use ($allSubjects, $allTopics) {
+            if (!empty($allTopics)) {
+                $q->whereIn('subject_id', $allTopics);
+            }
+            
+            if (!empty($allSubjects)) {
+                $q->orWhereIn('subject_id', $allSubjects);
+            }
+        });
+    
+        if ($filter === 'remove_question_resolved') {
             $resolvedQuestions = Answer::where('user_id', Auth::id())
-            ->pluck('question_id')
-            ->toArray();
+                ->pluck('question_id')
+                ->toArray();
             $query->whereNotIn('id', $resolvedQuestions);
         }
-
-        if ($filter == 'show_question_fail') {
-            
+    
+        if ($filter === 'show_question_fail') {
             $failedQuestions = Answer::join('options', 'answers.option_id', '=', 'options.id')
-            ->where('options.is_correct', false)
-            ->where('answers.user_id', Auth::id())
-            ->pluck('answers.question_id')
-            ->toArray();
+                ->where('options.is_correct', false)
+                ->where('answers.user_id', Auth::id())
+                ->pluck('answers.question_id')
+                ->toArray();
             $query->whereIn('id', $failedQuestions);
         }
-
-        $questionsBySubject = $query->get()->groupBy('subject_id');
-        $totalQuestions = [];
-        foreach ($questionsBySubject as $subjectId => $questions) {
-            $totalQuestions[$subjectId] = $questions->count();
+       
+        $filteredQuestions = $query->get();
+        if ($filteredQuestions->isEmpty()) {
+            return redirect()->back()->with('error', 'Nenhuma questão encontrada com os filtros aplicados.');
         }
-
-        $questionsNeeded = $number;
-        $selectedQuestions = collect();
-
-        foreach ($totalQuestions as $subjectId => $count) {
-            if ($questionsNeeded <= 0) break;
     
-            $questionsToSelect = min(intval($number / count($totalQuestions)), $count);
-            $selectedQuestions = $selectedQuestions->merge($questionsBySubject[$subjectId]->random($questionsToSelect));
-            $questionsNeeded -= $questionsToSelect;
-        }
+        $questionsNeeded = min($number, $filteredQuestions->count());
+        $selectedQuestions = $filteredQuestions->shuffle()->take($questionsNeeded);
 
-        if ($questionsNeeded > 0) {
-            $remainingQuestions = $query->inRandomOrder()->take($questionsNeeded)->get();
-            $selectedQuestions = $selectedQuestions->merge($remainingQuestions);
-        }
-
-        $selectedQuestions = $selectedQuestions->shuffle()->take($number);
         DB::transaction(function () use ($notebook, $selectedQuestions) {
             foreach ($selectedQuestions as $question) {
                 NotebookQuestion::create([
@@ -298,13 +269,13 @@ class NotebookController extends Controller {
                 ]);
             }
         });
-
+    
         if (!$selectedQuestions->isEmpty()) {
-            return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno atualizado com sucesso! Foram adicionados '.$selectedQuestions->count().' novas questões');
+            return redirect()->route('caderno', ['id' => $notebook->id])->with('success', 'Caderno atualizado com sucesso! Foram adicionadas ' . $selectedQuestions->count() . ' novas questões');
         } else {
             return redirect()->back()->with('error', 'Erro ao criar o caderno. Nenhuma questão encontrada.');
         }
-    }    
+    }        
 
     public function deleteNotebook(Request $request) {
         
