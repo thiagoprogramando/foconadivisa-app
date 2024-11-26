@@ -101,6 +101,7 @@ class NotebookController extends Controller {
     }   
 
     public function createNotebook(Request $request) {
+        
         $notebook = Notebook::create([
             'name'    => $request->input('name'),
             'user_id' => Auth::id(),

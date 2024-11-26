@@ -77,6 +77,7 @@
                 direction: "asc"
             }
         });
+
         document.querySelectorAll('.form-check-input').forEach(function(checkbox) {
             checkbox.addEventListener('change', function() {
                 if (this.checked) {
@@ -87,6 +88,19 @@
                     });
                 }
             });
+        });
+
+        const form = document.querySelector('form[action="{{ route('update-question') }}"]');
+        form.addEventListener('submit', function(event) {
+            const isCorrectChecked = Array.from(document.querySelectorAll('.form-check-input')).some(input => input.checked);
+            if (!isCorrectChecked) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Atenção',
+                    text: 'Você deve marcar pelo menos uma alternativa como correta!'
+                });
+            }
         });
     </script>
 

@@ -14,16 +14,10 @@
                 <form action="{{ route('update-notebook') }}" method="POST" class="row mt-3">
                     @csrf
                     <input type="hidden" name="id" value="{{ $notebook->id }}">
-                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                         <div class="form-floating mb-3">
                             <input type="text" name="name" class="form-control" id="name" placeholder="Nomeie seu caderno:" value="{{ $notebook->name }}" required>
                             <label for="name">Nomeie seu caderno</label>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                        <div class="form-floating mb-3">
-                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" required>
-                            <label for="questions">N° questões</label>
                         </div>
                     </div>
                    
@@ -67,7 +61,7 @@
                         <small class="btn btn-dark mt-5 w-100" id="question-count">Foram encontradas: 0 questões</small>
                     </div>
 
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-3">
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="filter" value="remove_question_resolved" id="removeQuestionResolved">
                             <label class="form-check-label" for="removeQuestionResolved">Eliminar questões já resolvidas</label>
@@ -76,10 +70,17 @@
                             <input class="form-check-input" type="radio" name="filter" value="show_question_fail" id="showQuestionFail">
                             <label class="form-check-label" for="showQuestionFail">Mostrar apenas as que eu já errei</label>
                         </div>
-                    </div>                    
+                    </div>      
+                    
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-floating mb-3">
+                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" required>
+                            <label for="questions">N° questões</label>
+                        </div>
+                    </div>
 
-                    <div class="col-12 col-sm-12 offset-md-4 col-md-4 offset-lg-4 col-lg-4 mt-3">
-                        <button type="submit" class="btn btn-outline-dark w-100">Atualizar Caderno</button>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 mt-1">
+                        <button type="submit" class="btn btn-lg btn-outline-dark w-100">Atualizar Caderno</button>
                     </div>
                 </form>
             </div>

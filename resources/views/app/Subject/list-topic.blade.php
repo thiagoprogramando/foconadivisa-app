@@ -21,8 +21,11 @@
                             @foreach ($topics as $topic)
                                 <tr>
                                     <th scope="row">{{ $topic->id }}</th>
-                                    <td>{{ $topic->name }}</td>
-                                    <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
+                                    <td>
+                                        {{ $topic->name }} <br>
+                                        <span class="badge bg-dark">Conteúdo: {{ $topic->parent->name }}</span>
+                                    </td>
+                                    <td>{{ strlen($topic->description) > 60 ? substr($topic->description, 0, 60) . '...' : $topic->description }}</td>
                                     <td class="text-center">{{ $topic->countQuestions() }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
