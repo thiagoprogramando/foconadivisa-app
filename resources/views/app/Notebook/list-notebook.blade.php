@@ -46,16 +46,16 @@
                                 </td>
                                 <td class="text-center">{{ $notebook->countQuestions() }}</td>
                                 <td class="text-center">
-                                    <form action="{{ route('delete-notebook') }}" method="POST" class="d-inline-block">
+                                    <form action="{{ route('delete-notebook') }}" method="POST" class="btn-group">
                                         @csrf
                                         <input type="hidden" name="id" value="{{ $notebook->id }}">
-                                        <button type="submit" class="btn btn-outline-danger">
+                                        <button type="submit" class="btn btn-danger">
                                             <i class="bi bi-trash"></i>
                                         </button>
+                                        <a href="{{ route('caderno', $notebook->id) }}" class="btn btn-outline-success">
+                                            <i class="bi bi-arrow-bar-right"></i>
+                                        </a>
                                     </form>
-                                    <a href="{{ route('caderno', $notebook->id) }}" class="btn btn-outline-success">
-                                        <i class="bi bi-arrow-bar-right"></i>
-                                    </a>
                                 </td>
                             </tr>
                         @endforeach

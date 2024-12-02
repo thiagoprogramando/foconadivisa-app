@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Subject;
 
 use App\Http\Controllers\Controller;
+use App\Models\Plan;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -52,6 +53,18 @@ class SubjectController extends Controller {
         $subject->name          = $request->name;
         $subject->description   = $request->description;
         if($subject->save()) {
+
+            if (env('ONEPLAN', false)) {
+                $plans = Plan::all();
+                $subjectIds = [$subject->id];
+    
+                foreach ($plans as $plan) {
+                    if (!$plan->subjects()->where('plan_subject.subject_id', $subject->id)->exists()) {
+                        $plan->subjects()->attach($subjectIds);
+                    }
+                }
+            }
+            
             return redirect()->route('conteudo', ['id' => $subject->id])->with('success', 'Conteúdo criado com sucesso!');
         }
 
@@ -112,6 +125,17 @@ class SubjectController extends Controller {
         $topic->subject_id  = $request->subject_id;
         $topic->type        = 2;
         if($topic->save()) {
+
+            if (env('ONEPLAN', false)) {
+                $plans = Plan::all();
+                $topicIds = [$topic->id];
+    
+                foreach ($plans as $plan) {
+                    if (!$plan->topics()->where('plan_subject.subject_id', $topic->id)->exists()) {
+                        $plan->subjects()->attach($topicIds);
+                    }
+                }
+            }
 
             return redirect()->back()->with('success', 'Tópico criado com sucesso!');
         }

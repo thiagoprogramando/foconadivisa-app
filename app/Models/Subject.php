@@ -13,7 +13,12 @@ class Subject extends Model {
 
     protected $table = 'subjects';
 
-    protected $fillable = ['subject_id', 'type', 'name', 'description'];
+    protected $fillable = [
+        'subject_id', 
+        'type', 
+        'name', 
+        'description'
+    ];
 
     public function plans() {
         return $this->belongsToMany(Plan::class, 'plan_subject');
