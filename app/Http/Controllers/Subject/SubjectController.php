@@ -100,20 +100,21 @@ class SubjectController extends Controller {
 
     public function topics(Request $request) {
 
-        $query = Subject::orderBy('name', 'desc')->where('type', 2);
+        $query = Subject::orderBy('name', 'asc')->where('type', 2);
 
         if(!empty($request->name)) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
-        if(!empty($request->description)) {
-            $query->where('description', 'like', '%' . $request->description . '%');
+        if(!empty($request->subjects)) {
+            $query->whereIn('subject_id', $request->subjects);
         }
 
         $topics = $query->get();
 
         return view('app.Subject.list-topic', [
-            'topics' => $topics
+            'topics'    => $topics,
+            'subjects'  => Subject::all()
         ]);
     }
 

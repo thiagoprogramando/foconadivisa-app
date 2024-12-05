@@ -21,7 +21,7 @@
                         </div>
                     </div>
                    
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-3">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 no-filter mb-3">
                         <div class="btn-group w-100 mb-3">
                             <input type="text" name="searchSubject" class="form-control" placeholder="Pesquisar conteúdos" title="Pesquisar conteúdos">
                             <button type="button" class="btn btn-dark" title="Pesquisar"><i class="bi bi-search"></i></button>
@@ -34,7 +34,7 @@
                                     data-questions='{{ $subject->totalQuestions() }}'
                                     id='subject-{{ $subject->id }}'
                                     data-topics='@json($subject->topics)'
-                                    id-resolved='{{ $subject->questionResolved() }}' 
+                                    id-resolved='{{ $subject->questionResolved($subject->id) }}' 
                                     id-fail='{{ $subject->questionFail() }}'>
                                 <label class="form-check-label" for="subject-{{ $subject->id }}">{{ $subject->name }}</label>
                             </div>
@@ -47,7 +47,7 @@
                                             data-subject="{{ $subject->id }}"
                                             data-questions="{{ $topic->totalQuestions() }}"
                                             id="topic-{{ $topic->id }}"
-                                            id-resolved='{{ $topic->questionResolved() }}' 
+                                            id-resolved='{{ $topic->questionResolved($topic->id) }}' 
                                             id-fail='{{ $topic->questionFail() }}'>
                                         <label class="form-check-label" for="topic-{{ $topic->id }}">{{ $topic->name }}</label>
                                     </div>
@@ -89,6 +89,7 @@
             let totalQuestions = 0;
             let lastChecked = null;
             const questionCountElement = document.getElementById("question-count");
+            const questionsInput = document.getElementById("questions");
 
             document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
                 radio.addEventListener('click', function () {
@@ -103,20 +104,21 @@
                 });
             });
 
-            const searchButton = document.querySelector('.btn.btn-dark');
-            searchButton.addEventListener("click", function (event) {
+            const searchInput = document.querySelector('input[name="searchSubject"]');
+            searchInput.addEventListener("input", function () {
                 
-                event.preventDefault();
-                const searchTerm = $('input[name="searchSubject"]').val().trim().toLowerCase();
+                const searchTerm = searchInput.value.trim().toLowerCase();
                 const subjectItems = document.querySelectorAll('.form-check');
 
                 subjectItems.forEach(function (subjectItem) {
-
                     const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
-                    if (subjectLabel.includes(searchTerm)) {
-                        subjectItem.style.display = "block";
-                    } else {
-                        subjectItem.style.display = "none";
+                    if (subjectItem.closest('.no-filter') && subjectItem.querySelector('label')) {
+                        const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
+                        if (subjectLabel.includes(searchTerm)) {
+                            subjectItem.style.display = "block";
+                        } else {
+                            subjectItem.style.display = "none";
+                        }
                     }
                 });
             });
@@ -184,6 +186,13 @@
                 });
 
                 questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
+
+                if (questionsInput) {
+                    questionsInput.setAttribute("max", totalQuestions);
+                    if (parseInt(questionsInput.value) > totalQuestions) {
+                        questionsInput.value = totalQuestions;
+                    }
+                }
             }
 
             document.querySelectorAll('.subject-checkbox').forEach(function (subjectCheckbox) {
@@ -210,6 +219,12 @@
 
             document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
                 radio.addEventListener('change', updateQuestionCount);
+            });
+
+            questionsInput.addEventListener('input', function () {
+                if (parseInt(questionsInput.value) > totalQuestions) {
+                    questionsInput.value = totalQuestions;
+                }
             });
 
             updateQuestionCount();

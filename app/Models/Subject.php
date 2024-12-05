@@ -25,7 +25,7 @@ class Subject extends Model {
     }
 
     public function questions() {
-        return $this->hasMany(Question::class);
+        return $this->hasMany(Question::class, 'subject_id');
     }
 
     public function parent() {
@@ -88,18 +88,12 @@ class Subject extends Model {
     }
     
 
-    public function questionResolved() {
+    public function questionResolved($id) {
         
         $userId = Auth::id();
         
-        $topicIds = $this->topics()->pluck('id')->toArray();
-        $subjectIds = array_merge([$this->id], $topicIds);
-
-        $questionIds = Question::whereIn('subject_id', $subjectIds)->pluck('id');
-        $count = Answer::whereIn('question_id', $questionIds)
-                   ->where('user_id', $userId)
-                   ->distinct('question_id')
-                   ->count('question_id');
+        $questionIds = Question::where('subject_id', $id)->pluck('id');
+        $count = Answer::whereIn('question_id', $questionIds)->where('user_id', $userId)->distinct('question_id')->count('question_id');
 
         return $count;
     }

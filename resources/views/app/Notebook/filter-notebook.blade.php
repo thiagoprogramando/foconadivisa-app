@@ -34,7 +34,7 @@
                                     data-questions='{{ $subject->totalQuestions() }}'
                                     id='subject-{{ $subject->id }}'
                                     data-topics='@json($subject->topics)'
-                                    id-resolved='{{ $subject->questionResolved() }}' 
+                                    id-resolved='{{ $subject->questionResolved($subject->id) }}' 
                                     id-fail='{{ $subject->questionFail() }}'
                                     @if (in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) checked @endif>
                                 <label class="form-check-label" for="subject-{{ $subject->id }}">{{ $subject->name }}</label>
@@ -48,7 +48,7 @@
                                             data-subject="{{ $subject->id }}"
                                             data-questions="{{ $topic->totalQuestions() }}"
                                             id="topic-{{ $topic->id }}"
-                                            id-resolved='{{ $topic->questionResolved() }}' 
+                                            id-resolved='{{ $topic->questionResolved($topic->id) }}' 
                                             id-fail='{{ $topic->questionFail() }}'
                                             @if (in_array($topic->id, $notebookTopics->pluck('id')->toArray())) checked @endif
                                             @if (in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) checked @endif>
@@ -96,15 +96,13 @@
             let filterResolved = false;
             let filterFail = false;
 
-            const searchButton = document.querySelector('.btn.btn-dark');
-            searchButton.addEventListener("click", function (event) {
+            const searchInput = document.querySelector('input[name="searchSubject"]');
+            searchInput.addEventListener("input", function () {
                 
-                event.preventDefault();
-                const searchTerm = $('input[name="searchSubject"]').val().trim().toLowerCase();
+                const searchTerm = searchInput.value.trim().toLowerCase();
                 const subjectItems = document.querySelectorAll('.form-check');
 
                 subjectItems.forEach(function (subjectItem) {
-
                     const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
                     if (subjectLabel.includes(searchTerm)) {
                         subjectItem.style.display = "block";

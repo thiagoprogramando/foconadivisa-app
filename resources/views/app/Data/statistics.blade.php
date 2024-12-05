@@ -120,37 +120,62 @@
 
         <div class="col-4 col-sm-12 col-md-12 col-lg-12 mt-3">
             <hr>
-            <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
+            <canvas id="radarChart" style="max-height: 400px;"></canvas>
         
             <script>
                 document.addEventListener("DOMContentLoaded", () => {
-                    
-                    const subjects = @json($subjects->pluck('name')); 
-                    const subjectCounts = @json($subjects->pluck('answers_count'));
-        
-                    var indicators = subjects.map((subject) => {
-                        return { name: subject, max: Math.max(...subjectCounts) };
-                    });
-        
-                    var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
-                        legend: {
-                            data: ['Conteúdos']
-                        },
-                        radar: {
-                            shape: 'circle',
-                            indicator: indicators
-                        },
-                        series: [{
-                            name: 'Conteúdos',
-                            type: 'radar',
-                            data: [{
-                                value: subjectCounts,
-                                name: 'Conteúdos'
-                            }]
+                    // Dados que você vai usar no gráfico
+                    const subjects = @json($subjects); // Passando os subjects para o JavaScript
+
+                    // Coletar os dados de acertos e erros para cada subject
+                    const labels = subjects.map(subject => subject.name);  // Nomes dos subjects
+                    console.log(labels);
+                    const correctAnswers = subjects.map(subject => subject.answers_correct);  // Contagem de respostas corretas
+                    const incorrectAnswers = subjects.map(subject => subject.answers_incorrect);  // Contagem de respostas incorretas
+
+                    // Criando o gráfico
+                    new Chart(document.querySelector('#radarChart'), {
+                    type: 'radar',
+                    data: {
+                        labels: labels,  // Nomes dos subjects
+                        datasets: [{
+                        label: 'Acertos',
+                        data: correctAnswers,  // Dados de acertos
+                        fill: true,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        pointBackgroundColor: 'rgb(75, 192, 192)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(75, 192, 192)'
+                        }, {
+                        label: 'Erros',
+                        data: incorrectAnswers,  // Dados de erros
+                        fill: true,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
                         }]
+                    },
+                    options: {
+                        elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                        },
+                        scales: {
+                        r: {
+                            min: 0,  // Define o valor mínimo do gráfico (pode ajustar conforme necessário)
+                            max: Math.max(...correctAnswers.concat(incorrectAnswers))  // Definir o valor máximo baseado nas respostas
+                        }
+                        }
+                    }
                     });
                 });
-            </script>
+            </script> 
         </div>        
     </div>
 </div>
