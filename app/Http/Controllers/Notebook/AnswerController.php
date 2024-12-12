@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AnswerController extends Controller {
     
-    public function answer($notebook) {
+    public function answer($notebook, $next_question = null) {
 
         $notebook = Notebook::find($notebook);
         if ($notebook) {
@@ -27,14 +27,18 @@ class AnswerController extends Controller {
             })
             ->count();
 
-            $unansweredQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
+            $unansweredQuestionsQuery = NotebookQuestion::where('notebook_id', $notebook->id)
             ->whereNotIn('id', $answeredNotebookQuestionIds)
             ->whereHas('question', function ($query) {
                 $query->whereNotNull('question_text')
                       ->where('question_text', '!=', '');
-            })
-            ->paginate(1);
+            });
 
+            if ($next_question) {
+                $unansweredQuestionsQuery->where('id', '!=', $next_question);
+            }
+
+            $unansweredQuestions = $unansweredQuestionsQuery->paginate(1);
             $nextQuestionNumber = $totalQuestions - $unansweredQuestions->total() + 1;
             $menu = 1;
 

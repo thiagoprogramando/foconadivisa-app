@@ -31,7 +31,6 @@
         </div>
     </div>
 
-    @if(Auth::user()->type == 1)
     <div class="col-sm-12 col-md-7 col-lg-7 mb-3">
         <div class="row">
             <div class="col-12 col-sm-12 col-md-12 col-lg-12">
@@ -138,9 +137,4 @@
             </div>
         @endif
     </div>
-    @else
-        <div class="mt-5 text-center">
-            <h2><b>Em construção,</b> para acessar seus produtos siga <a href="{{ route('minhas-compras') }}">acessando aqui!</a></h2>
-        </div>
-    @endif
 @endsection

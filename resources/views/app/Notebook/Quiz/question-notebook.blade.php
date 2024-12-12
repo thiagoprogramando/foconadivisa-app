@@ -106,12 +106,17 @@
                                 <h6 class="question">
                                     Questão: {{ $nextQuestionNumber }} de {{ $totalQuestions }}
                                 </h6>
-                                <small><b>Conteúdo/Tópico:</b> {{ $question->subject->name }}</small> <br>
+                                @if($question->subject || $question->topic)
+                                    <small><b>Conteúdo/Tópico:</b> 
+                                        {{ $question->subject->name ?? '---' }} |
+                                        {{ $question->topic->name ?? '---' }}
+                                    </small><br>
+                                @endif
                                 <small><b>{{ $question->responsesCount(Auth::user()->id, $notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $question->correctCount(Auth::user()->id, $notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $question->wrogCount(Auth::user()->id, $notebook->id) }}</b> Erros</small>
                             </div>
                             <div class="col-12 col-sm-12 col-md-5 col-lg-5">
                                 <div class="btn-group">
-                                    <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
+                                    <a href="{{ route('ver-questao', ['id' => $question->id]) }}" target="_blank" class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
                                     <a href="#" class="btn btn-outline-dark" id="updateNotebook" title="Modificar filtros">
                                         <i class="bx bx-filter"></i> Filtros
                                     </a>
@@ -167,9 +172,9 @@
                             </form>
 
                             @foreach ($question->comments as $comment)
-                                <div class="alert alert-dark bg-dark text-light border-0 alert-dismissible fade show" role="alert">
+                                <div class="alert alert-light border-light alert-dismissible fade show" role="alert">
                                     {{ $comment->user->name }} - <small>{{ $comment->created_at->format('d/m/Y') }}</small> <br> {{ $comment->comment }}
-                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="alert" aria-label="Close"></button>
                                   </div>
                             @endforeach
                         </div>
@@ -194,11 +199,11 @@
                             <hr class="mt-5">
                             <div class="text-center">
                                 <div class="btn-group mt-3" role="group" style="width: 70%;">
-                                    <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-dark">SAIR</a>
-                                    <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger">
-                                        <i class="bi bi-trash"></i> ELIMINAR QUESTÃO
-                                    </a>
-                                    <button type="submit" class="btn btn-outline-success">RESPONDER</button>
+                                    {{-- <a href="{{ route('caderno', ['id' => $notebook->id]) }}" title="Sair" class="btn btn-outline-dark">SAIR</a> --}}
+                                    <button onclick="history.back()" @disabled($nextQuestionNumber == 1) title="VOLTAR" class="btn btn-outline-dark">VOLTAR</button>
+                                    <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger">ELIMINAR QUESTÃO</a>
+                                    <button type="submit" title="Sair" class="btn btn-outline-success">RESPONDER</button>
+                                    <a href="{{ route('answer', ['id' => $notebook->id, 'next_question' => $notebookQuestion->id]) }}" title="Sair" class="btn btn-outline-dark">PULAR</a>
                                 </div>
                             </div>
                         </form>
@@ -207,10 +212,6 @@
                     <p>Questão não encontrada.</p>
                 @endif
             @endforeach
-
-            <div class="mt-3 text-center">
-                {{ $unansweredQuestions->links() }}
-            </div>
         @else
             <div class="text-center">
                 <i class="bi bi-award text-success" style="font-size: 86px;"></i>

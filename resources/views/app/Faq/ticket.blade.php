@@ -21,9 +21,16 @@
             <div class="accordion" id="faq-group-2">
                 @foreach ($tickets as $ticket)
                     <div class="accordion-item">
-                        <h2 class="accordion-header"> <button class="accordion-button collapsed" data-bs-target="#faqs{{ $ticket->id }}" type="button" data-bs-toggle="collapse"><a href="">#{{ $ticket->id }}</a> -  {{ $ticket->comment }}</button></h2>
+                        <h2 class="accordion-header"> <button class="accordion-button collapsed" data-bs-target="#faqs{{ $ticket->id }}" type="button" data-bs-toggle="collapse"><a href="">#{{ $ticket->id }}</a> - {{ $ticket->user->name }}</button></h2>
                         <div id="faqs{{ $ticket->id }}" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
                             <div class="accordion-body">
+                                <p>
+                                    <b>Questão</b> <br>
+                                    <a href="{{ route('questao', ['id' => $ticket->question->id]) }}" target="_blank">{!! $ticket->question->question_text !!}</a>
+                                    <b>Relato</b> <br>
+                                    {{ $ticket->comment }}
+                                </p>
+                                
                                 <form action="{{ route('update-ticket') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="id" value="{{ $ticket->id }}">

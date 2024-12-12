@@ -13,6 +13,7 @@ return new class extends Migration {
             $table->integer('type'); // 1 - Information 2 - Success 3 - Problem
             $table->string('title');
             $table->longText('description');
+            $table->string('url')->nullable();
             $table->timestamps();
         });
     }

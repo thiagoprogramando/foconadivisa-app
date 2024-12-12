@@ -9,12 +9,10 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('plan', function (Blueprint $table) {
             $table->id();
-
-            $table->integer('type')->default(1); // 1 - Month 2 - Year 3 - Lifetime
             $table->string('name');
             $table->longText('description')->nullable();
             $table->decimal('value', 10, 2)->default(0);
-
+            $table->integer('type')->default(1); // 1 - Month 2 - Year 3 - Lifetime
             $table->timestamps();
         });
     }

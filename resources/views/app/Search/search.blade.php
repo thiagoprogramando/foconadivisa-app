@@ -2,143 +2,78 @@
 @section('title') Pesquisa:  @endsection
 @section('content')
 
-    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
+    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-2">
         <div class="row g-0">
-
-            <div class="col-12">
-                <div class="btn-group" role="group">
-                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
-                    <a href="{{ route('topicos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
-                </div>
-            </div>
-
-            @if($notebooks->count())
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-5">
-                    <h1 class="card-title">Meus cadernos</h1>
+            @if ($questions->count())
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-2">
+                    <h1 class="card-title">Questões</h1>
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover table-sm">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Nome</th>
-                                    <th scope="col">Conteúdos</th>
-                                    <th scope="col" class="text-center">Progresso</th>
-                                    <th scope="col" class="text-center">Questões</th>
+                                    <th scope="col">Conteúdo/Tópico</th>
                                     @if (Auth::user()->type == 1) <th scope="col" class="text-center">Opções</th> @endif
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($notebooks as $notebook)
+                                @foreach ($questions as $question)
                                     <tr>
-                                        <th scope="row">{{ $notebook->id }}</th>
-                                        <td>{{ $notebook->name }}</td>
+                                        <th scope="row">{{ $question->id }}</th>
+                                        <td>{{ html_entity_decode(strip_tags($question->question_text)) }}</td>
                                         <td>
-                                            @foreach ($notebook->getSubjectsNames() as $subject)
-                                                <span class="badge bg-dark">{{ $subject }}</span>
-                                            @endforeach
-
-                                            @foreach ($notebook->getTopicsNames() as $topic)
-                                                <span class="badge bg-secondary">{{ $topic }}</span>
-                                            @endforeach
+                                            <span class="badge bg-dark">{{ $question->subject->name }}</span>
+                                            <span class="badge bg-primary">{{ $question->topic->name }}</span>
                                         </td>
-                                        <td class="text-center">{{ $notebook->percentage }}%</td>
-                                        <td class="text-center">{{ $notebook->countQuestions() }}</td>
-                                        @if (Auth::user()->type == 1)
-                                            <td class="text-center">
-                                                <form action="{{ route('delete-notebook') }}" method="POST" class="btn-group delete" role="group">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{ $notebook->id }}">
-                                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                                    <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-outline-success"><i class="bi bi-arrow-bar-right"></i></a>
-                                                </form>
-                                            </td>
-                                        @endif
+                                        <td class="text-center">
+                                            <div class="btn-group">
+                                                <button type="button" data-bs-toggle="modal" data-bs-target="#addModal{{ $question->id }}" class="btn btn-dark"><i class="ri-add-circle-line"></i> Adicionar ao caderno</button>
+                                            </div>
+                                        </td>
                                     </tr>
+
+                                    <form action="{{ route('add-question-notebook') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="question_id" value="{{ $question->id }}">
+                                        <div class="modal fade" id="addModal{{ $question->id }}" tabindex="-1" aria-hidden="true" style="display: none;">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Adicionar questão</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                                                <div class="form-floating mb-3">
+                                                                    <select name="notebook_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                                      <option selected="">Escolha um caderno:</option>
+                                                                      @foreach ($notebooks as $notebook)
+                                                                        <option value="{{ $notebook->id }}">{{ $notebook->name }}</option>
+                                                                      @endforeach
+                                                                    </select>
+                                                                    <label for="floatingSelect">Cadernos</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer btn-group">
+                                                        <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                                                        <button type="submit" class="btn btn-dark">Adicionar</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
                                 @endforeach
                             </tbody>
                         </table>  
                     </div>
                     <hr>
                 </div>
-            @endif
-
-            @if($subjects->count())
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-5">
-                    <h1 class="card-title">Conteúdos</h1>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Descrição</th>
-                                    <th scope="col" class="text-center">Tópicos</th>
-                                    <th scope="col" class="text-center">Questões</th>
-                                    @if (Auth::user()->type == 1) <th scope="col" class="text-center">Opções</th> @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($subjects as $subject)
-                                    <tr>
-                                        <th scope="row">{{ $subject->id }}</th>
-                                        <td>{{ $subject->name }}</td>
-                                        <td>{{ strlen($subject->description) > 60 ? substr($subject->description, 0, 60) . '...' : $subject->description }}</td>
-                                        <td class="text-center">{{ $subject->countTopics() }}</td>
-                                        <td class="text-center">{{ $subject->countQuestions() }}</td>
-                                        @if (Auth::user()->type == 1)
-                                            <td class="text-center">
-                                                <form action="{{ route('delete-subject') }}" method="POST" class="btn-group delete" role="group">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{ $subject->id }}">
-                                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                                    <a href="{{ route('conteudo', ['id' => $subject->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
-                                                </form>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>   
-                    </div>
-                    <hr>
-                </div>
-            @endif
-
-            @if($topics->count())
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-5">
-                    <h1 class="card-title">Tópicos</h1>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Descrição</th>
-                                    @if (Auth::user()->type == 1) <th scope="col" class="text-center">Opções</th> @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($topics as $topic)
-                                    <tr>
-                                        <th scope="row">{{ $topic->id }}</th>
-                                        <td>{{ $topic->name }}</td>
-                                        <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
-                                        @if (Auth::user()->type == 1)
-                                            <td class="text-center">
-                                                <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{ $topic->id }}">
-                                                    <a title="Detalhes" href="{{ route('conteudo', ['id' => $topic->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
-                                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                                </form>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>   
-                </div>
+            @else
+                <p class="text-center">Nenhuma questão encontrada!</p>
             @endif
 
         </div>

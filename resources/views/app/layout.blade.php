@@ -68,7 +68,7 @@
                             </li>
 
                             @foreach ($notifications as $notification)
-                                <a href="{{ route('delete-notification', ['id' => $notification->id]) }}">
+                            <a href="{{ $notification->url ?? route('delete-notification', ['id' => $notification->id]) }}">
                                     <li class="notification-item">
                                         {!! $notification->typeLabel() !!}
                                         <div>
@@ -151,19 +151,19 @@
                 </li>
 
                 @if(Auth::user()->type == 1)
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('cadernos') }}">
-                        <i class="bi bi-pen"></i>
-                        <span>Resolver Questões</span>
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="{{ route('cadernos') }}">
+                            <i class="bi bi-pen"></i>
+                            <span>Resolver Questões</span>
+                        </a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('cadernos') }}">
-                        <i class="bi bi-book-half"></i>
-                        <span>Meus Cadernos</span>
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="{{ route('cadernos') }}">
+                            <i class="bi bi-book-half"></i>
+                            <span>Meus Cadernos</span>
+                        </a>
+                    </li>
                 @endif
 
                 <li class="nav-item">
@@ -174,16 +174,16 @@
                 </li>
 
                 @if(Auth::user()->type == 1)
-                <li class="nav-heading">Meus Dados</li>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estátisticas</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('planos') }}"><i class="bi bi-cart"></i><span>Planos</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('pagamentos') }}"><i class="bi bi-arrow-down-square-fill"></i><span>Pendências</span></a>
-                </li>
+                    <li class="nav-heading">Meus Dados</li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estátisticas</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="{{ route('planos') }}"><i class="bi bi-cart"></i><span>Planos</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="{{ route('pagamentos') }}"><i class="bi bi-arrow-down-square-fill"></i><span>Pendências</span></a>
+                    </li>
                 @endif
 
                 @if(Auth::user()->type == 1)
@@ -196,9 +196,9 @@
                             <li>
                                 <a href="{{ route('conteudos') }}"><i class="bi bi-circle"></i><span>Conteúdos</span></a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="{{ route('topicos') }}"><i class="bi bi-circle"></i><span>Tópicos</span></a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </li>
                     <li class="nav-item">

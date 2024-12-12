@@ -7,6 +7,9 @@
 
             <div class="col-12">
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
+                    <button type="button" title="Adicionar" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#createModal">
+                        <i class="ri-add-circle-line"></i> Adicionar
+                    </button>
                     <button type="button" title="Filtros" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#filterModal">
                         <i class="bi bi-filter-circle"></i> Filtros
                     </button>
@@ -14,6 +17,52 @@
                         <i class="bi bi-file-earmark-excel"></i> Excel
                     </a>  
                     <a href="{{ route('planos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
+
+                    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" style="display: none;">
+                        <div class="modal-dialog">
+                            <form action="{{ route('create-plan') }}" method="POST" class="modal-content">
+                                @csrf
+                                <div class="modal-header">
+                                    <h5 class="modal-title">ADICIONAR PLANO</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                            <div class="form-floating mb-2">
+                                                <input type="text" name="name" class="form-control" id="name" placeholder="Nome:">
+                                                <label for="name">Nome:</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                            <div class="form-floating mb-2">
+                                                <input type="text" name="description" class="form-control" id="description" placeholder="Descrição:">
+                                                <label for="description">Descrição:</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                            <div class="form-floating mb-2">
+                                                <input type="text" name="value" class="form-control" id="value" placeholder="Valor:">
+                                                <label for="value">Valor:</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                            <select name="type" class="form-control" placeholder="Tipo de cobrança">
+                                                <option selected>Tipo de cobrança</option>
+                                                <option value="1">Mensal</option>
+                                                <option value="2">Anual</option>
+                                                <option value="3">Vitalício</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer btn-group">
+                                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                                    <button type="submit" class="btn btn-dark">Adicionar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
                     <div class="modal fade" id="filterModal" tabindex="-1" aria-hidden="true" style="display: none;">
                         <div class="modal-dialog">
@@ -38,7 +87,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
+                                <div class="modal-footer btn-group">
                                     <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
                                     <button type="submit" class="btn btn-dark">Pesquisar</button>
                                 </div>

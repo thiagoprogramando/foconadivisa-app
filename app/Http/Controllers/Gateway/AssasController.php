@@ -15,148 +15,150 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class AssasController extends Controller {
     
     public function payPlan($id) {
 
-        if(empty(Auth::user()->cpfcnpj) || empty(Auth::user()->phone)) {
+        if (empty(Auth::user()->cpfcnpj) || empty(Auth::user()->phone)) {
             return redirect()->route('perfil')->with('error', 'Ops! Complete o seu cadastro antes de adquirir um plano.');
         }
 
-        if(!empty(Auth::user()->customer)) {
-            $customer = Auth::user()->customer;
-        } else {
-            $customer = $this->createCustomer(Auth::user()->id);
-        }
+        try {
 
-        $plan = Plan::find($id);
-        if(!$plan) {
-            return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
-        }
-
-        if($plan->value == 0 || $plan->value < 1) {
-            $user       = User::find(Auth::user()->id);
-            $user->plan = $plan->id;
-            if($user->save()) {
-                return redirect()->back()->with('success', 'Plano alterado com sucesso!');
+            $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
+            if (!$customer) {
+                return redirect()->back()->with('error', 'Ops! Há algo de errado com seus dados, verifique e tente novamente.');
             }
 
-            return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
+            $plan = Plan::find($id);
+            if (!$plan) {
+                return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
+            }
+
+            if ($plan->value <= 0) {
+
+                $user = User::find(Auth::id());
+                $user->plan = $plan->id;
+                if ($user->save()) {
+                    return redirect()->back()->with('success', 'Plano alterado com sucesso!');
+                }
+
+                throw new \Exception('Erro ao salvar o plano gratuito.');
+            }
+
+            $dataInvoice = $this->createInvoice(null, null, $customer, $plan->value, $plan->name);
+            if (!$dataInvoice) {
+                throw new \Exception('Erro ao gerar fatura. Verifique seus dados e tente novamente.');
+            }
+
+            Invoice::where('user_id', Auth::user()->id)
+                ->where('payment_status', 0)
+                ->where('plan_id', $plan->id)
+                ->delete();
+
+            $invoice                = new Invoice();
+            $invoice->user_id       = Auth::user()->id;
+            $invoice->plan_id       = $plan->id;
+            $invoice->value         = $plan->value;
+            $invoice->payment_token = $dataInvoice['id'];
+            $invoice->payment_url   = $dataInvoice['invoiceUrl'];
+
+            if ($invoice->save()) {
+
+                $notification               = new Notification();
+                $notification->user_id      = Auth::user()->id;
+                $notification->type         = 1;
+                $notification->title        = 'Fatura gerada para o novo Plano!';
+                $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
+                $notification->save();
+
+                return redirect($dataInvoice['invoiceUrl']);
+            }
+
+            return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente.');
         }
-
-        $dataInvoice = $this->createInvoice(null, null, $customer, $plan->value, $plan->name);
-        if($dataInvoice == null) {
-            return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');
-        }
-
-        Invoice::where('user_id', Auth::user()->id)
-        ->where('payment_status', 0)
-        ->where('plan_id', $plan->id)
-        ->delete();
-
-        $invoice                = new Invoice();
-        $invoice->user_id       = Auth::user()->id;
-        $invoice->plan_id       = $plan->id;
-        $invoice->value         = $plan->value;
-        $invoice->payment_token = $dataInvoice['id'];
-        $invoice->payment_url   = $dataInvoice['invoiceUrl'];
-        if($invoice->save()) {
-
-            $notification               = new Notification();
-            $notification->user_id      = Auth::user()->id;
-            $notification->type         = 1;
-            $notification->title        = 'Fatura gerada para o novo Plano!';
-            $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
-            $notification->save();
-
-            return redirect($dataInvoice['invoiceUrl']);
-        }
-
-        return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');
     }
 
     public function createCustomer($id) {
 
         $user = User::find($id);
-        if(!$user) {
+        if (!$user) {
             return false;
         }
 
-        $client = new Client();
+        try {
+            $client = new Client();
 
-        $options = [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'access_token' => env('API_KEY'),
-                'User-Agent'   => env('APP_NAME')
-            ],
-            'json' => [
-                'name'          => $user->name,
-                'cpfCnpj'       => $user->cpfcnpj,
-                'mobilePhone'   => $user->phone,
-                'email'         => $user->email,
-                'notificationDisabled' => true
-            ],
-            'verify' => false
-        ];
+            $options = [
+                'headers' => [
+                    'Content-Type'  => 'application/json',
+                    'access_token'  => env('API_KEY'),
+                    'User-Agent'    => env('APP_NAME')
+                ],
+                'json' => [
+                    'name'                  => $user->name,
+                    'cpfCnpj'               => $user->cpfcnpj,
+                    'mobilePhone'           => $user->phone,
+                    'email'                 => $user->email,
+                    'notificationDisabled'  => true
+                ],
+                'verify' => false
+            ];
 
-        $response = $client->post(env('API_URL_ASSAS') . 'v3/customers', $options);
-        $body = (string) $response->getBody();
-        
-        if ($response->getStatusCode() === 200) {
-            $data = json_decode($body, true);
+            $response = $client->post(env('API_URL_ASSAS') . 'v3/customers', $options);
 
-            $user->customer = $data['id'];
-            if($user->save()) {
+            if ($response->getStatusCode() === 200) {
+                $data = json_decode($response->getBody(), true);
+                $user->customer = $data['id'];
+                $user->save();
                 return $data['id'];
             }
-
-            return $data['id'];
-        } else {
+        } catch (\Exception $e) {
+            Log::error('Erro em createCustomer: ' . $e->getMessage());
             return false;
         }
     }
 
     public function createInvoice($method, $installments, $customer, $value, $description) {
-        	
-        $client = new Client();
-
-        $options = [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'access_token' => env('API_KEY'),
-                'User-Agent'   => env('APP_NAME')
-            ],
-            'json' => [
-                'customer'          => $customer,
-                'billingType'       => $method ?? 'PIX',
-                'value'             => number_format($value, 2, '.', ''),
-                'dueDate'           => now()->addDay(),
-                'description'       => $description,
-                'installmentCount'  => $installments != null ? $installments : 1,
-                'installmentValue'  => $installments != null ? number_format(($value / intval($installments)), 2, '.', '') : $value,
-                // 'callback'          => [
-                //     'successUrl'    => env('APP_URL'),
-                //     'autoRedirect'  => true
-                // ]
-            ],
-            'verify' => false
-        ];
-
-        $response = $client->post(env('API_URL_ASSAS') . 'v3/payments', $options);
-        $body = (string) $response->getBody();
-
-        if ($response->getStatusCode() === 200) {
-            $data = json_decode($body, true);
-            return $dados['json'] = [
-                'id'            => $data['id'],
-                'invoiceUrl'    => $data['invoiceUrl'],
+        try {
+            $client = new Client();
+    
+            $options = [
+                'headers' => [
+                    'Content-Type'  => 'application/json',
+                    'access_token'  => env('API_KEY'),
+                    'User-Agent'    => env('APP_NAME'),
+                ],
+                'json' => [
+                    'customer'          => $customer,
+                    'billingType'       => $method ?? 'PIX',
+                    'value'             => number_format($value, 2, '.', ''),
+                    'dueDate'           => now()->addDay(),
+                    'description'       => $description,
+                    'installmentCount'  => $installments ?: 1,
+                    'installmentValue'  => $installments ? number_format(($value / $installments), 2, '.', '') : $value,
+                ],
+                'verify' => false,
             ];
-        } else {
+    
+            $response = $client->post(env('API_URL_ASSAS') . 'v3/payments', $options);
+    
+            if ($response->getStatusCode() === 200) {
+                $data = json_decode($response->getBody(), true);
+                return [
+                    'id' => $data['id'],
+                    'invoiceUrl' => $data['invoiceUrl'],
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Erro em createInvoice: ' . $e->getMessage());
             return false;
         }
-    }
+    }    
 
     public function webhook(Request $request) {
 

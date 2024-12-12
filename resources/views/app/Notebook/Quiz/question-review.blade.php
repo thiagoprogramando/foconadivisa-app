@@ -104,8 +104,13 @@
                 <div class="col-12 col-sm-12 col-md-7 col-lg-7">
                     <h6 class="question">
                         Questão: {{ $currentQuestionNumber }} de {{ $totalQuestions }}
-                    </h6>                    
-                    <small><b>Conteúdo/Tópico:</b> {{ $answer->question->subject->name }}</small> <br>
+                    </h6>
+                    @if($answer->question->subject || $answer->question->topic)
+                        <small><b>Conteúdo/Tópico:</b> 
+                            {{ $answer->question->subject->name ?? '---' }} |
+                            {{  $answer->question->topic->name ?? '---' }}
+                        </small><br>
+                    @endif                    
                     <small><b>{{ $answer->question->responsesCount(Auth::user()->id, $answer->notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $answer->question->correctCount(Auth::user()->id, $answer->notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $answer->question->wrogCount(Auth::user()->id, $answer->notebook->id) }}</b> Erros</small>
                 </div>
                 <div class="col-12 col-sm-12 col-md-5 col-lg-5">
@@ -163,9 +168,9 @@
                 </form>
 
                 @foreach ($answer->question->comments as $comment)
-                    <div class="alert alert-dark bg-dark text-light border-0 alert-dismissible fade show" role="alert">
+                    <div class="alert alert-light border-light alert-dismissible fade show" role="alert">
                         {{ $comment->user->name }} - <small>{{ $comment->created_at->format('d/m/Y') }}</small> <br> {{ $comment->comment }}
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="alert" aria-label="Close"></button>
                       </div>
                 @endforeach
             </div>

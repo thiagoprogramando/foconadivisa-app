@@ -124,18 +124,19 @@ Route::middleware('auth')->group(function () {
         Route::post('delete-topic', [SubjectController::class, 'deleteTopic'])->name('delete-topic');
 
         //Notebook
-        Route::get('/caderno/{id}', [NotebookController::class, 'notebook'])->name('caderno');
+        Route::get('/caderno/{id}/{tab?}', [NotebookController::class, 'notebook'])->name('caderno');
         Route::get('/caderno-filtros/{id}', [NotebookController::class, 'notebookFilter'])->name('caderno-filtros');
         Route::get('/cadernos', [NotebookController::class, 'notebooks'])->name('cadernos');
         Route::get('/completing-notebook/{id}', [NotebookController::class, 'completingNotebook'])->name('completing-notebook');
         Route::get('/criar-caderno', [NotebookController::class, 'createNotebookForm'])->name('criar-caderno');
         Route::post('create-notebook', [NotebookController::class, 'createNotebook'])->name('create-notebook');
+        Route::post('add-question-notebook', [NotebookController::class, 'addQuestion'])->name('add-question-notebook');
         Route::post('update-notebook', [NotebookController::class, 'updateNotebook'])->name('update-notebook');
         Route::post('delete-notebook', [NotebookController::class, 'deleteNotebook'])->name('delete-notebook');
         Route::get('delete-notebook-get/{id}', [NotebookController::class, 'deleteGetNotebook'])->name('delete-notebook-get');
         
         //Ansnwer
-        Route::get('/answer/{id}', [AnswerController::class, 'answer'])->name('answer');
+        Route::get('/answer/{id}/{next_question?}', [AnswerController::class, 'answer'])->name('answer');
         Route::get('/answer-review/{answer}', [AnswerController::class, 'answerReview'])->name('answer-review');
         Route::post('/notebooks/{notebook}/questions/{question}/{page}/submit', [AnswerController::class, 'submitAnswerAndNext'])->name('submitAnswerAndNext');
 
@@ -156,6 +157,7 @@ Route::middleware('auth')->group(function () {
 
     //Question & Option
     Route::get('questao/{id}', [QuestionController::class, 'viewQuestion'])->name('questao');
+    Route::get('ver-questao/{id}', [QuestionController::class, 'question'])->name('ver-questao');
     Route::get('create-question/{topic}', [QuestionController::class, 'createQuestion'])->name('create-question');
     Route::post('update-question', [QuestionController::class, 'updateQuestion'])->name('update-question');
     Route::post('delete-question', [QuestionController::class, 'deleteQuestion'])->name('delete-question');

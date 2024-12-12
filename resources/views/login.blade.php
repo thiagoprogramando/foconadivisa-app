@@ -34,7 +34,7 @@
 
                   <div class="d-flex justify-content-center py-4">
                       <a href="{{ route('login') }}" class="logo d-flex align-items-center w-auto">
-                        <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
+                        <img src="{{ asset('template/img/logo_preta.png') }}" alt="{{ env('APP_NAME') }}">
                       </a>
                   </div>
 

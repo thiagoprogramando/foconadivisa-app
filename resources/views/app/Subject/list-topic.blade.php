@@ -27,7 +27,6 @@
                                         <label for="name">Título</label>
                                     </div>
                                 </div>
-
                                 <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                     <select id="swal-subject" name="subjects[]" placeholder="Escolha um Conteúdo (Opcional)">
                                         <option value="" selected>Escolha um Conteúdo (Opcional)</option>
@@ -36,7 +35,6 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                
                             </div>
                         </div>
                         <div class="modal-footer btn-group">

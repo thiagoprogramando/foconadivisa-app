@@ -27,6 +27,21 @@ class QuestionController extends Controller {
         ]);
     }
 
+    public function question($id) {
+
+        $question   = Question::find($id);
+        if (!$question) {
+            return redirect()->route('app')->with('error', 'Ops! Não foi possível concluir essa operação.');
+        }
+
+        $answerDistribution = $question->getAnswerDistribution();
+
+        return view('app.Subject.Question.view-question', [
+            'question'              => $question,
+            'answerDistribution'    => $answerDistribution
+        ]);
+    }
+
     public function createQuestion($topic) {
 
         $question               = new Question();

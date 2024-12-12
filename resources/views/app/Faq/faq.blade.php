@@ -94,4 +94,9 @@
             </div>
         </div>
     </div>
+
+    <a href="{{ env('URL_SUPORT') }}" class="floating-button">
+        <i class="bx bxs-help-circle"></i>
+        Fale conosco
+    </a>
 @endsection

@@ -112,6 +112,7 @@ class FaqController extends Controller {
             $notification->type         = 1;
             $notification->title        = 'Ticket respondido!';
             $notification->description  = 'Olá, o suporte acabou de responde sua dúvida/relato!';
+            $notification->url          = env('APP_URL').'tickets';
             $notification->save();
 
             return redirect()->back()->with('success', 'Ticket atualizado com sucesso!');
@@ -134,6 +135,7 @@ class FaqController extends Controller {
             $notification->type         = 1;
             $notification->title        = 'Novo Ticket aberto!';
             $notification->description  = 'Olá, foi aberto um Ticket de suporte!';
+            $notification->url          = env('APP_URL').'tickets';
             $notification->save();
 
             return redirect()->back()->with('success', 'Ticket aberto com sucesso!');
