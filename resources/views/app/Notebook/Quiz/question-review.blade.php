@@ -107,15 +107,15 @@
                     </h6>
                     @if($answer->question->subject || $answer->question->topic)
                         <small><b>Conteúdo/Tópico:</b> 
-                            {{ $answer->question->subject->name ?? '---' }} |
-                            {{  $answer->question->topic->name ?? '---' }}
+                            {{ $answer->question->subject->parent->name ?? $answer->question->subject->name }} |
+                            {{ $answer->question->topic->name ?? '---' }}
                         </small><br>
                     @endif                    
                     <small><b>{{ $answer->question->responsesCount(Auth::user()->id, $answer->notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $answer->question->correctCount(Auth::user()->id, $answer->notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $answer->question->wrogCount(Auth::user()->id, $answer->notebook->id) }}</b> Erros</small>
                 </div>
                 <div class="col-12 col-sm-12 col-md-5 col-lg-5">
                     <div class="btn-group">
-                        <a class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
+                        <a href="{{ route('ver-questao', ['id' => $answer->question->id]) }}" target="_blank" class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
                         <a href="{{ route('caderno-filtros', ['id' => $answer->notebook->id]) }}" class="btn btn-outline-dark" title="Modificar filtros"><i class="bx bx-filter"></i> Filtros</a>
                         <button class="btn btn-outline-dark" title="Relatar problema" data-bs-toggle="modal" data-bs-target="#newTicket"><i class="ri-alarm-warning-fill"></i> Relatar problema</button>
                         <button class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bx bxs-book-reader"></i></button>

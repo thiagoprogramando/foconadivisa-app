@@ -74,11 +74,11 @@ class QuestionController extends Controller {
             }
 
             if ($optionCount < 2) {
-                return redirect()->back()->with('error', 'Você deve fornecer pelo menos duas opções.');
+                return redirect()->back()->with('error', 'Você deve fornecer pelo menos duas opções!');
             }
     
             if ($correctCount === 0) {
-                return redirect()->back()->with('error', 'Você deve marcar pelo menos uma opção como correta.');
+                return redirect()->back()->with('error', 'Você deve marcar pelo menos uma opção como correta!');
             }
 
             $question->question_text    = $request->input('question_text');
@@ -109,7 +109,7 @@ class QuestionController extends Controller {
                     $option->save();
                 }
     
-                return redirect()->route('create-question', ['topic' => $request->input('subject_id') ?? $request->input('subject_id_question')])->with('success', 'Dados salvos com sucesso!');
+                return redirect()->route('create-question', ['topic' => $request->input('subject_id_question') ?? $request->input('subject_id')])->with('success', 'Dados salvos com sucesso!');
             }
         }
     

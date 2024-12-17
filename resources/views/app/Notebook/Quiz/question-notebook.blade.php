@@ -108,7 +108,7 @@
                                 </h6>
                                 @if($question->subject || $question->topic)
                                     <small><b>Conteúdo/Tópico:</b> 
-                                        {{ $question->subject->name ?? '---' }} |
+                                        {{ $question->subject->parent->name ?? $question->subject->name }} |
                                         {{ $question->topic->name ?? '---' }}
                                     </small><br>
                                 @endif

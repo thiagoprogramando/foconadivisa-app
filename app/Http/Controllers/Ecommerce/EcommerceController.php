@@ -57,7 +57,12 @@ class EcommerceController extends Controller {
 
     public function payProduct(Request $request) {
 
+        if (empty($request->method) || empty($request->installments)) {
+            return redirect()->back()->with('info', 'É preciso escolher uma forma de pagamento e parcelas!');
+        }
+
         try {
+
             $product = Product::find($request->product_id);
             if (!$product) {
                 return redirect()->back()->with('info', 'Ops, Produto não encontrado ou disponível!');

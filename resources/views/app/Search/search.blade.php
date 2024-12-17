@@ -12,7 +12,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Nome</th>
+                                    <th scope="col">Questão</th>
                                     <th scope="col">Conteúdo/Tópico</th>
                                     @if (Auth::user()->type == 1) <th scope="col" class="text-center">Opções</th> @endif
                                 </tr>
@@ -23,15 +23,44 @@
                                         <th scope="row">{{ $question->id }}</th>
                                         <td>{{ html_entity_decode(strip_tags($question->question_text)) }}</td>
                                         <td>
-                                            <span class="badge bg-dark">{{ $question->subject->name }}</span>
-                                            <span class="badge bg-primary">{{ $question->topic->name }}</span>
-                                        </td>
+                                            @if($question->subject->parent)
+                                                <span class="badge bg-dark">{{ $question->subject->parent->name }}</span>
+                                            @else
+                                                <span class="badge bg-dark">{{ $question->subject->name }}</span>
+                                            @endif
+                                        
+                                            @if($question->topic)
+                                                <span class="badge bg-primary">{{ $question->topic->name }}</span>
+                                            @endif
+                                        </td>                                        
                                         <td class="text-center">
                                             <div class="btn-group">
+                                                <button type="button" data-bs-toggle="modal" data-bs-target="#viewModal{{ $question->id }}" class="btn btn-primary"><i class="ri-drag-drop-line"></i> Ver</button>
                                                 <button type="button" data-bs-toggle="modal" data-bs-target="#addModal{{ $question->id }}" class="btn btn-dark"><i class="ri-add-circle-line"></i> Adicionar ao caderno</button>
                                             </div>
                                         </td>
                                     </tr>
+
+                                    <div class="modal fade" id="viewModal{{ $question->id }}" tabindex="-1" aria-hidden="true" style="display: none;">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Questão: <a href="">{{ $question->id }}</a></h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                                           {!! $question->question_text !!}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer btn-group">
+                                                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <form action="{{ route('add-question-notebook') }}" method="POST">
                                         @csrf
