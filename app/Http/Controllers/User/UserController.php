@@ -41,24 +41,26 @@ class UserController extends Controller {
 
     public function updateProfile(Request $request) {
 
+        $user = User::find($request->id);
+        if (!$user) {
+            return redirect()->back()->with('info', 'Não foi possível encontrar os dados do usuário!');
+        }
+
         $data = [
             'name'      => $request->name,
             'cpfcnpj'   => $request->cpfcnpj,
             'email'     => $request->email,
             'phone'     => $request->phone,
             'meta'      => $request->meta,
-            'password'  => bcrypt($request->password)
         ];
 
-        $data = array_filter($data, function($value) {
-            return !empty($value);
-        });
+        if (!empty($request->password)) {
+            $data['password'] = bcrypt($request->password);
+        }
 
         if(!empty($request->type)) {
             $data['type'] = $request->type;
         }
-
-        $user = User::find($request->id);
         
         if(!empty($request->photo)) {
 

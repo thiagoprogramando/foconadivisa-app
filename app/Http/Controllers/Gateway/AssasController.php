@@ -25,69 +25,67 @@ class AssasController extends Controller {
             return redirect()->route('perfil')->with('error', 'Ops! Complete o seu cadastro antes de adquirir um plano.');
         }
 
-        try {
-
-            $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
-            if (!$customer) {
-                return redirect()->back()->with('error', 'Ops! Há algo de errado com seus dados, verifique e tente novamente.');
-            }
-
-            $plan = Plan::find($id);
-            if (!$plan) {
-                return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
-            }
-
-            if ($plan->value <= 0) {
-
-                $user = User::find(Auth::id());
-                $user->plan = $plan->id;
-                if ($user->save()) {
-                    return redirect()->back()->with('success', 'Plano alterado com sucesso!');
-                }
-
-                throw new \Exception('Erro ao salvar o plano gratuito.');
-            }
-
-            $dataInvoice = $this->createInvoice(null, null, $customer, $plan->value, $plan->name);
-            if (!$dataInvoice) {
-                throw new \Exception('Erro ao gerar fatura. Verifique seus dados e tente novamente.');
-            }
-
-            Invoice::where('user_id', Auth::user()->id)
-                ->where('payment_status', 0)
-                ->where('plan_id', $plan->id)
-                ->delete();
-
-            $invoice                = new Invoice();
-            $invoice->user_id       = Auth::user()->id;
-            $invoice->plan_id       = $plan->id;
-            $invoice->value         = $plan->value;
-            $invoice->payment_token = $dataInvoice['id'];
-            $invoice->payment_url   = $dataInvoice['invoiceUrl'];
-
-            if ($invoice->save()) {
-
-                $notification               = new Notification();
-                $notification->user_id      = Auth::user()->id;
-                $notification->type         = 1;
-                $notification->title        = 'Fatura gerada para o novo Plano!';
-                $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
-                $notification->save();
-
-                return redirect($dataInvoice['invoiceUrl']);
-            }
-
-            return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente.');
+        $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
+        if ($customer['status'] == false || $customer['status'] == 0) {
+            return redirect()->back()->with('error', $customer['message']);
         }
+
+        $plan = Plan::find($id);
+        if (!$plan) {
+            return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
+        }
+
+        if ($plan->value <= 0) {
+
+            $user = User::find(Auth::id());
+            $user->plan = $plan->id;
+            if ($user->save()) {
+                return redirect()->back()->with('success', 'Plano alterado com sucesso!');
+            }
+
+            return redirect()->back()->with('error', 'Erro ao salvar o plano gratuito.');
+        }
+
+        $dataInvoice = $this->createInvoice(null, null, $customer, $plan->value, $plan->name);
+        if (!$dataInvoice) {
+            return redirect()->back()->with('error', 'Não foi possível gerar sua fatura! Verifique seus dados e tente novamente.');
+        }
+
+        Invoice::where('user_id', Auth::user()->id)
+            ->where('payment_status', 0)
+            ->where('plan_id', $plan->id)
+            ->delete();
+
+        $invoice                = new Invoice();
+        $invoice->user_id       = Auth::user()->id;
+        $invoice->plan_id       = $plan->id;
+        $invoice->value         = $plan->value;
+        $invoice->payment_token = $dataInvoice['id'];
+        $invoice->payment_url   = $dataInvoice['invoiceUrl'];
+
+        if ($invoice->save()) {
+
+            $notification               = new Notification();
+            $notification->user_id      = Auth::user()->id;
+            $notification->type         = 1;
+            $notification->title        = 'Fatura gerada para o novo Plano!';
+            $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
+            $notification->save();
+
+            return redirect($dataInvoice['invoiceUrl']);
+        }
+
+        return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente.');
     }
 
     public function createCustomer($id) {
 
         $user = User::find($id);
         if (!$user) {
-            return false;
+            return [
+                'status'  => false,
+                'message' => 'Não foi possível encontrar dados do Usuário!'
+            ];
         }
 
         try {
@@ -115,11 +113,45 @@ class AssasController extends Controller {
                 $data = json_decode($response->getBody(), true);
                 $user->customer = $data['id'];
                 $user->save();
-                return $data['id'];
+                return [
+                    'status' => true,
+                    'id'     => $data['id']
+                ];
             }
+    
+            $errorMessage = 'Erro desconhecido.';
+            if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
+                $errorBody = json_decode($response->getBody(), true);
+                if (isset($errorBody['errors'][0]['description'])) {
+                    $errorMessage = $errorBody['errors'][0]['description'];
+                } else {
+                    $errorMessage = isset($errorBody['message']) ? $errorBody['message'] : 'Estamos com problemas no momento, tente novamente mais tarde!';
+                }
+            } elseif ($response->getStatusCode() >= 500) {
+                $errorMessage = 'Estamos com problemas no momento, tente novamente mais tarde!';
+            }
+    
+            return [
+                'status'  => false,
+                'message' => $errorMessage
+            ];
         } catch (\Exception $e) {
-            Log::error('Erro em createCustomer: ' . $e->getMessage());
-            return false;
+            
+            $errorMessage = $e->getMessage();
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                $errorBody = json_decode($response->getBody(), true);
+                if (isset($errorBody['errors'][0]['description'])) {
+                    $errorMessage = $errorBody['errors'][0]['description'];
+                } elseif (isset($errorBody['message'])) {
+                    $errorMessage = $errorBody['message'];
+                }
+            }
+
+            return [
+                'status'  => false,
+                'message' => $errorMessage
+            ];
         }
     }
 

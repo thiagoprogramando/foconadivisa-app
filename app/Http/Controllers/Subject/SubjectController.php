@@ -15,11 +15,11 @@ class SubjectController extends Controller {
 
         $query = Subject::orderBy('name', 'desc')->where('type', 1);
 
-        if(!empty($request->name)) {
+        if (!empty($request->name)) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
-        if(!empty($request->description)) {
+        if (!empty($request->description)) {
             $query->where('description', 'like', '%' . $request->description . '%');
         }
 
@@ -33,7 +33,7 @@ class SubjectController extends Controller {
     public function viewSubject($id) {
 
         $subject = Subject::find($id);
-        if($subject) {
+        if ($subject) {
 
             $topics     = Subject::where('subject_id', $subject->id)->where('type', 2)->get();
             $questions  = Question::where('subject_id', $subject->id)->orderBy('subject_id', 'asc')->get();

@@ -12,6 +12,9 @@
                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Tópicos</button>
             </li>
             <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Questões</button>
+            </li>
+            <li class="nav-item" role="presentation">
                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false" tabindex="-1">Dados</button>
             </li>
         </ul>
@@ -83,6 +86,36 @@
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $topic->id }}">
                                             <a title="Detalhes" href="{{ route('conteudo', ['id' => $topic->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
+                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table> 
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <div class="table-responsive">
+                    <table class="table table-hover mt-5">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Questão</th>
+                                <th scope="col" class="text-center">Opções</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($questions as $question)
+                                <tr>
+                                    <th scope="row">{{ $question->id }}</th>
+                                    <td>{{ html_entity_decode(strip_tags($question->question_text)) }}</td>
+                                    <td class="text-center">
+                                        <form action="{{ route('delete-question') }}" method="POST" class="btn-group delete" role="group">
+                                            @csrf
+                                            <input type="hidden" name="id" value="{{ $question->id }}">
+                                            <a href="{{ route('questao', ['id' => $question->id]) }}" target="_blank" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
                                             <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
                                         </form>
                                     </td>

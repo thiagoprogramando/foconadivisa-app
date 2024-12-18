@@ -53,15 +53,15 @@
                             <ul class="list-group mt-3">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Total de resoluções:
-                                    <span class="badge bg-dark rounded-pill">{{ $question->responsesCountGeneral() }} vezes</span>
+                                    <span class="badge bg-dark rounded-pill">{{ $question->responsesCountGeneral(null, null, $question->id) }} vezes</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Acertos:
-                                    <span class="badge bg-success rounded-pill">{{ $question->correctCountGeneral() }} vezes</span>
+                                    <span class="badge bg-success rounded-pill">{{ $question->correctCountGeneral(null, null, $question->id) }} vezes</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Erros:
-                                    <span class="badge bg-danger rounded-pill">{{ $question->wrongCountGeneral() }} vezes</span>
+                                    <span class="badge bg-danger rounded-pill">{{ $question->wrongCountGeneral(null, null, $question->id) }} vezes</span>
                                 </li>
                             </ul>
                         </div>
@@ -135,15 +135,15 @@
                             <ul class="list-group mt-3">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Total de resoluções:
-                                    <span class="badge bg-dark rounded-pill">{{ $question->responsesCount(Auth::user()->id) }} vezes</span>
+                                    <span class="badge bg-dark rounded-pill">{{ $question->responsesCount(Auth::user()->id, null, $question->id) }} vezes</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Acertos:
-                                    <span class="badge bg-success rounded-pill">{{ $question->correctCount(Auth::user()->id) }} vezes</span>
+                                    <span class="badge bg-success rounded-pill">{{ $question->correctCount(Auth::user()->id, null, $question->id) }} vezes</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Erros:
-                                    <span class="badge bg-danger rounded-pill">{{ $question->wrogCount(Auth::user()->id) }} vezes</span>
+                                    <span class="badge bg-danger rounded-pill">{{ $question->wrogCount(Auth::user()->id, null, $question->id) }} vezes</span>
                                 </li>
                             </ul>
                         </div>

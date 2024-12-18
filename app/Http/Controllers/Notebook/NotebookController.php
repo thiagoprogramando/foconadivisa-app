@@ -248,17 +248,24 @@ class NotebookController extends Controller {
                 ->toArray();
     
             $allSubjects = array_unique(array_merge($allSubjects, $topicSubjectIds));
+        } else {
+            $childTopics = Subject::whereIn('subject_id', $subjects)
+                ->where('type', 2)
+                ->pluck('id')
+                ->toArray();
+
+            $allTopics = array_merge($allTopics, $childTopics);
         }
 
         $query->where(function ($q) use ($allSubjects, $allTopics) {
             if (!empty($allTopics)) {
                 $q->whereIn('subject_id', $allTopics);
             }
-    
+        
             if (!empty($allSubjects)) {
                 $q->orWhereIn('subject_id', $allSubjects);
             }
-        });
+        });        
     
         if ($filter === 'remove_question_resolved') {
             $resolvedQuestions = Answer::where('user_id', Auth::id())
@@ -275,12 +282,6 @@ class NotebookController extends Controller {
                 ->toArray();
             $query->whereIn('id', $failedQuestions);
         }
-    
-        $existingQuestionIds = NotebookQuestion::where('notebook_id', $notebook->id)
-        ->pluck('question_id')
-        ->toArray();
-
-        $query->whereNotIn('id', $existingQuestionIds);
     
         $filteredQuestions = $query->get();
         if ($filteredQuestions->isEmpty()) {

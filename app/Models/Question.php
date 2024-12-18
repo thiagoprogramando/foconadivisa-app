@@ -41,7 +41,7 @@ class Question extends Model {
         return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
     }
 
-    public function responsesCount($userId, $notebookId = null) {
+    public function responsesCount($userId, $notebookId = null, $questionId = null) {
         $query = Answer::where('user_id', $userId);
         
         if ($notebookId) {
@@ -49,13 +49,25 @@ class Question extends Model {
                 $q->where('notebook_id', $notebookId);
             });
         }
+
+        if ($questionId) {
+            $query->where('question_id', $questionId);
+        }
         
         return $query->count();
     } 
     
-    public function responsesCountGeneral($notebookId = null) {
+    public function responsesCountGeneral($notebookId = null, $userId = null, $questionId = null) {
 
         $query = Answer::query();
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        if ($questionId) {
+            $query->where('question_id', $questionId);
+        }
 
         if (!is_null($notebookId)) {
             $query->whereHas('notebookQuestion', function ($q) use ($notebookId) {
@@ -66,7 +78,7 @@ class Question extends Model {
         return $query->count();
     }
     
-    public function correctCount($userId, $notebookId = null) {
+    public function correctCount($userId, $notebookId = null, $questionId = null) {
         $query = Answer::where('user_id', $userId)->where('status', 1);
         
         if (!is_null($notebookId)) {
@@ -74,13 +86,25 @@ class Question extends Model {
                 $q->where('notebook_id', $notebookId);
             });
         }
+
+        if ($questionId) {
+            $query->where('question_id', $questionId);
+        }
         
         return $query->count();
     }    
 
-    public function correctCountGeneral($notebookId = null) {
+    public function correctCountGeneral($notebookId = null, $userId = null, $questionId = null) {
 
         $query = Answer::where('status', 1);
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        if ($questionId) {
+            $query->where('question_id', $questionId);
+        }
 
         if (!is_null($notebookId)) {
             $query->whereHas('notebookQuestion', function ($q) use ($notebookId) {
@@ -91,23 +115,23 @@ class Question extends Model {
         return $query->count();
     }
     
-    public function wrogCount($userId, $notebookId = null) {
-        $totalResponses = $this->responsesCount($userId, $notebookId);
-        $correctAnswers = $this->correctCount($userId, $notebookId);
+    public function wrogCount($userId, $notebookId = null, $questionId = null) {
+        $totalResponses = $this->responsesCount($userId, $notebookId, $questionId);
+        $correctAnswers = $this->correctCount($userId, $notebookId, $questionId);
     
         return $totalResponses - $correctAnswers;
     }   
     
-    public function wrongCountGeneral($notebookId = null) {
+    public function wrongCountGeneral($notebookId = null, $userId = null, $questionId = null) {
 
-        $totalResponses = $this->responsesCountGeneral($notebookId);
-        $correctAnswers = $this->correctCountGeneral($notebookId);
+        $totalResponses = $this->responsesCountGeneral($notebookId, $userId, $questionId);
+        $correctAnswers = $this->correctCountGeneral($notebookId, $userId, $questionId);
 
         return $totalResponses - $correctAnswers;
     }
 
-    public function getAnswerDistribution()
-    {
+    public function getAnswerDistribution() {
+
         // Total de respostas associadas à questão
         $totalAnswers = $this->answers()->count();
 
