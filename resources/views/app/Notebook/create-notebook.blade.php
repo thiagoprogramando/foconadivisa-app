@@ -35,6 +35,7 @@
                                     id='subject-{{ $subject->id }}'
                                     data-topics='@json($subject->topics)'
                                     id-resolved='{{ $subject->questionResolved($subject->id) }}' 
+                                    id-resolved-parent='{{ $subject->questionResolvedParent($subject->id) }}'
                                     id-fail='{{ $subject->questionFail() }}'>
                                 <label class="form-check-label" for="subject-{{ $subject->id }}">{{ $subject->name }}</label>
                             </div>
@@ -129,9 +130,14 @@
                 const filterFail = document.getElementById("showQuestionFail").checked;
 
                 document.querySelectorAll('.subject-checkbox:checked').forEach(function (subjectCheckbox) {
+
                     let subjectQuestions = parseInt(subjectCheckbox.getAttribute('data-questions')) || 0;
+
                     const subjectResolved = parseInt(subjectCheckbox.getAttribute('id-resolved')) || 0;
+                    const subjectResolvedParent = parseInt(subjectCheckbox.getAttribute('id-resolved-parent')) || 0;
+
                     const subjectFail = parseInt(subjectCheckbox.getAttribute('id-fail')) || 0;
+
 
                     let subjectHasTopic = false;
                     const associatedTopics = JSON.parse(subjectCheckbox.getAttribute('data-topics'));
@@ -157,8 +163,9 @@
 
                     if (!subjectHasTopic) {
                         if (filterResolved) {
-                            subjectQuestions -= subjectResolved;
+                            subjectQuestions -= subjectResolvedParent;
                         }
+
                         if (filterFail) {
                             subjectQuestions = subjectFail;
                         }

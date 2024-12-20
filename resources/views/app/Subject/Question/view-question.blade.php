@@ -1,6 +1,6 @@
 @extends('app.layout')
 @section('title') 
-    Questão: <a href="">{{ $question->id }}</a> - {{ Str::limit(strip_tags($question->question_text), 40) }}
+    Questão: <a href="">{{ $question->id }}</a> - {{ html_entity_decode(Str::limit(strip_tags($question->question_text), 70)) }}
 @endsection
 @section('content')
 
@@ -26,8 +26,8 @@
                             <script>
                                 document.addEventListener("DOMContentLoaded", () => {
         
-                                    const errorsCount = @json($question->wrongCountGeneral());
-                                    const correctCount = @json($question->correctCountGeneral());
+                                    const errorsCount = @json($question->wrongCountGeneral(null, null, $question->id));
+                                    const correctCount = @json($question->correctCountGeneral(null, null, $question->id));
         
                                     new Chart(document.querySelector('#doughnutChart'), {
                                         type: 'doughnut',
@@ -108,8 +108,8 @@
                             <script>
                                 document.addEventListener("DOMContentLoaded", () => {
         
-                                    const errorsCount = @json($question->wrongCountGeneral());
-                                    const correctCount = @json($question->correctCountGeneral());
+                                    const errorsCount = @json($question->wrongCountGeneral(null, Auth::user()->id, $question->id));
+                                    const correctCount = @json($question->correctCountGeneral(null, Auth::user()->id, $question->id));
         
                                     new Chart(document.querySelector('#my'), {
                                         type: 'doughnut',

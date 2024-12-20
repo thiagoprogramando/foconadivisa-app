@@ -87,7 +87,6 @@ class Subject extends Model {
         return $this->topics()->where('subject_id', $subjectId)->get();
     }
     
-
     public function questionResolved($id) {
         
         $userId = Auth::id();
@@ -97,6 +96,30 @@ class Subject extends Model {
 
         return $count;
     }
+
+    public function questionResolvedParent($id) {
+        
+        $userId = Auth::id();
+
+        $subject = Subject::find($id);
+        $questionIds = Question::whereIn('subject_id', $subject->getAllSubjectIds())->pluck('id');
+        $count = Answer::whereIn('question_id', $questionIds)
+                   ->where('user_id', $userId)
+                   ->distinct('question_id')
+                   ->count('question_id');
+
+        return $count;
+    }
+
+    public function getAllSubjectIds() {
+      
+        $ids = [$this->id];
+        foreach ($this->topics as $topic) {
+            $ids[] = $topic->id;
+        }
+    
+        return $ids;
+    }    
 
     public function questionFail() {
         

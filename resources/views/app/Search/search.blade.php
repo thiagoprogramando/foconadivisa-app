@@ -6,8 +6,10 @@
         <div class="row g-0">
             @if ($questions->count())
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-2">
-                    <h1 class="card-title">Questões</h1>
 
+                    <h1 class="card-title">Questões <span class="badge bg-dark text-white">FORAM LOCALIZADAS {{ $questions->count() }} QUESTÕES</span></h1> 
+                    
+                    
                     @foreach ($questions as $question)
                         <div class="card p-2 m-2 mb-5">
                             <div class="card-header">
