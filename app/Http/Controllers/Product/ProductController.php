@@ -62,13 +62,13 @@ class ProductController extends Controller {
 
         if ($request->hasFile('photo')) {
             $fileName = Str::uuid() . '.' . $request->file('photo')->getClientOriginalExtension();
-            $path = $request->file('photo')->store('products-photo', $fileName, 'public');
+            $path = $request->file('photo')->storeAs('products-photo', $fileName, 'public');
             $product->photo = $path;
         }
 
         if ($request->hasFile('file')) {
             $fileName = Str::uuid() . '.' . $request->file('file')->getClientOriginalExtension();
-            $path = $request->file('file')->store('products-file', $fileName, 'public');
+            $path = $request->file('file')->storeAs('products-file', $fileName, 'public');
             $product->file = $path;
         }
 

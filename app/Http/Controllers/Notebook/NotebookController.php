@@ -257,15 +257,15 @@ class NotebookController extends Controller {
             $allTopics = array_merge($allTopics, $childTopics);
         }
 
-        $query->where(function ($q) use ($allSubjects, $allTopics) {
-            if (!empty($allTopics)) {
-                $q->whereIn('subject_id', $allTopics);
-            }
+        // $query->where(function ($q) use ($allSubjects, $allTopics) {
+        //     if (!empty($allTopics)) {
+        //         $q->whereIn('subject_id', $allTopics);
+        //     }
         
-            if (!empty($allSubjects)) {
-                $q->orWhereIn('subject_id', $allSubjects);
-            }
-        });        
+        //     if (!empty($allSubjects)) {
+        //         $q->whereIn('subject_id', $allSubjects);
+        //     }
+        // });        
     
         if ($filter === 'remove_question_resolved') {
             $resolvedQuestions = Answer::where('user_id', Auth::id())
@@ -319,7 +319,7 @@ class NotebookController extends Controller {
         
             $selectedQuestions = $selectedQuestions->merge($remainingQuestions->shuffle()->take($questionsNeeded));
         }
-        
+
         DB::transaction(function () use ($notebook, $selectedQuestions) {
             foreach ($selectedQuestions as $question) {
                 NotebookQuestion::updateOrCreate(
