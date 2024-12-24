@@ -255,17 +255,7 @@ class NotebookController extends Controller {
                 ->toArray();
 
             $allTopics = array_merge($allTopics, $childTopics);
-        }
-
-        // $query->where(function ($q) use ($allSubjects, $allTopics) {
-        //     if (!empty($allTopics)) {
-        //         $q->whereIn('subject_id', $allTopics);
-        //     }
-        
-        //     if (!empty($allSubjects)) {
-        //         $q->whereIn('subject_id', $allSubjects);
-        //     }
-        // });        
+        }      
     
         if ($filter === 'remove_question_resolved') {
             $resolvedQuestions = Answer::where('user_id', Auth::id())

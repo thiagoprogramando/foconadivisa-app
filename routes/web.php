@@ -8,6 +8,7 @@ use App\Http\Controllers\Data\StatisticsController;
 use App\Http\Controllers\Ecommerce\EcommerceController;
 use App\Http\Controllers\Ecommerce\ShopController;
 use App\Http\Controllers\Gateway\AssasController;
+use App\Http\Controllers\Jury\JuryController;
 use App\Http\Controllers\Mkt\BannerController;
 use App\Http\Controllers\Notebook\AnswerController;
 use App\Http\Controllers\Notebook\NotebookController;
@@ -48,14 +49,37 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/app', [AppController::class, 'app'])->name('app');
 
+        Route::middleware(['monthValidate'])->group(function () {
+
+            //Search
+            Route::get('search', [SearchController::class, 'search'])->name('search');
+
+            //Notebook
+            Route::get('/caderno/{id}/{tab?}', [NotebookController::class, 'notebook'])->name('caderno');
+            Route::get('/caderno-filtros/{id}', [NotebookController::class, 'notebookFilter'])->name('caderno-filtros');
+            Route::get('/cadernos', [NotebookController::class, 'notebooks'])->name('cadernos');
+            Route::get('/completing-notebook/{id}', [NotebookController::class, 'completingNotebook'])->name('completing-notebook');
+            Route::get('/criar-caderno', [NotebookController::class, 'createNotebookForm'])->name('criar-caderno');
+            Route::post('create-notebook', [NotebookController::class, 'createNotebook'])->name('create-notebook');
+            Route::post('add-question-notebook', [NotebookController::class, 'addQuestion'])->name('add-question-notebook');
+            Route::post('update-notebook', [NotebookController::class, 'updateNotebook'])->name('update-notebook');
+            Route::post('delete-notebook', [NotebookController::class, 'deleteNotebook'])->name('delete-notebook');
+            Route::get('delete-notebook-get/{id}', [NotebookController::class, 'deleteGetNotebook'])->name('delete-notebook-get');
+
+            //Ansnwer
+            Route::get('/answer/{id}/{next_question?}', [AnswerController::class, 'answer'])->name('answer');
+            Route::get('/answer-review/{answer}', [AnswerController::class, 'answerReview'])->name('answer-review');
+            Route::post('/notebooks/{notebook}/questions/{question}/{page}/submit', [AnswerController::class, 'submitAnswerAndNext'])->name('submitAnswerAndNext');
+
+            //Data
+            Route::get('/statistic', [StatisticsController::class, 'statistic'])->name('statistic');
+        });
+
         //User
         Route::get('/perfil', [UserController::class, 'profile'])->name('perfil');
         Route::get('/usuarios', [UserController::class, 'users'])->name('usuarios');
         Route::post('update-profile', [UserController::class, 'updateProfile'])->name('update-profile');
         Route::post('delete-user', [UserController::class, 'deleteUser'])->name('delete-user');
-
-        //Search
-        Route::get('search', [SearchController::class, 'search'])->name('search');
 
         //Faq
         Route::get('faq', [FaqController::class, 'faq'])->name('faq');
@@ -85,6 +109,12 @@ Route::middleware('auth')->group(function () {
         Route::post('create-product', [ProductController::class, 'createProduct'])->name('create-product');
         Route::post('update-product', [ProductController::class, 'updateProduct'])->name('update-product');
         Route::post('delete-product', [ProductController::class, 'deleteProduct'])->name('delete-product');
+
+        //Juries
+        Route::get('/bancas', [JuryController::class, 'juries'])->name('bancas');
+        Route::post('create-jury', [JuryController::class, 'createJury'])->name('create-jury');
+        Route::post('update-jury', [JuryController::class, 'updateJury'])->name('update-jury');
+        Route::post('delete-jury', [JuryController::class, 'deleteJury'])->name('delete-jury');
 
         //Payment
         Route::get('/pagamentos', [PaymentController::class, 'payments'])->name('pagamentos');
@@ -123,23 +153,6 @@ Route::middleware('auth')->group(function () {
         Route::post('create-topic', [SubjectController::class, 'createTopic'])->name('create-topic');
         Route::post('delete-topic', [SubjectController::class, 'deleteTopic'])->name('delete-topic');
 
-        //Notebook
-        Route::get('/caderno/{id}/{tab?}', [NotebookController::class, 'notebook'])->name('caderno');
-        Route::get('/caderno-filtros/{id}', [NotebookController::class, 'notebookFilter'])->name('caderno-filtros');
-        Route::get('/cadernos', [NotebookController::class, 'notebooks'])->name('cadernos');
-        Route::get('/completing-notebook/{id}', [NotebookController::class, 'completingNotebook'])->name('completing-notebook');
-        Route::get('/criar-caderno', [NotebookController::class, 'createNotebookForm'])->name('criar-caderno');
-        Route::post('create-notebook', [NotebookController::class, 'createNotebook'])->name('create-notebook');
-        Route::post('add-question-notebook', [NotebookController::class, 'addQuestion'])->name('add-question-notebook');
-        Route::post('update-notebook', [NotebookController::class, 'updateNotebook'])->name('update-notebook');
-        Route::post('delete-notebook', [NotebookController::class, 'deleteNotebook'])->name('delete-notebook');
-        Route::get('delete-notebook-get/{id}', [NotebookController::class, 'deleteGetNotebook'])->name('delete-notebook-get');
-        
-        //Ansnwer
-        Route::get('/answer/{id}/{next_question?}', [AnswerController::class, 'answer'])->name('answer');
-        Route::get('/answer-review/{answer}', [AnswerController::class, 'answerReview'])->name('answer-review');
-        Route::post('/notebooks/{notebook}/questions/{question}/{page}/submit', [AnswerController::class, 'submitAnswerAndNext'])->name('submitAnswerAndNext');
-
         //MKT
         Route::get('banners', [BannerController::class, 'banners'])->name('banners');
         Route::post('create-banner', [BannerController::class, 'createBanner'])->name('create-banner');
@@ -150,18 +163,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/plan-excel', [ExcelController::class, 'planExcel'])->name('plan-excel');
         Route::get('/invoice-excel', [ExcelController::class, 'invoiceExcel'])->name('invoice-excel');
         Route::get('/sale-excel', [ExcelController::class, 'saleExcel'])->name('sale-excel');
-
-        //Data
-        Route::get('/statistic', [StatisticsController::class, 'statistic'])->name('statistic');
     });
 
     //Question & Option
     Route::get('questao/{id}', [QuestionController::class, 'viewQuestion'])->name('questao');
     Route::get('ver-questao/{id}', [QuestionController::class, 'question'])->name('ver-questao');
+    Route::get('delete-question-answer/{notebook}/{question}', [QuestionController::class, 'deleteQuestionAnswer'])->name('delete-question-answer');
     Route::get('create-question/{topic}', [QuestionController::class, 'createQuestion'])->name('create-question');
     Route::post('update-question', [QuestionController::class, 'updateQuestion'])->name('update-question');
     Route::post('delete-question', [QuestionController::class, 'deleteQuestion'])->name('delete-question');
-    Route::get('delete-question-answer/{notebook}/{question}', [QuestionController::class, 'deleteQuestionAnswer'])->name('delete-question-answer');
     Route::post('create-comment', [CommentController::class, 'createComment'])->name('create-comment');
 });
 

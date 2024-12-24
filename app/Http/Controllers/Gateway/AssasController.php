@@ -11,6 +11,7 @@ use App\Models\Sale;
 use App\Models\User;
 
 use GuzzleHttp\Client;
+use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class AssasController extends Controller {
         }
 
         $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
-        if ($customer['status'] == false || $customer['status'] == 0) {
+        if (!empty($customer['status']) && ($customer['status'] == false || $customer['status'] == 0)) {
             return redirect()->back()->with('error', $customer['message']);
         }
 
@@ -60,6 +61,8 @@ class AssasController extends Controller {
         $invoice->user_id       = Auth::user()->id;
         $invoice->plan_id       = $plan->id;
         $invoice->value         = $plan->value;
+        $invoice->type          = 1;
+        $invoice->due_date      = Carbon::now()->subDays(7);
         $invoice->payment_token = $dataInvoice['id'];
         $invoice->payment_url   = $dataInvoice['invoiceUrl'];
 

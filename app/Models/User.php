@@ -52,6 +52,10 @@ class User extends Authenticatable {
         return $this->belongsTo(Plan::class, 'plan');
     }
 
+    public function invoices() {
+        return $this->hasMany(Invoice::class);
+    }
+
     public function typeLabel() {
         switch ($this->type) {
             case 0:

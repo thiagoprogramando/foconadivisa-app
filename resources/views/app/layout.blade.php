@@ -191,6 +191,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link collapsed" href="{{ route('bancas') }}">
+                            <i class="bi bi-bank"></i>
+                            <span>Bancas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link collapsed" data-bs-target="#components-cart" data-bs-toggle="collapse" href="#">
                         <i class="bi bi-cart-check"></i><span>Planos</span><i class="bi bi-chevron-down ms-auto"></i>
                         </a>

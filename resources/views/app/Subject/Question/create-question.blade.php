@@ -29,6 +29,15 @@
                         </select>
                     </div>
 
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                        <select id="swal-jury" name="jury_id" placeholder="Escolha uma Banca (Opcional)">
+                            <option value="" selected>@if(empty($question->jury_id)) Escolha uma Banca (Opcional) @else {{ $question->jury->name ?? '---' }} @endif</option>
+                            @foreach($juries as $jury)
+                                <option value="{{ $jury->id }}">{{ $jury->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3 mb-3">
                         <textarea name="question_text" class="tinymce-editor" placeholder="Questão" id="question">
                             {{ $question->question_text }}
@@ -71,6 +80,14 @@
 
     <script>
         new TomSelect("#swal-topic",{
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+
+        new TomSelect("#swal-jury",{
             create: false,
             sortField: {
                 field: "text",

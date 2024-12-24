@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Subject;
 
 use App\Http\Controllers\Controller;
+use App\Models\Jury;
 use App\Models\NotebookQuestion;
 use App\Models\Option;
 use App\Models\Question;
@@ -17,13 +18,14 @@ class QuestionController extends Controller {
         $question   = Question::find($id);
         $subject    = Subject::find($question->subject_id);
         $topics     = Subject::where('type', 2)->where('subject_id', $subject->id)->get();
-        $options = $question->options->keyBy('option_number');
+        $options    = $question->options->keyBy('option_number');
 
         return view('app.Subject.Question.create-question', [
             'subject'   => $subject,
             'topics'    => $topics,
             'question'  => $question,
             'options'   => $options,
+            'juries'    => Jury::all()
         ]);
     }
 
@@ -81,9 +83,10 @@ class QuestionController extends Controller {
                 return redirect()->back()->with('error', 'Você deve marcar pelo menos uma opção como correta!');
             }
 
-            $question->question_text    = $request->input('question_text');
-            $question->subject_id       = $request->input('subject_id') ?? $request->input('subject_id_question');
-            $question->comment_text     = $request->input('comment_text');
+            $question->question_text = $request->input('question_text');
+            $question->subject_id    = $request->input('subject_id') ?? $request->input('subject_id_question');
+            $question->jury_id       = $request->input('jury_id');
+            $question->comment_text  = $request->input('comment_text');
             if ($question->save()) {
                 
                 for ($i = 1; $i <= 5; $i++) {
