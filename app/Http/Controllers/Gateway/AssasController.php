@@ -62,7 +62,7 @@ class AssasController extends Controller {
         $invoice->plan_id       = $plan->id;
         $invoice->value         = $plan->value;
         $invoice->type          = 1;
-        $invoice->due_date      = Carbon::now()->subDays(7);
+        $invoice->due_date      = now()->addDay(2);
         $invoice->payment_token = $dataInvoice['id'];
         $invoice->payment_url   = $dataInvoice['invoiceUrl'];
 
@@ -172,7 +172,7 @@ class AssasController extends Controller {
                     'customer'          => $customer,
                     'billingType'       => $method ?? 'PIX',
                     'value'             => number_format($value, 2, '.', ''),
-                    'dueDate'           => now()->addDay(),
+                    'dueDate'           => now()->addDay(2)->toDateString(),
                     'description'       => $description,
                     'installmentCount'  => $installments ?: 1,
                     'installmentValue'  => $installments ? number_format(($value / $installments), 2, '.', '') : $value,

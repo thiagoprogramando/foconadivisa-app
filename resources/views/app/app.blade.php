@@ -37,14 +37,14 @@
                 <div class="card">
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 text-center d-flex align-items-center justify-content-center">
-                            <img src="{{ asset('template/img/components/monitoring.png') }}" class="img-fluid w-50" alt="Trabalhando...">
+                            <img src="{{ asset('template/img/components/monitoring.png') }}" class="img-fluid" alt="Trabalhando...">
                         </div>
                         <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                             <div class="card-body">
                                 <h5 class="card-title">Olá, {{ Auth::user()->name }}!</h5>
                                 <p class="card-text">
                                     O seu plano atual é: <a href="{{ route('planos') }}">{{ Auth::user()->labelPlan->name }}</a> <br>
-                                    Aproveite os benefícios da sua assinatura.
+                                    {!! Auth::user()->validadMonth() !!}
                                 </p>                                                               
                             </div>
                         </div>

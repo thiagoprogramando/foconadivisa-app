@@ -57,6 +57,10 @@ class QuestionController extends Controller {
 
     public function updateQuestion(Request $request) {
 
+        if (empty($request->jury_id) || empty($request->subject_id)) {
+            return redirect()->back()->with('info', 'Preencha os dados corretamente!');
+        }
+
         $question = Question::find($request->id);
         if ($question) {
 

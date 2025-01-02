@@ -22,7 +22,9 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">Plano</th>
-                                <th scope="col">Link de Pagamento</th>
+                                <th scope="col">Valor</th>
+                                <th scope="col">Acesso ao Pagamento</th>
+                                <th scope="col">Vencimento</th>
                                 <th scope="col" class="text-center">Status</th>
                                 <th scope="col" class="text-center">Opções</th>
                             </tr>
@@ -32,13 +34,21 @@
                                 <tr>
                                     <th scope="row">{{ $payment->id }}</th>
                                     <td>{{ $payment->labelPlan->name }}</td>
-                                    <td> <a href="{{ $payment->payment_url }}"><span class="badge bg-dark">{{ $payment->payment_url }}</span></a> </td>
+                                    <td>R$ {{ number_format($payment->value, 2, ',', '.') }}</td>
+                                    <td> 
+                                        <a href="{{ $payment->payment_url }}">
+                                            <span class="badge bg-dark">{{ $payment->payment_url }}</span>
+                                        </a> 
+                                    </td>
+                                    <td>{{ \Carbon\Carbon::parse($payment->due_date)->format('d/m/Y') }}</td>
                                     <td class="text-center">{{ $payment->statusLabel() }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('delete-payment') }}" method="POST" class="btn-group delete" role="group">
                                             @csrf
                                             <input type="hidden" name="id" value="{{ $payment->id }}">
-                                            <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            @if (Auth::user()->type == 1)
+                                                <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                            @endif
                                             <a href="{{ $payment->payment_url }}" target="_blank" class="btn btn-dark"><i class="bi bi-credit-card-2-back"></i></a>
                                         </form>
                                     </td>

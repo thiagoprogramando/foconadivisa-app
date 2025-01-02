@@ -6,8 +6,9 @@
 
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
 
-        <h6 class="card-title">
-            <a href="#">Conteúdo/Tópico:</a> {{ $question->subject->name ?? '---' }}/{{ $question->topic->name ?? '---' }}
+        <h6>
+            <b>Conteúdo/Tópico: </b><a href="#">{{ $question->subject->parent->name ?? $question->subject->name }}/{{ $question->topic->name ?? '---' }}</a> <br>
+            <b>Banca: </b><a href="#">{{ $question->jury->name }}</a>
         </h6>        
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">

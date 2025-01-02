@@ -21,7 +21,7 @@
                     <input type="hidden" name="subject_id_question" value="{{ $question->subject_id }}">
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <select id="swal-topic" name="subject_id" placeholder="Escolha um tópico (Opcional)">
+                        <select id="swal-topic" name="subject_id" placeholder="Escolha um tópico (Opcional)" required>
                             <option value="{{ $question->subject_id }}" selected>@if(empty($question->subject_id)) Escolha um tópico (Opcional) @else {{ $question->topic->name ?? '---' }} @endif</option>
                             @foreach($topics as $topic)
                                 <option value="{{ $topic->id }}">{{ $topic->name }}</option>
@@ -30,10 +30,10 @@
                     </div>
 
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <select id="swal-jury" name="jury_id" placeholder="Escolha uma Banca (Opcional)">
-                            <option value="" selected>@if(empty($question->jury_id)) Escolha uma Banca (Opcional) @else {{ $question->jury->name ?? '---' }} @endif</option>
+                        <select id="swal-jury" name="jury_id" placeholder="Escolha uma Banca" required>
+                            <option value="" selected>Escolha uma Banca</option>
                             @foreach($juries as $jury)
-                                <option value="{{ $jury->id }}">{{ $jury->name }}</option>
+                                <option value="{{ $jury->id }}" @selected(!empty($question->jury->id) == $jury->id)>{{ $jury->name }}</option>
                             @endforeach
                         </select>
                     </div>

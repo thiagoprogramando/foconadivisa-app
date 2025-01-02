@@ -224,6 +224,10 @@ h6 {
   box-shadow: 0px 0 30px rgba(1, 41, 112, 0.1);
 }
 
+.card-login {
+  border: 5px double #FBB816;
+}
+
 .card-header,
 .card-footer {
   border-color: #ebeef4;
@@ -236,7 +240,7 @@ h6 {
   padding: 20px 0 15px 0;
   font-size: 18px;
   font-weight: 500;
-  color: #012970;
+  color: #FBB816;
   font-family: "Poppins", sans-serif;
 }
 
@@ -364,8 +368,12 @@ h6 {
   }
 }
 
+.logo-menu {
+  max-height: 50px !important;
+}
+
 .logo img {
-  max-height: 50px;
+  max-height: 100px;
   margin-right: 6px;
 }
 

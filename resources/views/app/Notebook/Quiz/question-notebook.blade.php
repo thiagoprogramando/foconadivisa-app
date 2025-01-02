@@ -112,6 +112,11 @@
                                         {{ $question->topic->name ?? '---' }}
                                     </small><br>
                                 @endif
+                                @if($question->jury)
+                                    <small><b>Banca:</b> 
+                                        {{ $question->jury->name ?? '---' }}
+                                    </small><br>
+                                @endif
                                 <small><b>{{ $question->responsesCount(Auth::user()->id, $notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $question->correctCount(Auth::user()->id, $notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $question->wrogCount(Auth::user()->id, $notebook->id) }}</b> Erros</small>
                             </div>
                             <div class="col-12 col-sm-12 col-md-5 col-lg-5">

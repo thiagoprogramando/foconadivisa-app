@@ -13,12 +13,17 @@ class Question extends Model {
 
     protected $fillable = [
         'subject_id',
+        'jury_id',
         'question_text',
         'comment_text',
     ];
 
     public function subject() {
         return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function jury() {
+        return $this->belongsTo(Jury::class, 'jury_id');
     }
 
     public function topic() {

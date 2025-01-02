@@ -110,7 +110,12 @@
                             {{ $answer->question->subject->parent->name ?? $answer->question->subject->name }} |
                             {{ $answer->question->topic->name ?? '---' }}
                         </small><br>
-                    @endif                    
+                    @endif 
+                    @if($answer->question->jury)
+                        <small><b>Banca:</b> 
+                            {{ $answer->question->jury->name ?? '---' }}
+                        </small><br>
+                    @endif                   
                     <small><b>{{ $answer->question->responsesCount(Auth::user()->id, $answer->notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $answer->question->correctCount(Auth::user()->id, $answer->notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $answer->question->wrogCount(Auth::user()->id, $answer->notebook->id) }}</b> Erros</small>
                 </div>
                 <div class="col-12 col-sm-12 col-md-5 col-lg-5">

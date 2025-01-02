@@ -31,7 +31,18 @@ class AccessController extends Controller {
             return redirect()->route('app');
         }
 
-        return view('login');
+        $hour = now()->format('H');
+        $greeting = 'Bom dia';
+
+        if ($hour >= 12 && $hour < 18) {
+            $greeting = 'Boa tarde';
+        } elseif ($hour >= 18) {
+            $greeting = 'Boa noite';
+        }
+
+        return view('login', [
+            'greeting' => $greeting
+        ]);
     }
 
     public function logon(Request $request) {

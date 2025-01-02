@@ -71,4 +71,45 @@ class User extends Authenticatable {
                 return 'Cliente';
         }
     }
+
+    public function validadMonth() {
+
+        $lastInvoice = $this->invoices()
+            ->where('payment_status', 1)
+            ->where('plan_id', $this->plan)
+            ->orderBy('due_date', 'desc')
+            ->first();
+    
+        if (!$lastInvoice || !$lastInvoice->due_date) {
+            return '---';
+        }
+
+        $plan = $this->labelPlan;
+        if (!$plan) {
+            return 'Nenhum Plano Associado';
+        }
+
+        $activationDate = \Carbon\Carbon::parse($lastInvoice->created_at);
+        switch ($plan->type) {
+            case 1:
+                $renewalDate = $activationDate->addMonth();
+                break;
+            case 2:
+                $renewalDate = $activationDate->addYear();
+                break;
+            case 3:
+                return 'Vitalício';
+            default:
+                return 'Plano inválido';
+        }
+
+        $today = \Carbon\Carbon::now();
+        $daysRemaining = $today->diffInDays($renewalDate, false);
+
+        if ($daysRemaining < 0) {
+            return "Sua assinatura venceu há <a href='#'><b>" . abs($daysRemaining) . "</b></a> dias!";
+        }
+
+        return "Faltam <a href='#'><b>" . abs($daysRemaining) . "</b></a> dias para a renovação da sua Assinatura!";
+    }
 }

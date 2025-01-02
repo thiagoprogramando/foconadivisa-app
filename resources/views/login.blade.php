@@ -22,6 +22,15 @@
     <link href="{{ asset('template/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
     <link href="{{ asset('template/vendor/simple-datatables/style.css') }}" rel="stylesheet">
     <link href="{{ asset('template/css/style.css') }}" rel="stylesheet">
+
+    <style>
+      body {
+        background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ asset('template/img/background/bg_military_us.jpg') }}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+    </style>
   </head>
 
   <body>
@@ -30,48 +39,48 @@
         <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
           <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-
-                  <div class="d-flex justify-content-center py-4">
+              <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                <div class="card card-login mb-3">
+                  <div class="card-body mt-0">
+                    <div class="d-flex justify-content-center">
                       <a href="{{ route('login') }}" class="logo d-flex align-items-center w-auto">
                         <img src="{{ asset('template/img/logo_preta.jpeg') }}" alt="{{ env('APP_NAME') }}">
                       </a>
-                  </div>
-
-                  <div class="card mb-3">
-                    <div class="card-body">
-                      <div class="pt-4 pb-2">
-                          <h5 class="card-title text-center pb-0 fs-4">Bem-vindo(a)!</h5>
-                          <p class="text-center small">Faça login para ter acesso aos benefícios da sua conta.</p>
-                      </div>
-
-                      <form action="{{ route('logon') }}" method="POST" class="row g-3">
-                          @csrf
-                          <div class="col-12">
-                            <input type="email" name="email" class="form-control" placeholder="E-mail:" required>
-                          </div>
-                          <div class="col-12 position-relative">
-                            <input type="password" name="password" id="password" class="form-control" placeholder="Senha:" required>
-                            <button type="button" id="togglePassword" class="btn position-absolute top-50 end-0 translate-middle-y" style="right: 10px;">
-                                <i id="toggleIcon" class="ri-eye-line"></i>
-                            </button>
-                          </div>
-                          <div class="col-12">
-                            <button class="btn btn-dark w-100" type="submit">Acessar</button>
-                          </div>
-                          <div class="col-12 text-center">
-                            <p class="small mb-0">Não tem uma conta? <a href="{{ route('cadastro') }}">Criar Conta</a></p>
-                            ou
-                            <p class="small mb-0"><a href="{{ route('recuperar-conta') }}">Recuperar conta</a></p>
-                          </div>
-                      </form>
                     </div>
-                  </div>
 
-                  <div class="credits">
-                      Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
+                    <div class="pb-2">
+                        <h5 class="card-title text-center pb-0 fs-4">Olá, {{ $greeting }}!</h5>
+                        <p class="text-center small">Faça login para ter acesso aos benefícios da sua conta.</p>
+                    </div>
+
+                    <form action="{{ route('logon') }}" method="POST" class="row g-2">
+                        @csrf
+                        <div class="col-12">
+                          <input type="email" name="email" class="form-control" placeholder="E-mail:" required>
+                        </div>
+                        <div class="col-12 position-relative">
+                          <input type="password" name="password" id="password" class="form-control" placeholder="Senha:" required>
+                          <button type="button" id="togglePassword" class="btn position-absolute top-50 end-0 translate-middle-y" style="right: 10px;">
+                              <i id="toggleIcon" class="ri-eye-line"></i>
+                          </button>
+                        </div>
+                        <div class="col-12">
+                          <button type="submit" class="btn btn-dark w-100">Acessar</button>
+                          <a href="{{ route('ecommerce') }}" class="btn btn-outline-dark w-100 mt-2">Ver Produtos</a>
+                        </div>
+                        <div class="col-12 text-center">
+                          <p class="small mb-0">Não tem uma conta? <a href="{{ route('cadastro') }}">Criar Conta</a></p>
+                          ou
+                          <p class="small mb-0"><a href="{{ route('recuperar-conta') }}">Recuperar conta</a></p>
+                        </div>
+                    </form>
                   </div>
                 </div>
+
+                <div class="credits text-white">
+                    Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
+                </div>
+              </div>
             </div>
           </div>
         </section>

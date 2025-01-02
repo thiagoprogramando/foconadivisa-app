@@ -32,7 +32,7 @@
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-between">
                 <a href="{{ route('app') }}" class="logo d-flex align-items-center">
-                    <img src="{{ asset('template/img/logo.png') }}" alt="Logo">
+                    <img src="{{ asset('template/img/logo.png') }}" class="logo-menu" alt="Logo">
                     <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                 </a>
                 <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -40,7 +40,7 @@
 
             <div class="search-bar">
                 <form class="search-form d-flex align-items-center" method="GET" action="{{ route('search') }}">
-                    <input type="text" name="search" placeholder="Pesquisar" title="Pesquisar">
+                    <input type="text" name="search" placeholder="Pesquisar uma questão" title="Pesquisar uma questão">
                     <button type="submit" title="Pesquisar"><i class="bi bi-search"></i></button>
                 </form>
             </div>
