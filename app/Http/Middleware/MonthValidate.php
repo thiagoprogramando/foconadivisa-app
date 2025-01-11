@@ -20,6 +20,11 @@ class MonthValidate {
         }
 
         if (Auth::user()->type !== 1) {
+
+            if (!empty(Auth::user()->plan)) {
+                return redirect()->route('planos')->with('info', 'Você precisa escolher um Plano!');
+            }
+
             $planType = Auth::user()->labelPlan->type;
             switch ($planType) {
                 case 1:
@@ -34,13 +39,9 @@ class MonthValidate {
                         return $redirect;
                     }
                     break;
-                default:
-                    return redirect()->route('planos')->with('info', 'Você precisa escolher um Plano!');
-                    break;
             }
         }
         
-
         return $next($request);
     }
 
