@@ -43,8 +43,12 @@
                             <div class="card-body">
                                 <h5 class="card-title">Olá, {{ Auth::user()->name }}!</h5>
                                 <p class="card-text">
-                                    O seu plano atual é: <a href="{{ route('planos') }}">{{ Auth::user()->labelPlan->name }}</a> <br>
-                                    {!! Auth::user()->validadMonth() !!}
+                                    @if (Auth::user()->labelPlan)
+                                        O seu plano atual é: <a href="{{ route('planos') }}">{{ Auth::user()->labelPlan->name }}</a> <br>
+                                        {!! Auth::user()->validadMonth() !!}
+                                    @else
+                                        Você ainda não escolheu um <a href="{{ route('planos') }}"><b>Plano</b></a>, faça a melhor escolha e aproveite os benefícios!
+                                    @endif
                                 </p>                                                               
                             </div>
                         </div>

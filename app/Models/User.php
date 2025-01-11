@@ -81,7 +81,7 @@ class User extends Authenticatable {
             ->first();
     
         if (!$lastInvoice || !$lastInvoice->due_date) {
-            return '---';
+            return "Conheça os planos disponível para você! <a href='".route('planos')."'><b>Acessar Planos</b></a>";
         }
 
         $plan = $this->labelPlan;

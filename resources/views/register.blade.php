@@ -22,6 +22,15 @@
         <link href="{{ asset('template/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
         <link href="{{ asset('template/vendor/simple-datatables/style.css') }}" rel="stylesheet">
         <link href="{{ asset('template/css/style.css') }}" rel="stylesheet">
+
+        <style>
+            body {
+              background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ asset('template/img/background/bg_military_us.jpg') }}');
+              background-size: cover;
+              background-repeat: no-repeat;
+              background-position: center;
+            }
+          </style>
     </head>
     <body>
 
@@ -31,19 +40,17 @@
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                                <div class="d-flex justify-content-center py-4">
-                                    <a href="{{ route('cadastro') }}" class="logo d-flex align-items-center w-auto">
-                                        <img src="{{ asset('template/img/logo_preta.jpeg') }}" alt="{{ env('APP_NAME') }}">
-                                    </a>
-                                </div>
-
-                                <div class="card mb-3">
+                                <div class="card card-login mb-3">
                                     <div class="card-body">
-                                        <div class="pt-4 pb-2">
+                                        <div class="d-flex justify-content-center">
+                                            <a href="{{ route('cadastro') }}" class="logo d-flex align-items-center w-auto">
+                                                <img src="{{ asset('template/img/logo_preta.jpeg') }}" alt="{{ env('APP_NAME') }}">
+                                            </a>
+                                        </div>
+                                        <div class="pb-2">
                                             <h5 class="card-title text-center pb-0 fs-4">Faça parte!</h5>
                                             <p class="text-center small">Preencha seus dados para receber benefícios.</p>
                                         </div>
-
                                         <form action="{{ route('registrer') }}" method="POST" class="row g-3">
                                             @csrf
                                             <div class="col-12">
@@ -68,7 +75,7 @@
                                     </div>
                                 </div>
 
-                                <div class="credits">
+                                <div class="credits text-white">
                                     Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
                                 </div>
                             </div>

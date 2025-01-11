@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('phone')->nullable();
 
             $table->integer('status')->default(0); // is 0 = pendent | 1 - active 3 - block
-            $table->unsignedBigInteger('plan')->default(1);
+            $table->unsignedBigInteger('plan')->nullable();
             $table->foreign('plan')->references('id')->on('plan')->onDelete('cascade');
             $table->integer('type')->default(0); // is 0 = user | 1 - ADM 2 - Colaborador
             $table->unsignedBigInteger('meta')->default(100);

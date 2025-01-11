@@ -34,6 +34,9 @@ class MonthValidate {
                         return $redirect;
                     }
                     break;
+                default:
+                    return redirect()->route('planos')->with('info', 'Você precisa escolher um Plano!');
+                    break;
             }
         }
         
@@ -52,6 +55,10 @@ class MonthValidate {
     }
 
     private function checkMonthlyInvoice() {
+
+        if (Auth::user()->labelPlan->value <= 0) {
+            return null;
+        }
        
         $lastInvoice = Auth::user()->invoices()->where('plan_id', Auth::user()->plan)->latest()->first();
         if (!$lastInvoice || Carbon::parse($lastInvoice->created_at)->lt(Carbon::now()->subDays(30))) {

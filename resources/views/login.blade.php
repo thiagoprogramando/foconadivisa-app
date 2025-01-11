@@ -47,12 +47,10 @@
                         <img src="{{ asset('template/img/logo_preta.jpeg') }}" alt="{{ env('APP_NAME') }}">
                       </a>
                     </div>
-
                     <div class="pb-2">
                         <h5 class="card-title text-center pb-0 fs-4">Olá, {{ $greeting }}!</h5>
                         <p class="text-center small">Faça login para ter acesso aos benefícios da sua conta.</p>
                     </div>
-
                     <form action="{{ route('logon') }}" method="POST" class="row g-2">
                         @csrf
                         <div class="col-12">
@@ -70,7 +68,7 @@
                         </div>
                         <div class="col-12 text-center">
                           <p class="small mb-0">Não tem uma conta? <a href="{{ route('cadastro') }}">Criar Conta</a></p>
-                          ou
+                            ou
                           <p class="small mb-0"><a href="{{ route('recuperar-conta') }}">Recuperar conta</a></p>
                         </div>
                     </form>
