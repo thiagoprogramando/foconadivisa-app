@@ -21,7 +21,7 @@ class MonthValidate {
 
         if (Auth::user()->type !== 1) {
 
-            if (!empty(Auth::user()->plan)) {
+            if (Auth::user()->plan == null) {
                 return redirect()->route('planos')->with('info', 'Você precisa escolher um Plano!');
             }
 
