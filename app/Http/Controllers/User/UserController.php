@@ -46,13 +46,25 @@ class UserController extends Controller {
             return redirect()->back()->with('info', 'Não foi possível encontrar os dados do usuário!');
         }
 
-        $data = [
-            'name'      => $request->name,
-            'cpfcnpj'   => $request->cpfcnpj,
-            'email'     => $request->email,
-            'phone'     => $request->phone,
-            'meta'      => $request->meta,
-        ];
+        if(!empty($request->name)) {
+            $data['name'] = $request->name;
+        }
+
+        if(!empty($request->cpfcnpj)) {
+            $data['cpfcnpj'] = $request->cpfcnpj;
+        }
+
+        if(!empty($request->email)) {
+            $data['email'] = $request->email;
+        }
+
+        if(!empty($request->phone)) {
+            $data['phone'] = $request->phone;
+        }
+
+        if(!empty($request->meta)) {
+            $data['meta'] = $request->meta;
+        }
 
         if (!empty($request->password)) {
             $data['password'] = bcrypt($request->password);

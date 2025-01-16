@@ -15,7 +15,8 @@ class Notification extends Model {
         'user_id',
         'type',
         'title',
-        'description'
+        'description',
+        'url'
     ];
 
     public function typeLabel() {

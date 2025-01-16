@@ -276,6 +276,7 @@
         <script src="{{ asset('template/js/main.js') }}"></script>
         <script src="{{ asset('template/js/jquery.js') }}"></script>
         <script src="{{ asset('template/js/sweetalert.js') }}"></script>
+        <script src="{{ asset('template/js/mask.js') }}"></script>
         <script>
             @if ($errors->any())
                 let errorMessages = '';

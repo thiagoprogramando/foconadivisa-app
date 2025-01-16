@@ -7,9 +7,11 @@
 
             <div class="col-12">
                 <div class="btn-group" role="group" aria-label="Basic outlined example">
-                    <button type="button" title="Adicionar" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#createModal">
-                        <i class="ri-add-circle-line"></i> Adicionar
-                    </button>
+                    @if (Auth::user()->type == 1)
+                        <button type="button" title="Adicionar" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#createModal">
+                            <i class="ri-add-circle-line"></i> Adicionar
+                        </button>
+                    @endif
                     <button type="button" title="Filtros" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#filterModal">
                         <i class="bi bi-filter-circle"></i> Filtros
                     </button>
@@ -121,7 +123,7 @@
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                             <div class="form-floating mb-2">
-                                                <input type="number" name="value" class="form-control" id="value" placeholder="Valor:" required>
+                                                <input type="text" name="value" class="form-control" id="value" placeholder="Valor:" oninput="mascaraReal(this)" required>
                                                 <label for="value">Valor</label>
                                             </div>
                                         </div>
@@ -167,8 +169,10 @@
                                         @if(Auth::user()->plan != $plan->id)
                                             <a href="{{ route('pay-plan', ['plan' => $plan->id]) }}" class="btn btn-outline-dark mt-2 w-100">Comprar Plano</a>
                                         @endif
-                                        <a href="{{ route('plano', ['id' => $plan->id]) }}" class="btn btn-outline-warning mt-2 w-100">Editar plano</a>
-                                        <button type="submit" class="btn btn-danger mt-2 w-100">Excluir plano</button>
+                                        @if (Auth::user()->type == 1)
+                                            <a href="{{ route('plano', ['id' => $plan->id]) }}" class="btn btn-outline-warning mt-2 w-100">Editar plano</a>
+                                            <button type="submit" class="btn btn-danger mt-2 w-100">Excluir plano</button>
+                                        @endif
                                     </form>                                    
                                 </div>
                             </div>
@@ -179,4 +183,11 @@
         </div>
     </div>
 
+    <script>
+        document.addEventListener('input', function (event) {
+            if (event.target && event.target.id === 'value') {
+                mascaraReal(event.target);
+            }
+        });
+    </script>
 @endsection

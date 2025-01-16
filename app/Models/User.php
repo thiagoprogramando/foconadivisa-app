@@ -75,10 +75,14 @@ class User extends Authenticatable {
     public function validadMonth() {
 
         $lastInvoice = $this->invoices()
-            ->where('payment_status', 1)
             ->where('plan_id', $this->plan)
             ->orderBy('due_date', 'desc')
             ->first();
+
+        if ($lastInvoice && $lastInvoice->payment_status == 0 && $lastInvoice->due_date >= \Carbon\Carbon::now()) {
+            $daysRemaining = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($lastInvoice->due_date), false);
+            return "Seu teste grátis irá acabar em <a href='#'><b>" . abs($daysRemaining) + 1 . "</b></a> dias!";
+        }
     
         if (!$lastInvoice || !$lastInvoice->due_date) {
             return "Conheça os planos disponível para você! <a href='".route('planos')."'><b>Acessar Planos</b></a>";

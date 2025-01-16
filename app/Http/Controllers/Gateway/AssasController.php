@@ -62,7 +62,7 @@ class AssasController extends Controller {
         $invoice->plan_id       = $plan->id;
         $invoice->value         = $plan->value;
         $invoice->type          = 1;
-        $invoice->due_date      = now()->addDay(2);
+        $invoice->due_date      = now()->addDay(1);
         $invoice->payment_token = $dataInvoice['id'];
         $invoice->payment_url   = $dataInvoice['invoiceUrl'];
 
@@ -75,10 +75,16 @@ class AssasController extends Controller {
             $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
             $notification->save();
 
-            return redirect($dataInvoice['invoiceUrl']);
+            $user       = User::find(Auth::id());
+            $user->plan = $plan->id;
+            if ($user->save()) {
+                return redirect()->back()->with('success', 'Plano alterado com sucesso! Aproveite os benefícios.');
+            }
+
+            return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente!');
         }
 
-        return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente.');
+        return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente!');
     }
 
     public function createCustomer($id) {
@@ -172,7 +178,7 @@ class AssasController extends Controller {
                     'customer'          => $customer,
                     'billingType'       => $method ?? 'PIX',
                     'value'             => number_format($value, 2, '.', ''),
-                    'dueDate'           => now()->addDay(2)->toDateString(),
+                    'dueDate'           => now()->addDay(1)->toDateString(),
                     'description'       => $description,
                     'installmentCount'  => $installments ?: 1,
                     'installmentValue'  => $installments ? number_format(($value / $installments), 2, '.', '') : $value,
@@ -252,6 +258,33 @@ class AssasController extends Controller {
             }
             
             return response()->json(['status' => 'success', 'message' => 'Nenhuma fatura encontrada!']);
+        }
+
+        if ($jsonData['event'] === 'PAYMENT_OVERDUE') {
+
+            $invoice = Invoice::where('payment_token', $token)->first();
+            if ($invoice) {
+
+                $user = User::find($invoice->user_id);
+                if ($user) {
+                    $user->plan = null;
+                    $user->save();
+
+                    $notification               = new Notification();
+                    $notification->user_id      = $user->id;
+                    $notification->type         = 3;
+                    $notification->title        = 'Plano cancelado!';
+                    $notification->description  = 'Por falta de pagamento, cancelamos o seu plano. Você pode assinar outro plano!';
+                    $notification->url          = env('APP_URL').'planos';
+                    $notification->save();
+
+                    return response()->json(['status' => 'success', 'message' => 'Plano cancelado para o usuário!']);
+                }
+
+                return response()->json(['status' => 'success', 'message' => 'Nenhum usuário associado a essa Fatura!']);
+            }
+
+            return response()->json(['status' => 'success', 'message' => 'Webhook não utilizado!']);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Webhook não utilizado!']);
