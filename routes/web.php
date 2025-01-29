@@ -148,6 +148,7 @@ Route::middleware('auth')->group(function () {
 
         //Plan & Gatway
         Route::get('/pay-plan/{plan}', [AssasController::class, 'payPlan'])->name('pay-plan');
+        Route::post('buy-plan', [AssasController::class, 'buyPlan'])->name('buy-plan');
 
         // Topic
         Route::post('create-topic', [SubjectController::class, 'createTopic'])->name('create-topic');

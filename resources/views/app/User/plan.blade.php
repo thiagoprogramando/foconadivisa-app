@@ -11,13 +11,13 @@
                         <button type="button" title="Adicionar" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#createModal">
                             <i class="ri-add-circle-line"></i> Adicionar
                         </button>
+                        <a href="{{ route('plan-excel', request()->query()) }}" class="btn btn-dark" title="Excel">
+                            <i class="bi bi-file-earmark-excel"></i> Excel
+                        </a>
                     @endif
-                    <button type="button" title="Filtros" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#filterModal">
+                    <button type="button" title="Filtros" class="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#filterModal">
                         <i class="bi bi-filter-circle"></i> Filtros
                     </button>
-                    <a href="{{ route('plan-excel', request()->query()) }}" class="btn btn-outline-dark" title="Excel">
-                        <i class="bi bi-file-earmark-excel"></i> Excel
-                    </a>  
                     <a href="{{ route('planos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
 
                     <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -44,7 +44,7 @@
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                             <div class="form-floating mb-2">
-                                                <input type="text" name="value" class="form-control" id="value" placeholder="Valor:">
+                                                <input type="text" name="value" class="form-control" id="value" placeholder="Valor:" oninput="mascaraReal(this)">
                                                 <label for="value">Valor:</label>
                                             </div>
                                         </div>
@@ -166,14 +166,57 @@
                                     <form action="{{ route('delete-plan') }}" method="POST" class="delete">
                                         @csrf
                                         <input type="hidden" name="id" value="{{ $plan->id }}">
-                                        @if(Auth::user()->plan != $plan->id)
-                                            <a href="{{ route('pay-plan', ['plan' => $plan->id]) }}" class="btn btn-outline-dark mt-2 w-100">Comprar Plano</a>
+                                        @if(Auth::user()->plan != $plan->id && $plan->value > 0)
+                                            <button type="button" class="btn btn-outline-dark mt-2 w-100" data-bs-toggle="modal" data-bs-target="#payPlanModal{{ $plan->id }}">Assinar Plano</button>
+                                        @endif
+                                        @if($plan->value <= 0)
+                                            <a href="{{ route('pay-plan', ['plan' => $plan->id]) }}" class="btn btn-outline-dark mt-2 w-100">Assinar Plano</a>
                                         @endif
                                         @if (Auth::user()->type == 1)
                                             <a href="{{ route('plano', ['id' => $plan->id]) }}" class="btn btn-outline-warning mt-2 w-100">Editar plano</a>
                                             <button type="submit" class="btn btn-danger mt-2 w-100">Excluir plano</button>
                                         @endif
                                     </form>                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="payPlanModal{{ $plan->id }}" tabindex="-1" aria-hidden="true" style="display: none;">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Forma de Pagamento:</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form action="{{ route('buy-plan') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="id" value="{{ $plan->id }}">
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                                    <div class="form-floating mb-2">
+                                                        <select name="method" class="form-select" id="method">
+                                                            <option value="" selected>Forma de cobrança</option>
+                                                            <option value="PIX">PIX</option>
+                                                            <option value="BOLETO">Boleto</option>
+                                                            <option value="CREDIT_CARD">Cartão de Crédito</option>
+                                                        </select>
+                                                        <label for="method">Forma de cobrança</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                                    <div class="form-floating mb-2">
+                                                        <input type="number" name="installments" class="form-control" id="installments" placeholder="Parcelas:" min="1">
+                                                        <label for="installments">Parcelas</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer btn-group">
+                                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                                            <button type="submit" class="btn btn-dark">Contratar</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -188,6 +231,38 @@
             if (event.target && event.target.id === 'value') {
                 mascaraReal(event.target);
             }
+        });
+
+        $(document).ready(function() {
+            $(document).on('shown.bs.modal', '.modal', function () {
+                const modal = $(this);
+                const paymentMethod = modal.find('#method');
+                const installmentsField = modal.find('#installments');
+
+                function updateInstallmentsField() {
+                    const selectedMethod = paymentMethod.val();
+
+                    if (selectedMethod === 'PIX' || selectedMethod === 'BOLETO') {
+                        installmentsField.val(1).prop('disabled', true);
+                    } else if (selectedMethod === 'CREDIT_CARD') {
+                        installmentsField.attr('min', 1);
+                        installmentsField.attr('max', 12);
+                        installmentsField.prop('disabled', false);
+                        
+                        installmentsField.on('input', function() {
+                            var value = parseInt(installmentsField.val(), 10);
+                            if (value < 1) {
+                                installmentsField.val(1);
+                            } else if (value > 12) {
+                                installmentsField.val(12);
+                            }
+                        });
+                    }
+                }
+
+                paymentMethod.off('change').on('change', updateInstallmentsField);
+                updateInstallmentsField();
+            });
         });
     </script>
 @endsection

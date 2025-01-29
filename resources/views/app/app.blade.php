@@ -47,7 +47,7 @@
                                         O seu plano atual é: <a href="{{ route('planos') }}">{{ Auth::user()->labelPlan->name }}</a> <br>
                                         {!! Auth::user()->validadMonth() !!}
                                     @else
-                                        Você ainda não escolheu um <a href="{{ route('planos') }}"><b>Plano</b></a>, faça a melhor escolha e aproveite os benefícios!
+                                    {!! Auth::user()->validadMonth() !!}
                                     @endif
                                 </p>                                                               
                             </div>

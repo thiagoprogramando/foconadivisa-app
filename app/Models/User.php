@@ -3,10 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
 use Laravel\Sanctum\HasApiTokens;
+
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable {
     
@@ -79,12 +84,12 @@ class User extends Authenticatable {
             ->orderBy('due_date', 'desc')
             ->first();
 
-        if ($lastInvoice && $lastInvoice->payment_status == 0 && $lastInvoice->due_date >= \Carbon\Carbon::now()) {
-            $daysRemaining = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($lastInvoice->due_date), false);
+        if ($lastInvoice && $lastInvoice->payment_status == 0) {
+            $daysRemaining = Carbon::now()->diffInDays(Carbon::parse($lastInvoice->due_date), false);
             return "Seu teste grátis irá acabar em <a href='#'><b>" . abs($daysRemaining) + 1 . "</b></a> dias!";
         }
     
-        if (!$lastInvoice || !$lastInvoice->due_date) {
+        if (!$lastInvoice) {
             return "Conheça os planos disponível para você! <a href='".route('planos')."'><b>Acessar Planos</b></a>";
         }
 
@@ -93,7 +98,7 @@ class User extends Authenticatable {
             return 'Nenhum Plano Associado';
         }
 
-        $activationDate = \Carbon\Carbon::parse($lastInvoice->created_at);
+        $activationDate = Carbon::parse($lastInvoice->created_at);
         switch ($plan->type) {
             case 1:
                 $renewalDate = $activationDate->addMonth();
@@ -107,7 +112,7 @@ class User extends Authenticatable {
                 return 'Plano inválido';
         }
 
-        $today = \Carbon\Carbon::now();
+        $today = Carbon::now();
         $daysRemaining = $today->diffInDays($renewalDate, false);
 
         if ($daysRemaining < 0) {
@@ -116,4 +121,11 @@ class User extends Authenticatable {
 
         return "Faltam <a href='#'><b>" . abs($daysRemaining) . "</b></a> dias para a renovação da sua Assinatura!";
     }
+
+    public function hasUsedTrial() {
+        return DB::table('trial_histories')
+            ->where('user_id', $this->id)
+            ->exists();
+    }
+
 }

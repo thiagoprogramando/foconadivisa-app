@@ -173,7 +173,7 @@
 
                 <li class="nav-heading">Meus Dados</li>
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estátisticas</span></a>
+                    <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estatísticas</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('planos') }}"><i class="bi bi-cart"></i><span>Planos</span></a>

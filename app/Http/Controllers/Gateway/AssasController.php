@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class AssasController extends Controller {
     
@@ -47,14 +48,56 @@ class AssasController extends Controller {
             return redirect()->back()->with('error', 'Erro ao salvar o plano gratuito.');
         }
 
-        $dataInvoice = $this->createInvoice(null, null, $customer, $plan->value, $plan->name);
+        return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente!');
+    }
+
+    public function buyPlan(Request $request) {
+
+        if (empty(Auth::user()->cpfcnpj) || empty(Auth::user()->phone)) {
+            return redirect()->route('perfil')->with('error', 'Ops! Complete o seu cadastro antes de adquirir um plano.');
+        }
+
+        $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
+        if (!empty($customer['status']) && ($customer['status'] == false || $customer['status'] == 0)) {
+            return redirect()->back()->with('error', $customer['message']);
+        }
+
+        $plan = Plan::find($request->id);
+        if (!$plan) {
+            return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
+        }
+
+        if ($plan->value <= 0) {
+
+            $user = User::find(Auth::id());
+            $user->plan = $plan->id;
+            if ($user->save()) {
+                return redirect()->back()->with('success', 'Plano alterado com sucesso!');
+            }
+
+            return redirect()->back()->with('error', 'Erro ao salvar o plano gratuito.');
+        }
+
+        if (Auth::user()->hasUsedTrial()) {
+            $due_date = now();
+        } else {
+            $due_date = now()->addDay(env('TIME_DUE_DATE'));
+            DB::table('trial_histories')->insert([
+                'user_id'       => Auth::user()->id,
+                'plan_id'       => $plan->id,
+                'start_date'    => now(),
+                'end_date'      => now()->addDays(env('TIME_DUE_DATE')),
+                'created_at'    => now(),
+            ]);
+        }
+
+        $dataInvoice = $this->createInvoice($request->method, $request->installments, $customer, $plan->value, $plan->name, $due_date);
         if (!$dataInvoice) {
             return redirect()->back()->with('error', 'Não foi possível gerar sua fatura! Verifique seus dados e tente novamente.');
         }
 
         Invoice::where('user_id', Auth::user()->id)
             ->where('payment_status', 0)
-            ->where('plan_id', $plan->id)
             ->delete();
 
         $invoice                = new Invoice();
@@ -62,7 +105,7 @@ class AssasController extends Controller {
         $invoice->plan_id       = $plan->id;
         $invoice->value         = $plan->value;
         $invoice->type          = 1;
-        $invoice->due_date      = now()->addDay(1);
+        $invoice->due_date      = $due_date;
         $invoice->payment_token = $dataInvoice['id'];
         $invoice->payment_url   = $dataInvoice['invoiceUrl'];
 
@@ -164,7 +207,7 @@ class AssasController extends Controller {
         }
     }
 
-    public function createInvoice($method, $installments, $customer, $value, $description) {
+    public function createInvoice($method, $installments, $customer, $value, $description, $due_date = null) {
         try {
             $client = new Client();
     
@@ -176,12 +219,12 @@ class AssasController extends Controller {
                 ],
                 'json' => [
                     'customer'          => $customer,
-                    'billingType'       => $method ?? 'PIX',
+                    'billingType'       => $method ?? 'UNDEFINED',
                     'value'             => number_format($value, 2, '.', ''),
-                    'dueDate'           => now()->addDay(1)->toDateString(),
+                    'dueDate'           => $due_date ?? now()->addDay(1)->toDateString(),
                     'description'       => $description,
-                    'installmentCount'  => $installments ?: 1,
-                    'installmentValue'  => $installments ? number_format(($value / $installments), 2, '.', '') : $value,
+                    'installmentCount'  => $method == 'CREDIT_CARD' ? 3 : $installments,
+                    'installmentValue'  => $method == 'CREDIT_CARD' ? number_format(($value / 3), 2, '.', '') : $value,
                 ],
                 'verify' => false,
             ];
@@ -196,7 +239,7 @@ class AssasController extends Controller {
                 ];
             }
         } catch (\Exception $e) {
-            Log::error('Erro em createInvoice: ' . $e->getMessage());
+            Log::error('Erro Ao Criar Invoice: ' . $e->getMessage());
             return false;
         }
     }    
@@ -265,16 +308,21 @@ class AssasController extends Controller {
             $invoice = Invoice::where('payment_token', $token)->first();
             if ($invoice) {
 
+
                 $user = User::find($invoice->user_id);
                 if ($user) {
                     $user->plan = null;
                     $user->save();
 
+                    Invoice::where('user_id', $user->id)
+                        ->where('payment_status', 0)
+                        ->delete();
+
                     $notification               = new Notification();
                     $notification->user_id      = $user->id;
                     $notification->type         = 3;
                     $notification->title        = 'Plano cancelado!';
-                    $notification->description  = 'Por falta de pagamento, cancelamos o seu plano. Você pode assinar outro plano!';
+                    $notification->description  = 'Por falta de pagamento, cancelamos o seu plano. Você pode assinar outro!';
                     $notification->url          = env('APP_URL').'planos';
                     $notification->save();
 

@@ -51,7 +51,7 @@ class MonthValidate {
             ->where('plan_id', Auth::user()->plan) 
             ->where('payment_status', 0) 
             ->where('type', 1)
-            ->where('created_at', '<', Carbon::now()->subDays(7))
+            ->whereDate('due_date', '<=', Carbon::now())
             ->count();
     }
 
