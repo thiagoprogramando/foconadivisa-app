@@ -204,11 +204,10 @@
                             <hr class="mt-5">
                             <div class="text-center">
                                 <div class="btn-group mt-3" role="group" style="width: 70%;">
-                                    {{-- <a href="{{ route('caderno', ['id' => $notebook->id]) }}" title="Sair" class="btn btn-outline-dark">SAIR</a> --}}
-                                    <button onclick="history.back()" @disabled($nextQuestionNumber == 1) title="VOLTAR" class="btn btn-outline-dark">VOLTAR</button>
+                                    <button onclick="history.back()" @disabled($nextQuestionNumber == 1) title="Voltar" class="btn btn-outline-dark">VOLTAR</button>
                                     <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger">ELIMINAR QUESTÃO</a>
-                                    <button type="submit" title="Sair" class="btn btn-outline-success">RESPONDER</button>
-                                    <a href="{{ route('answer', ['id' => $notebook->id, 'next_question' => $notebookQuestion->id]) }}" title="Sair" class="btn btn-outline-dark">PULAR</a>
+                                    <button type="submit" title="Responder" class="btn btn-outline-success">RESPONDER</button>
+                                    <a href="{{ route('answer', ['id' => $notebook->id, 'next_question' => $question->id]) }}" title="Pular Questão" class="btn btn-outline-dark">PULAR</a>
                                 </div>
                             </div>
                         </form>

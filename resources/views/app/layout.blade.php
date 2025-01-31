@@ -27,7 +27,7 @@
         <script src="{{ asset('template/js/tom-select.complete.min.js') }}"></script>
     </head>
 
-    <body @if(!empty($menu) && $menu == 1) class="toggle-sidebar" @endif>
+    <body>
 
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-between">
@@ -342,6 +342,9 @@
                         });
                     });
                 });
+
+                const money = document.getElementById('value');
+                if (money && money.value) mascaraReal(money);
             });
         </script>
     </body>

@@ -12,39 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AnswerController extends Controller {
-    
-    // public function answer($notebook, $next_question = null) {
-
-    //     $notebook = Notebook::find($notebook);
-    //     if ($notebook) {
-
-    //         $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)->pluck('notebook_question_id')->toArray();
-
-    //         $totalQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
-    //         ->whereHas('question', function ($query) {
-    //             $query->whereNotNull('question_text')
-    //                   ->where('question_text', '!=', '');
-    //         })
-    //         ->count();
-
-    //         $unansweredQuestionsQuery = NotebookQuestion::where('notebook_id', $notebook->id)
-    //         ->whereNotIn('id', $answeredNotebookQuestionIds)
-    //         ->whereHas('question', function ($query) {
-    //             $query->whereNotNull('question_text')
-    //                   ->where('question_text', '!=', '');
-    //         });
-
-    //         if ($next_question) {
-    //             $unansweredQuestionsQuery->where('id', '!=', $next_question);
-    //         }
-
-    //         $unansweredQuestions = $unansweredQuestionsQuery->paginate(1);
-    //         $nextQuestionNumber = $totalQuestions - $unansweredQuestions->total() + 1;
-    //         $menu = 1;
-
-    //         return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber', 'menu'));
-    //     }
-    // }
 
     public function answer($notebook, $next_question = null) {
         
@@ -68,6 +35,11 @@ class AnswerController extends Controller {
                           ->where('question_text', '!=', '');
                 })
                 ->inRandomOrder();
+
+            if ($next_question !== null) {
+                $unansweredQuestionsQuery->where('question_id', '!=', $next_question);
+            }
+
             $unansweredQuestions = $unansweredQuestionsQuery->paginate(1);
             $nextQuestionNumber = $totalQuestions - $unansweredQuestions->total() + 1;
             $menu = 1;

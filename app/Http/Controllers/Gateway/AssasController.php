@@ -116,6 +116,7 @@ class AssasController extends Controller {
             $notification->type         = 1;
             $notification->title        = 'Fatura gerada para o novo Plano!';
             $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
+            $notification->url          = env('APP_URL').'pagamentos';
             $notification->save();
 
             $user       = User::find(Auth::id());

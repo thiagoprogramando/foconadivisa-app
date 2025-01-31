@@ -86,6 +86,10 @@ class User extends Authenticatable {
 
         if ($lastInvoice && $lastInvoice->payment_status == 0) {
             $daysRemaining = Carbon::now()->diffInDays(Carbon::parse($lastInvoice->due_date), false);
+            if ($daysRemaining < 1) {
+                return "É necessário <b>renovar</b> seu plano em <a href='".route('pagamentos')."'><b>Faturas</b></a>";
+            }
+
             return "Seu teste grátis irá acabar em <a href='#'><b>" . abs($daysRemaining) + 1 . "</b></a> dias!";
         }
     

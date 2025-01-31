@@ -198,7 +198,6 @@
                                                         <select name="method" class="form-select" id="method">
                                                             <option value="" selected>Forma de cobrança</option>
                                                             <option value="PIX">PIX</option>
-                                                            <option value="BOLETO">Boleto</option>
                                                             <option value="CREDIT_CARD">Cartão de Crédito</option>
                                                         </select>
                                                         <label for="method">Forma de cobrança</label>
@@ -206,7 +205,7 @@
                                                 </div>
                                                 <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                                                     <div class="form-floating mb-2">
-                                                        <input type="number" name="installments" class="form-control" id="installments" placeholder="Parcelas:" min="1">
+                                                        <input type="number" name="installments" class="form-control" id="installments" placeholder="Parcelas:" min="1" max="{{ $plan->type == 1 ? 1 : 10 }}">
                                                         <label for="installments">Parcelas</label>
                                                     </div>
                                                 </div>
@@ -241,20 +240,21 @@
 
                 function updateInstallmentsField() {
                     const selectedMethod = paymentMethod.val();
+                    const maxInstallments = parseInt(installmentsField.attr('max'), 10);
 
                     if (selectedMethod === 'PIX' || selectedMethod === 'BOLETO') {
                         installmentsField.val(1).prop('disabled', true);
                     } else if (selectedMethod === 'CREDIT_CARD') {
                         installmentsField.attr('min', 1);
-                        installmentsField.attr('max', 12);
+                        installmentsField.attr('max', maxInstallments);
                         installmentsField.prop('disabled', false);
-                        
+
                         installmentsField.on('input', function() {
                             var value = parseInt(installmentsField.val(), 10);
                             if (value < 1) {
                                 installmentsField.val(1);
-                            } else if (value > 12) {
-                                installmentsField.val(12);
+                            } else if (value > maxInstallments) {
+                                installmentsField.val(maxInstallments);
                             }
                         });
                     }
