@@ -224,8 +224,8 @@ class AssasController extends Controller {
                     'value'             => number_format($value, 2, '.', ''),
                     'dueDate'           => $due_date ?? now()->addDay(1)->toDateString(),
                     'description'       => $description,
-                    'installmentCount'  => $method == 'CREDIT_CARD' ? 3 : $installments,
-                    'installmentValue'  => $method == 'CREDIT_CARD' ? number_format(($value / 3), 2, '.', '') : $value,
+                    'installmentCount'  => $installments,
+                    'installmentValue'  => number_format(($value / $installments), 2, '.', ''),
                 ],
                 'verify' => false,
             ];

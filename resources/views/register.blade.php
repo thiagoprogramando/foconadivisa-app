@@ -36,7 +36,7 @@
 
         <main>
             <div class="container">
-                <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                <section class="section min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
@@ -63,7 +63,7 @@
                                                 <input type="password" name="password" class="form-control" placeholder="Senha:" required>
                                             </div>
                                             <div class="col-12">
-                                                <input type="number" name="meta" class="form-control" placeholder="Qual sua meta de Questões?">
+                                                <input type="number" name="meta" class="form-control" placeholder="Qual sua meta de Questões?" required>
                                             </div>
                                             <div class="col-12">
                                                 <button class="btn btn-dark w-100" type="submit">Cadastrar-me</button>

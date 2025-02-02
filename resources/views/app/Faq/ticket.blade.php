@@ -21,12 +21,16 @@
             <div class="accordion" id="faq-group-2">
                 @foreach ($tickets as $ticket)
                     <div class="accordion-item">
-                        <h2 class="accordion-header"> <button class="accordion-button collapsed" data-bs-target="#faqs{{ $ticket->id }}" type="button" data-bs-toggle="collapse"><a href="">#{{ $ticket->id }}</a> - {{ $ticket->user->name }}</button></h2>
+                        <h2 class="accordion-header"> 
+                            <button class="accordion-button collapsed" data-bs-target="#faqs{{ $ticket->id }}" type="button" data-bs-toggle="collapse">
+                                <a href="" class="@if (!empty($ticket->response_comment)) text-success @endif">#{{ $ticket->id }}</a> - {{ $ticket->user->name }} 
+                            </button>
+                        </h2>
                         <div id="faqs{{ $ticket->id }}" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
                             <div class="accordion-body">
                                 <p>
                                     <b>Questão</b> <br>
-                                    <a href="{{ route('questao', ['id' => $ticket->question->id]) }}" target="_blank">{!! $ticket->question->question_text !!}</a>
+                                    <a href="@if (Auth::user()->type == 1) {{ route('questao', ['id' => $ticket->question->id]) }} @else # @endif" target="_blank">{!! $ticket->question->question_text !!}</a>
                                     <b>Relato</b> <br>
                                     {{ $ticket->comment }}
                                 </p>
@@ -34,15 +38,18 @@
                                 <form action="{{ route('update-ticket') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="id" value="{{ $ticket->id }}">
-                                    <textarea name="response_comment" class="form-control" rows="4" placeholder="Resposta:">{{ $ticket->response_comment }}</textarea>
-                                    @if(Auth::user()->type == 1)
-                                        <button type="submit" class="btn btn-block btn-dark mt-2">Enviar</button>
-                                    @endif
+                                    <textarea name="response_comment" class="form-control" rows="4" placeholder="Resposta:" @disabled(Auth::user()->type !== 1)>{{ $ticket->response_comment }}</textarea>
+                                     <div class="btn-group">
+                                        @if(Auth::user()->type == 1)
+                                            <button type="submit" title="Enviar Resposta" class="btn btn-block btn-dark mt-2">Enviar</button>
+                                            @if(Auth::user()->type == 1 || Auth::user()->type == 2)
+                                                <a href="{{ route('delete-ticket', ['id' => $ticket->id]) }}" title="Excluir Ticket" class="btn btn-block btn-danger mt-2"><i class="bi bi-trash"></i></span></a>
+                                            @endif
+                                        @endif
+                                    </div>
                                 </form>
                                 <hr>
-                                @if(Auth::user()->type == 1 || Auth::user()->type == 2)
-                                    <a href="{{ route('delete-ticket', ['id' => $ticket->id]) }}"><span class="badge bg-danger rounded-pill"><i class="bi bi-trash"></i></span></a>
-                                @endif
+                               
                             </div>
                         </div>
                     </div>

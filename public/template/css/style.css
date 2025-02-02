@@ -225,7 +225,8 @@ h6 {
 }
 
 .card-login {
-  border: 5px double #FBB816;
+  border: 2px double #FBB816;
+  margin-top: 20%;
 }
 
 .card-header,

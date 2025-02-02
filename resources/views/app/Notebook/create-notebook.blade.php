@@ -37,7 +37,7 @@
                                     id-resolved='{{ $subject->questionResolved($subject->id) }}' 
                                     id-resolved-parent='{{ $subject->questionResolvedParent($subject->id) }}'
                                     id-fail='{{ $subject->questionFail() }}'>
-                                <label class="form-check-label" for="subject-{{ $subject->id }}">{{ $subject->name }}</label>
+                                <label class="form-check-label" for="subject-{{ $subject->id }}"><b>{{ $subject->name }}</b></label>
                             </div>
                     
                             <div class="ps-3 topics" id="topics-{{ $subject->id }}" style="display: none;">
