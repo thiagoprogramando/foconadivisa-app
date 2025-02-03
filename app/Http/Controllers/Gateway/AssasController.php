@@ -57,6 +57,10 @@ class AssasController extends Controller {
             return redirect()->route('perfil')->with('error', 'Ops! Complete o seu cadastro antes de adquirir um plano.');
         }
 
+        if (empty($request->method) || ($request->installments)) {
+            return redirect()->back()->with('info', 'É necessário escolher uma Forma de Pagamento!');
+        }
+
         $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
         if (!empty($customer['status']) && ($customer['status'] == false || $customer['status'] == 0)) {
             return redirect()->back()->with('error', $customer['message']);
@@ -225,7 +229,7 @@ class AssasController extends Controller {
                     'dueDate'           => $due_date ?? now()->addDay(1)->toDateString(),
                     'description'       => $description,
                     'installmentCount'  => $installments,
-                    'installmentValue'  => number_format(($value / $installments), 2, '.', ''),
+                    'installmentValue'  => $installments > 0 ? number_format(($value / $installments), 2, '.', '') : $value,
                 ],
                 'verify' => false,
             ];
