@@ -61,6 +61,10 @@ class User extends Authenticatable {
         return $this->hasMany(Invoice::class);
     }
 
+    public function notebooks() {
+        return $this->hasMany(Notebook::class);
+    }
+
     public function typeLabel() {
         switch ($this->type) {
             case 0:

@@ -57,7 +57,7 @@ class AssasController extends Controller {
             return redirect()->route('perfil')->with('error', 'Ops! Complete o seu cadastro antes de adquirir um plano.');
         }
 
-        if (empty($request->method) || ($request->installments)) {
+        if (empty($request->method) || empty($request->installments)) {
             return redirect()->back()->with('info', 'É necessário escolher uma Forma de Pagamento!');
         }
 

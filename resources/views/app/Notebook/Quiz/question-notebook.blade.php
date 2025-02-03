@@ -131,13 +131,13 @@
                                 </div>
 
                                 <div class="modal fade" id="newTicket" tabindex="-1" aria-hidden="true" style="display: none;">
-                                    <div class="modal-dialog modal-lg">
+                                    <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title">Detalhes:</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <form action="{{ route('create-ticket') }}" method="POST">
+                                            <form id="ticketForm">
                                                 @csrf
                                                 <input type="hidden" name="question_id" value="{{ $question->id }}">
                                                 <div class="modal-body">
@@ -147,9 +147,9 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="modal-footer">
+                                                <div class="modal-footer btn-group">
                                                     <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
-                                                    <button type="submit" class="btn btn-outline-success">Enviar</button>
+                                                    <button type="submit" class="btn btn-dark">Enviar</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -304,6 +304,53 @@
                     // Se o usuário clicar em "SIM", redireciona para a rota
                     window.location.href = "{{ route('caderno-filtros', ['id' => $notebook->id]) }}";
                 }
+            });
+        });
+
+        document.getElementById('ticketForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita o envio padrão do formulário
+
+            let form = event.target;
+            let formData = new FormData(form);
+
+            formData.append('user_id', "{{ Auth::user()->id }}");
+
+            fetch("{{ route('create-ticket') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Sucesso!',
+                        text: 'Seu ticket foi enviado com sucesso!',
+                        icon: 'success',
+                        timer: 3000
+                    });
+
+                    form.reset();
+                    let modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
+                    modal.hide();
+                } else {
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: data.message || 'Houve um problema ao enviar o ticket.',
+                        icon: 'error',
+                        timer: 3000
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'Erro ao processar a requisição.',
+                    icon: 'error',
+                    timer: 3000
+                });
             });
         });
     </script>

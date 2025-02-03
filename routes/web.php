@@ -89,7 +89,6 @@ Route::middleware('auth')->group(function () {
         //Ticket
         Route::get('tickets', [FaqController::class, 'tickets'])->name('tickets');
         Route::get('delete-ticket/{id}', [FaqController::class, 'deleteTicket'])->name('delete-ticket');
-        Route::post('create-ticket', [FaqController::class, 'createTicket'])->name('create-ticket');
         Route::post('update-ticket', [FaqController::class, 'updateTicket'])->name('update-ticket');
 
         //Notification

@@ -144,14 +144,14 @@
         <aside id="sidebar" class="sidebar">
             <ul class="sidebar-nav" id="sidebar-nav">
                 <li class="nav-item">
-                    <a class="nav-link " href="{{ route('app') }}">
+                    <a class="nav-link" href="{{ route('app') }}">
                         <i class="bi bi-grid"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('cadernos') }}">
+                    <a class="nav-link collapsed" @if (Auth::user()->notebooks->count() > 0) href="{{ route('cadernos') }}" @else onclick="notNotebook()" @endif>
                         <i class="bi bi-pen"></i>
                         <span>Resolver Questões</span>
                     </a>
@@ -346,6 +346,17 @@
                 const money = document.getElementById('value');
                 if (money && money.value) mascaraReal(money);
             });
+
+            function notNotebook() {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'Você não possui caderno, clique em "NOVO CADERNO" e filtre suas questões!',
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = '/cadernos';
+                });
+            }
         </script>
     </body>
 </html>
