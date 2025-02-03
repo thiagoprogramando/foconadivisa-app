@@ -24,13 +24,19 @@
         <link href="{{ asset('template/css/style.css') }}" rel="stylesheet">
 
         <style>
+            * {
+              width: 100%;
+              height: auto;
+            }
+      
             body {
               background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ asset('template/img/background/bg_military_us.jpg') }}');
-              background-size: cover;
+              background-size: 100;
               background-repeat: no-repeat;
               background-position: center;
+              min-height: 100vh;
             }
-          </style>
+        </style>
     </head>
     <body>
 
