@@ -207,7 +207,9 @@
                                     <button onclick="history.back()" @disabled($nextQuestionNumber == 1) title="Voltar" class="btn btn-outline-dark">VOLTAR</button>
                                     <a href="{{ route('delete-question-answer', ['notebook' => $notebook->id, 'question' => $question->id]) }}" title="Eliminar Questão" class="btn btn-outline-danger">ELIMINAR QUESTÃO</a>
                                     <button type="submit" title="Responder" class="btn btn-outline-success">RESPONDER</button>
-                                    <a href="{{ route('answer', ['id' => $notebook->id, 'next_question' => $question->id]) }}" title="Pular Questão" class="btn btn-outline-dark">PULAR</a>
+                                    @if ($unansweredQuestions->count() > 0)
+                                        {{ $unansweredQuestions->links() }}
+                                    @endif
                                 </div>
                             </div>
                         </form>
@@ -301,14 +303,13 @@
                 cancelButtonText: 'NÃO'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Se o usuário clicar em "SIM", redireciona para a rota
                     window.location.href = "{{ route('caderno-filtros', ['id' => $notebook->id]) }}";
                 }
             });
         });
 
         document.getElementById('ticketForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita o envio padrão do formulário
+            event.preventDefault();
 
             let form = event.target;
             let formData = new FormData(form);

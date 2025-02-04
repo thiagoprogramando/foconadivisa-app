@@ -42,10 +42,10 @@
 
         <main>
             <div class="container">
-                <section class="section min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                <section class="section d-flex flex-column align-items-center justify-content-center py-4">
                     <div class="container">
                         <div class="row justify-content-center">
-                            <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+                            <div class="col-12 col-sm-12 col-md-8 col-lg-5">
                                 <div class="card card-login mb-3">
                                     <div class="card-body">
                                         <div class="d-flex justify-content-center">
@@ -81,7 +81,7 @@
                                     </div>
                                 </div>
 
-                                <div class="credits text-white">
+                                <div class="credits text-white text-center">
                                     Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
                                 </div>
                             </div>

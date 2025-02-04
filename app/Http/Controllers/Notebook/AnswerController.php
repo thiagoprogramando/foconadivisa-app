@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Notebook;
 
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
-use App\Models\Comment;
 use App\Models\Notebook;
 use App\Models\NotebookQuestion;
 use App\Models\Question;
@@ -14,9 +13,10 @@ use Illuminate\Support\Facades\Auth;
 class AnswerController extends Controller {
 
     public function answer($notebook, $next_question = null) {
-        
+
         $notebook = Notebook::find($notebook);
         if ($notebook) {
+
             $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)
                 ->pluck('notebook_question_id')
                 ->toArray();
@@ -28,25 +28,35 @@ class AnswerController extends Controller {
                 })
                 ->count();
     
+            $answeredCount = count($answeredNotebookQuestionIds);
+    
+            $perPage = 1;
+            $initialPage = ceil(($answeredCount + 1) / $perPage);
+            if (!request()->has('page') && $answeredCount > 0) {
+                return redirect()->route('answer', [
+                    'id' => $notebook->id, 
+                    'next_question' => null,
+                    'page' => $initialPage
+                ]);
+            }
+    
             $unansweredQuestionsQuery = NotebookQuestion::where('notebook_id', $notebook->id)
                 ->whereNotIn('id', $answeredNotebookQuestionIds)
                 ->whereHas('question', function ($query) {
                     $query->whereNotNull('question_text')
                           ->where('question_text', '!=', '');
-                })
-                ->inRandomOrder();
-
+                });
+    
             if ($next_question !== null) {
                 $unansweredQuestionsQuery->where('question_id', '!=', $next_question);
             }
-
-            $unansweredQuestions = $unansweredQuestionsQuery->paginate(1);
-            $nextQuestionNumber = $totalQuestions - $unansweredQuestions->total() + 1;
-            $menu = 1;
     
-            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber', 'menu'));
+            $unansweredQuestions = $unansweredQuestionsQuery->paginate($perPage);
+            $nextQuestionNumber = ($unansweredQuestions->currentPage() - 1) * $unansweredQuestions->perPage() + 1;
+    
+            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber'));
         }
-    }    
+    }   
 
     public function answerReview($answer) {
 
