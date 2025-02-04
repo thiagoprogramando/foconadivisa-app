@@ -102,7 +102,7 @@
                 @if($question)
                     <div class="card-header">
                         <div class="row mb-3">
-                            <div class="col-12 col-sm-12 col-md-7 col-lg-7">
+                            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                                 <h6 class="question">
                                     Questão: {{ $nextQuestionNumber }} de {{ $totalQuestions }}
                                 </h6>
@@ -119,7 +119,7 @@
                                 @endif
                                 <small><b>{{ $question->responsesCount(Auth::user()->id, $notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $question->correctCount(Auth::user()->id, $notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $question->wrogCount(Auth::user()->id, $notebook->id) }}</b> Erros</small>
                             </div>
-                            <div class="col-12 col-sm-12 col-md-5 col-lg-5">
+                            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                                 <div class="btn-group">
                                     <a href="{{ route('ver-questao', ['id' => $question->id]) }}" target="_blank" class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
                                     <a href="#" class="btn btn-outline-dark" id="updateNotebook" title="Modificar filtros">
@@ -128,6 +128,7 @@
                                     <button class="btn btn-outline-dark" title="Relatar problema" data-bs-toggle="modal" data-bs-target="#newTicket"><i class="ri-alarm-warning-fill"></i> Relatar problema</button>
                                     <button type="button" class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bx bxs-book-reader"></i></button>
                                     <button type="button" class="btn btn-outline-dark btn-comment" title="Comentários sobre a questão"><i class="bi bi-chat-square-text"></i></button>
+                                    <button type="button" class="btn btn-outline-dark" onclick="favorite({{ $question->id }})" title="Favoritar"><i id="favorite" class="bi {{ $question->favorites->where('user_id', Auth::id())->isNotEmpty() ? 'bi-heart-fill' : 'bi-heart' }} text-danger"></i></button>
                                 </div>
 
                                 <div class="modal fade" id="newTicket" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -327,10 +328,10 @@
             .then(data => {
                 if (data.success) {
                     Swal.fire({
-                        title: 'Sucesso!',
-                        text: 'Seu ticket foi enviado com sucesso!',
-                        icon: 'success',
-                        timer: 3000
+                        title : 'Sucesso!',
+                        text  : 'Seu ticket foi enviado com sucesso!',
+                        icon  : 'success',
+                        timer : 3000
                     });
 
                     form.reset();
@@ -338,21 +339,66 @@
                     modal.hide();
                 } else {
                     Swal.fire({
-                        title: 'Erro!',
-                        text: data.message || 'Houve um problema ao enviar o ticket.',
-                        icon: 'error',
-                        timer: 3000
+                        title : 'Erro!',
+                        text  : data.message || 'Houve um problema ao enviar o ticket.',
+                        icon  : 'error',
+                        timer : 3000
                     });
                 }
             })
             .catch(error => {
                 Swal.fire({
+                    title : 'Erro!',
+                    text  : 'Erro ao processar a requisição!',
+                    icon  : 'error',
+                    timer : 3000
+                });
+            });
+        });
+
+        function favorite(question_id) {
+            
+            fetch("{{ route('create-favorite') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    question_id : question_id,
+                    user_id     : "{{ Auth::user()->id }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title : 'Sucesso!',
+                        text  : data.message,
+                        icon  : 'success',
+                        timer : 3000
+                    });
+
+                    $('#favorite').removeClass().addClass(data.icon);
+                } else {
+                    Swal.fire({
+                        title : 'Erro!',
+                        text  : data.message || 'Houve um problema, tente novamente mais tarde!',
+                        icon  : 'error',
+                        timer : 3000
+                    });
+
+                    $('#favorite').removeClass().addClass(data.icon);
+                }
+            })
+            .catch(error => {
+                Swal.fire({
                     title: 'Erro!',
-                    text: 'Erro ao processar a requisição.',
+                    text: 'Erro ao processar a requisição!',
                     icon: 'error',
                     timer: 3000
                 });
             });
-        });
+        }
     </script>
 @endsection

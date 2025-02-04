@@ -56,6 +56,15 @@
                                         <div class="pb-2">
                                             <h5 class="card-title text-center pb-0 fs-4">Faça parte!</h5>
                                             <p class="text-center small">Preencha seus dados para receber benefícios.</p>
+                                            @if ($errors->any())
+                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                    <i class="bi bi-exclamation-octagon me-1"></i>
+                                                    @foreach ($errors->all() as $error)
+                                                        {{ $error }}
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                    @endforeach
+                                                </div>
+                                            @endif
                                         </div>
                                         <form action="{{ route('registrer') }}" method="POST" class="row g-3">
                                             @csrf
@@ -104,24 +113,5 @@
         <script src="{{ asset('template/js/main.js') }}"></script>
         <script src="{{ asset('template/js/jquery.js') }}"></script>
         <script src="{{ asset('template/js/sweetalert.js') }}"></script>
-        <script>
-            @if(session('error'))
-                  Swal.fire({
-                      title: 'Erro!',
-                      text: '{{ session('error') }}',
-                      icon: 'error',
-                      timer: 2000
-                  })
-              @endif
-              
-              @if(session('success'))
-                  Swal.fire({
-                      title: 'Sucesso!',
-                      text: '{{ session('success') }}',
-                      icon: 'success',
-                      timer: 2000
-                  })
-              @endif
-          </script>
     </body>
 </html>

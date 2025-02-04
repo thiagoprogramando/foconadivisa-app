@@ -82,6 +82,21 @@ class Subject extends Model {
         
         return $this->totalQuestions();
     }
+
+    public function totalQuestionsFavoriteForTopic($topicId = null) {
+        
+        $userId = Auth::id();
+        if ($topicId) {
+            return Question::where('subject_id', $topicId)
+                ->whereHas('favorites', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                })
+                ->count();
+        }
+    
+        return $this->totalQuestions();
+    }
+    
     
     public function topicsForSubject($subjectId) {
         return $this->topics()->where('subject_id', $subjectId)->get();

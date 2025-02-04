@@ -243,7 +243,7 @@
                     const maxInstallments = parseInt(installmentsField.attr('max'), 10);
 
                     if (selectedMethod === 'PIX' || selectedMethod === 'BOLETO') {
-                        installmentsField.val(1).prop('disabled', true);
+                        installmentsField.val(1).prop('readonly', true);
                     } else if (selectedMethod === 'CREDIT_CARD') {
                         installmentsField.attr('min', 1);
                         installmentsField.attr('max', maxInstallments);

@@ -47,8 +47,16 @@ class AccessController extends Controller {
 
     public function logon(Request $request) {
 
+        $request->validate([
+            'email'     => 'required|email',
+            'password'  => 'required',
+        ], [
+            'email.required'    => 'Informe um E-mail!',
+            'email.email'       => 'Informe um E-mail válido!',
+            'password.required' => 'Informe uma senha!',
+        ]);
+
         $credentials = $request->only(['email', 'password']);
-        $credentials['password'] = $credentials['password'];
         if (Auth::attempt($credentials)) {
             return redirect()->route('app');
         } else {
@@ -66,6 +74,20 @@ class AccessController extends Controller {
     }
 
     public function registrer(Request $request) {
+
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:users,email',
+            'password'  => 'required',
+        ], [
+            'name.required'         => 'Informe qual seu Nome!',
+            'name.string'           => 'Informe um nome válido!',
+            'name.max'              => 'Informe um nome válido!',
+            'email.required'        => 'Informe um E-mail!',
+            'email.email'           => 'Informe um E-mail válido!',
+            'email.unique'          => 'Já existe uma conta com esse E-mail!',
+            'password.required'     => 'Informe uma senha!',
+        ]);
 
         $user = new User();
         $user->name      = $request->name;

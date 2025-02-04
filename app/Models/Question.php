@@ -46,6 +46,10 @@ class Question extends Model {
         return $this->hasMany(Comment::class)->orderBy('created_at', 'desc');
     }
 
+    public function favorites() {
+        return $this->hasMany(Favorite::class, 'question_id');
+    }    
+
     public function responsesCount($userId, $notebookId = null, $questionId = null) {
         $query = Answer::where('user_id', $userId);
         

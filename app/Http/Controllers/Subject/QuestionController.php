@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Subject;
 
 use App\Http\Controllers\Controller;
+use App\Models\Favorite;
 use App\Models\Jury;
 use App\Models\NotebookQuestion;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller {
@@ -151,5 +153,32 @@ class QuestionController extends Controller {
         }
 
         return redirect()->back()->with('error', 'Ops! Não foi possível concluir essa operação.');
+    }
+
+    public function favoriteQuestion(Request $request) {
+
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Usuário não localizado na base de dados!']);
+        }
+
+        $question = Question::find($request->question_id);
+        if (!$question) {
+            return response()->json(['success' => false, 'message' => 'Questão não localizada na base de dados!']);
+        }
+
+        $favorite = Favorite::where('question_id', $question->id)->first();
+        if ($favorite && $favorite->delete()) {
+            return response()->json(['success' => true, 'message' => 'Desmarcada!', 'icon' => 'bi bi-heart text-danger']);
+        }
+
+        $favorite               = new Favorite();
+        $favorite->user_id      = $user->id;
+        $favorite->question_id  = $question->id;
+        if ($favorite->save()) {
+            return response()->json(['success' => true, 'message' => 'Marcada como Favorita!', 'icon' => 'bi bi-heart-fill text-danger']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Erro ao favoritar questão!']);
     }
 }

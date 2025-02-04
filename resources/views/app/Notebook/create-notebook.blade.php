@@ -49,7 +49,8 @@
                                             data-questions="{{ $topic->totalQuestions() }}"
                                             id="topic-{{ $topic->id }}"
                                             id-resolved='{{ $topic->questionResolved($topic->id) }}' 
-                                            id-fail='{{ $topic->questionFail() }}'>
+                                            id-fail='{{ $topic->questionFail() }}'
+                                            id-favorite='{{ $topic->totalQuestionsFavoriteForTopic($topic->id) }}'>
                                         <label class="form-check-label" for="topic-{{ $topic->id }}">{{ $topic->name }}</label>
                                     </div>
                                 @endforeach
@@ -62,11 +63,15 @@
                     <div class="col-12 col-sm-12 col-md-4 col-lg-4 mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="filter" value="remove_question_resolved" id="removeQuestionResolved">
-                            <label class="form-check-label" for="removeQuestionResolved">Eliminar questões já resolvidas</label>
+                            <label class="form-check-label" for="removeQuestionResolved">Eliminar questões já <b>Resolvidas</b></label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="filter" value="show_question_fail" id="showQuestionFail">
-                            <label class="form-check-label" for="showQuestionFail">Mostrar apenas as que eu já errei</label>
+                            <label class="form-check-label" for="showQuestionFail">Mostrar apenas as que eu já <b>Errei</b></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="filter" value="show_question_favorite" id="showQuestionFavorite">
+                            <label class="form-check-label" for="showQuestionFavorite">Mostrar apenas as questões <b>Favoritas</b></label>
                         </div>
                     </div>  
                     
@@ -87,312 +92,167 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-    let totalQuestions = 0;
-    let lastChecked = null;
-    const questionCountElement = document.getElementById("question-count");
-    const questionsInput = document.getElementById("questions");
+            let totalQuestions = 0;
+            let lastChecked = null;
+            const questionCountElement = document.getElementById("question-count");
+            const questionsInput = document.getElementById("questions");
 
-    document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
-        radio.addEventListener('click', function () {
-            if (lastChecked === this) {
-                this.checked = false;
-                lastChecked = null;
-            } else {
-                lastChecked = this;
-            }
-
-            updateQuestionCount();
-        });
-    });
-
-    const searchInput = document.querySelector('input[name="searchSubject"]');
-    searchInput.addEventListener("input", function () {
-        
-        const searchTerm = searchInput.value.trim().toLowerCase();
-        const subjectItems = document.querySelectorAll('.form-check');
-
-        subjectItems.forEach(function (subjectItem) {
-            const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
-            if (subjectItem.closest('.no-filter') && subjectItem.querySelector('label')) {
-                const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
-                if (subjectLabel.includes(searchTerm)) {
-                    subjectItem.style.display = "block";
-                } else {
-                    subjectItem.style.display = "none";
-                }
-            }
-        });
-    });
-
-    function updateQuestionCount() {
-        totalQuestions = 0;
-        const filterResolved = document.getElementById("removeQuestionResolved").checked;
-        const filterFail = document.getElementById("showQuestionFail").checked;
-
-        document.querySelectorAll('.subject-checkbox:checked').forEach(function (subjectCheckbox) {
-
-            let subjectQuestions = parseInt(subjectCheckbox.getAttribute('data-questions')) || 0;
-
-            const subjectResolved = parseInt(subjectCheckbox.getAttribute('id-resolved')) || 0;
-            const subjectResolvedParent = parseInt(subjectCheckbox.getAttribute('id-resolved-parent')) || 0;
-
-            const subjectFail = parseInt(subjectCheckbox.getAttribute('id-fail')) || 0;
-
-
-            let subjectHasTopic = false;
-            const associatedTopics = JSON.parse(subjectCheckbox.getAttribute('data-topics'));
-
-            associatedTopics.forEach(function (topic) {
-                const topicCheckbox = document.getElementById('topic-' + topic.id);
-                if (topicCheckbox && topicCheckbox.checked) {
-                    let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
-                    const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
-                    const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
-
-                    if (filterResolved) {
-                        topicQuestions -= topicResolved;
-                    }
-                    if (filterFail) {
-                        topicQuestions = topicFail;
+            document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
+                radio.addEventListener('click', function () {
+                    if (lastChecked === this) {
+                        this.checked = false;
+                        lastChecked = null;
+                    } else {
+                        lastChecked = this;
                     }
 
-                    totalQuestions += Math.max(topicQuestions, 0);
-                    subjectHasTopic = true;
-                }
-            });
-
-            if (!subjectHasTopic) {
-                if (filterResolved) {
-                    subjectQuestions -= subjectResolvedParent;
-                }
-
-                if (filterFail) {
-                    subjectQuestions = subjectFail;
-                }
-
-                totalQuestions += Math.max(subjectQuestions, 0);
-            }
-        });
-
-        document.querySelectorAll('.topic-checkbox:checked').forEach(function (topicCheckbox) {
-            const subjectId = topicCheckbox.getAttribute('data-subject');
-            if (!document.querySelector(`#subject-${subjectId}:checked`)) {
-                let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
-                const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
-                const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
-
-                if (filterResolved) {
-                    topicQuestions -= topicResolved;
-                }
-                if (filterFail) {
-                    topicQuestions = topicFail;
-                }
-
-                totalQuestions += Math.max(topicQuestions, 0);
-            }
-        });
-
-        questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
-
-        if (questionsInput) {
-            questionsInput.setAttribute("max", totalQuestions);
-            if (parseInt(questionsInput.value) > totalQuestions) {
-                questionsInput.value = totalQuestions;
-            }
-        }
-    }
-
-    // Função para marcar ou desmarcar os tópicos ao alterar o estado do subject
-    document.querySelectorAll('.subject-checkbox').forEach(function (subjectCheckbox) {
-        subjectCheckbox.addEventListener('change', function () {
-            const subjectId = subjectCheckbox.value;
-            const topicsDiv = document.getElementById('topics-' + subjectId);
-
-            // Marca/desmarca todos os tópicos associados
-            topicsDiv.querySelectorAll('.topic-checkbox').forEach(function (topicCheckbox) {
-                topicCheckbox.checked = subjectCheckbox.checked;
-            });
-
-            if (subjectCheckbox.checked) {
-                topicsDiv.style.display = 'block';
-            } else {
-                topicsDiv.style.display = 'none';
-                topicsDiv.querySelectorAll('.topic-checkbox').forEach(function (topicCheckbox) {
-                    topicCheckbox.checked = false; // Garantir que os tópicos sejam desmarcados
+                    updateQuestionCount();
                 });
+            });
+
+            const searchInput = document.querySelector('input[name="searchSubject"]');
+            searchInput.addEventListener("input", function () {
+                
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                const subjectItems = document.querySelectorAll('.form-check');
+
+                subjectItems.forEach(function (subjectItem) {
+                    const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
+                    if (subjectItem.closest('.no-filter') && subjectItem.querySelector('label')) {
+                        const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
+                        if (subjectLabel.includes(searchTerm)) {
+                            subjectItem.style.display = "block";
+                        } else {
+                            subjectItem.style.display = "none";
+                        }
+                    }
+                });
+            });
+
+            function updateQuestionCount() {
+                totalQuestions = 0;
+                const filterResolved = document.getElementById("removeQuestionResolved").checked;
+                const filterFail = document.getElementById("showQuestionFail").checked;
+                const filterFavorite = document.getElementById("showQuestionFavorite").checked;
+
+                document.querySelectorAll('.subject-checkbox:checked').forEach(function (subjectCheckbox) {
+
+                    let subjectQuestions = parseInt(subjectCheckbox.getAttribute('data-questions')) || 0;
+
+                    const subjectResolved = parseInt(subjectCheckbox.getAttribute('id-resolved')) || 0;
+                    const subjectResolvedParent = parseInt(subjectCheckbox.getAttribute('id-resolved-parent')) || 0;
+                    const subjectFail = parseInt(subjectCheckbox.getAttribute('id-fail')) || 0;
+                    const subjectFavorite = parseInt(subjectCheckbox.getAttribute('id-favorite')) || 0;
+
+                    let subjectHasTopic = false;
+                    const associatedTopics = JSON.parse(subjectCheckbox.getAttribute('data-topics'));
+
+                    associatedTopics.forEach(function (topic) {
+                        const topicCheckbox = document.getElementById('topic-' + topic.id);
+                        if (topicCheckbox && topicCheckbox.checked) {
+                            let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
+                            const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
+                            const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
+                            const topicFavorite = parseInt(topicCheckbox.getAttribute('id-favorite')) || 0;
+
+                            if (filterResolved) {
+                                topicQuestions -= topicResolved;
+                            }
+                            if (filterFail) {
+                                topicQuestions = topicFail;
+                            }
+
+                            if (filterFavorite) {
+                                topicQuestions = topicFavorite;
+                            }
+
+                            totalQuestions += Math.max(topicQuestions, 0);
+                            subjectHasTopic = true;
+                        }
+                    });
+
+                    if (!subjectHasTopic) {
+                        if (filterResolved) {
+                            subjectQuestions -= subjectResolvedParent;
+                        }
+
+                        if (filterFail) {
+                            subjectQuestions = subjectFail;
+                        }
+
+                        if (filterFavorite) {
+                            subjectQuestions = subjectFavorite;
+                        }
+
+                        totalQuestions += Math.max(subjectQuestions, 0);
+                    }
+                });
+
+                document.querySelectorAll('.topic-checkbox:checked').forEach(function (topicCheckbox) {
+                    const subjectId = topicCheckbox.getAttribute('data-subject');
+                    if (!document.querySelector(`#subject-${subjectId}:checked`)) {
+                        let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
+                        const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
+                        const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
+
+                        if (filterResolved) {
+                            topicQuestions -= topicResolved;
+                        }
+                        if (filterFail) {
+                            topicQuestions = topicFail;
+                        }
+
+                        totalQuestions += Math.max(topicQuestions, 0);
+                    }
+                });
+
+                questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
+
+                if (questionsInput) {
+                    questionsInput.setAttribute("max", totalQuestions);
+                    if (parseInt(questionsInput.value) > totalQuestions) {
+                        questionsInput.value = totalQuestions;
+                    }
+                }
             }
+
+            document.querySelectorAll('.subject-checkbox').forEach(function (subjectCheckbox) {
+                subjectCheckbox.addEventListener('change', function () {
+                    const subjectId = subjectCheckbox.value;
+                    const topicsDiv = document.getElementById('topics-' + subjectId);
+
+                    topicsDiv.querySelectorAll('.topic-checkbox').forEach(function (topicCheckbox) {
+                        topicCheckbox.checked = subjectCheckbox.checked;
+                    });
+
+                    if (subjectCheckbox.checked) {
+                        topicsDiv.style.display = 'block';
+                    } else {
+                        topicsDiv.style.display = 'none';
+                        topicsDiv.querySelectorAll('.topic-checkbox').forEach(function (topicCheckbox) {
+                            topicCheckbox.checked = false;
+                        });
+                    }
+
+                    updateQuestionCount();
+                });
+            });
+
+            document.querySelectorAll('.subject-checkbox, .topic-checkbox').forEach(function (checkbox) {
+                checkbox.addEventListener('change', updateQuestionCount);
+            });
+
+            document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
+                radio.addEventListener('change', updateQuestionCount);
+            });
+
+            questionsInput.addEventListener('input', function () {
+                if (parseInt(questionsInput.value) > totalQuestions) {
+                    questionsInput.value = totalQuestions;
+                }
+            });
 
             updateQuestionCount();
         });
-    });
-
-    // Atualiza o contador de questões ao alterar o estado de qualquer checkbox (subject ou topic)
-    document.querySelectorAll('.subject-checkbox, .topic-checkbox').forEach(function (checkbox) {
-        checkbox.addEventListener('change', updateQuestionCount);
-    });
-
-    document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
-        radio.addEventListener('change', updateQuestionCount);
-    });
-
-    questionsInput.addEventListener('input', function () {
-        if (parseInt(questionsInput.value) > totalQuestions) {
-            questionsInput.value = totalQuestions;
-        }
-    });
-
-    updateQuestionCount();
-});
-
-        // document.addEventListener("DOMContentLoaded", function () {
-        //     let totalQuestions = 0;
-        //     let lastChecked = null;
-        //     const questionCountElement = document.getElementById("question-count");
-        //     const questionsInput = document.getElementById("questions");
-
-        //     document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
-        //         radio.addEventListener('click', function () {
-        //             if (lastChecked === this) {
-        //                 this.checked = false;
-        //                 lastChecked = null;
-        //             } else {
-        //                 lastChecked = this;
-        //             }
-
-        //             updateQuestionCount();
-        //         });
-        //     });
-
-        //     const searchInput = document.querySelector('input[name="searchSubject"]');
-        //     searchInput.addEventListener("input", function () {
-                
-        //         const searchTerm = searchInput.value.trim().toLowerCase();
-        //         const subjectItems = document.querySelectorAll('.form-check');
-
-        //         subjectItems.forEach(function (subjectItem) {
-        //             const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
-        //             if (subjectItem.closest('.no-filter') && subjectItem.querySelector('label')) {
-        //                 const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
-        //                 if (subjectLabel.includes(searchTerm)) {
-        //                     subjectItem.style.display = "block";
-        //                 } else {
-        //                     subjectItem.style.display = "none";
-        //                 }
-        //             }
-        //         });
-        //     });
-
-        //     function updateQuestionCount() {
-        //         totalQuestions = 0;
-        //         const filterResolved = document.getElementById("removeQuestionResolved").checked;
-        //         const filterFail = document.getElementById("showQuestionFail").checked;
-
-        //         document.querySelectorAll('.subject-checkbox:checked').forEach(function (subjectCheckbox) {
-
-        //             let subjectQuestions = parseInt(subjectCheckbox.getAttribute('data-questions')) || 0;
-
-        //             const subjectResolved = parseInt(subjectCheckbox.getAttribute('id-resolved')) || 0;
-        //             const subjectResolvedParent = parseInt(subjectCheckbox.getAttribute('id-resolved-parent')) || 0;
-
-        //             const subjectFail = parseInt(subjectCheckbox.getAttribute('id-fail')) || 0;
-
-
-        //             let subjectHasTopic = false;
-        //             const associatedTopics = JSON.parse(subjectCheckbox.getAttribute('data-topics'));
-
-        //             associatedTopics.forEach(function (topic) {
-        //                 const topicCheckbox = document.getElementById('topic-' + topic.id);
-        //                 if (topicCheckbox && topicCheckbox.checked) {
-        //                     let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
-        //                     const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
-        //                     const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
-
-        //                     if (filterResolved) {
-        //                         topicQuestions -= topicResolved;
-        //                     }
-        //                     if (filterFail) {
-        //                         topicQuestions = topicFail;
-        //                     }
-
-        //                     totalQuestions += Math.max(topicQuestions, 0);
-        //                     subjectHasTopic = true;
-        //                 }
-        //             });
-
-        //             if (!subjectHasTopic) {
-        //                 if (filterResolved) {
-        //                     subjectQuestions -= subjectResolvedParent;
-        //                 }
-
-        //                 if (filterFail) {
-        //                     subjectQuestions = subjectFail;
-        //                 }
-
-        //                 totalQuestions += Math.max(subjectQuestions, 0);
-        //             }
-        //         });
-
-        //         document.querySelectorAll('.topic-checkbox:checked').forEach(function (topicCheckbox) {
-        //             const subjectId = topicCheckbox.getAttribute('data-subject');
-        //             if (!document.querySelector(`#subject-${subjectId}:checked`)) {
-        //                 let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
-        //                 const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
-        //                 const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
-
-        //                 if (filterResolved) {
-        //                     topicQuestions -= topicResolved;
-        //                 }
-        //                 if (filterFail) {
-        //                     topicQuestions = topicFail;
-        //                 }
-
-        //                 totalQuestions += Math.max(topicQuestions, 0);
-        //             }
-        //         });
-
-        //         questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
-
-        //         if (questionsInput) {
-        //             questionsInput.setAttribute("max", totalQuestions);
-        //             if (parseInt(questionsInput.value) > totalQuestions) {
-        //                 questionsInput.value = totalQuestions;
-        //             }
-        //         }
-        //     }
-
-        //     document.querySelectorAll('.subject-checkbox').forEach(function (subjectCheckbox) {
-        //         subjectCheckbox.addEventListener('change', function () {
-        //             const subjectId = subjectCheckbox.value;
-        //             const topicsDiv = document.getElementById('topics-' + subjectId);
-
-        //             if (subjectCheckbox.checked) {
-        //                 topicsDiv.style.display = 'block';
-        //             } else {
-        //                 topicsDiv.style.display = 'none';
-        //                 topicsDiv.querySelectorAll('.topic-checkbox').forEach(function (topicCheckbox) {
-        //                     topicCheckbox.checked = false;
-        //                 });
-        //             }
-
-        //             updateQuestionCount();
-        //         });
-        //     });
-
-        //     document.querySelectorAll('.subject-checkbox, .topic-checkbox').forEach(function (checkbox) {
-        //         checkbox.addEventListener('change', updateQuestionCount);
-        //     });
-
-        //     document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
-        //         radio.addEventListener('change', updateQuestionCount);
-        //     });
-
-        //     questionsInput.addEventListener('input', function () {
-        //         if (parseInt(questionsInput.value) > totalQuestions) {
-        //             questionsInput.value = totalQuestions;
-        //         }
-        //     });
-
-        //     updateQuestionCount();
-        // });
     </script>
 @endsection
