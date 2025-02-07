@@ -17,29 +17,26 @@ class AnswerController extends Controller {
         $notebook = Notebook::find($notebook);
         if ($notebook) {
 
-            $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)
+            $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)->where('position', 1)
                 ->pluck('notebook_question_id')
                 ->toArray();
-    
+            $answeredCount = count($answeredNotebookQuestionIds);
+            
             $totalQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
                 ->whereHas('question', function ($query) {
                     $query->whereNotNull('question_text')
                           ->where('question_text', '!=', '');
                 })
                 ->count();
-    
-            $answeredCount = count($answeredNotebookQuestionIds);
-    
-            $perPage = 1;
-            $initialPage = ceil(($answeredCount + 1) / $perPage);
-            if (!request()->has('page') && $answeredCount > 0) {
-                return redirect()->route('answer', [
-                    'id' => $notebook->id, 
-                    'next_question' => null,
-                    'page' => $initialPage
-                ]);
-            }
-    
+
+            $totalQuestionsPendenting = NotebookQuestion::where('notebook_id', $notebook->id)
+                ->whereHas('question', function ($query) {
+                    $query->whereNotNull('question_text')
+                          ->where('question_text', '!=', '');
+                })
+                ->whereDoesntHave('answers')
+                ->count();
+
             $unansweredQuestionsQuery = NotebookQuestion::where('notebook_id', $notebook->id)
                 ->whereNotIn('id', $answeredNotebookQuestionIds)
                 ->whereHas('question', function ($query) {
@@ -50,10 +47,13 @@ class AnswerController extends Controller {
             if ($next_question !== null) {
                 $unansweredQuestionsQuery->where('question_id', '!=', $next_question);
             }
-    
-            $unansweredQuestions = $unansweredQuestionsQuery->paginate($perPage);
-            $nextQuestionNumber = ($unansweredQuestions->currentPage() - 1) * $unansweredQuestions->perPage() + 1;
-    
+            
+            $perPage = 1;
+            $nextQuestionNumber = request()->has('page')
+                ? (($totalQuestions - $totalQuestionsPendenting) + request()->get('page'))
+                : ($totalQuestions - $totalQuestionsPendenting) + 1;
+            $unansweredQuestions = $unansweredQuestionsQuery->paginate(1);
+            
             return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber'));
         }
     }   
@@ -96,8 +96,8 @@ class AnswerController extends Controller {
     public function submitAnswerAndNext(Request $request, $notebookId, $notebookQuestionId, $page) {
         
         $request->validate([
-            'option_id' => 'required|exists:options,id',
-            'notebook_question_id' => 'required|exists:notebook_questions,id',
+            'option_id'             => 'required|exists:options,id',
+            'notebook_question_id'  => 'required|exists:notebook_questions,id',
         ]);
 
         $notebook = Notebook::find($notebookId);

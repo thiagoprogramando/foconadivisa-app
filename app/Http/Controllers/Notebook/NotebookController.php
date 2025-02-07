@@ -213,6 +213,7 @@ class NotebookController extends Controller {
         }
 
         NotebookQuestion::where('notebook_id', $notebook->id)->delete();
+        Answer::where('notebook_id', $notebook->id)->where('position', 1)->update(['position' => 2]);
 
         $topics = collect($request->input('topics', []))->flatten()->toArray();
         $number = max(1, intval($request->input('number', 1)));
@@ -355,6 +356,7 @@ class NotebookController extends Controller {
             $notebook->percentage = 100;
             $notebook->status = 1;
             if($notebook->save()) {
+                Answer::where('notebook_id', $notebook->id)->where('position', 1)->update(['position' => 2]);
                 return redirect()->route('caderno', ['id' => $notebook->id, 'tab' => 'contact-tab'])->with('success', 'Parabéns, o caderno foi completado com sucesso!');
             }
         }

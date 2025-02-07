@@ -240,7 +240,7 @@
 
                 function updateInstallmentsField() {
                     const selectedMethod = paymentMethod.val();
-                    const maxInstallments = parseInt(installmentsField.attr('max'), 10);
+                    const maxInstallments = parseInt(installmentsField.attr('max'), 12);
 
                     if (selectedMethod === 'PIX' || selectedMethod === 'BOLETO') {
                         installmentsField.val(1).prop('readonly', true);
@@ -250,7 +250,7 @@
                         installmentsField.prop('disabled', false);
 
                         installmentsField.on('input', function() {
-                            var value = parseInt(installmentsField.val(), 10);
+                            var value = parseInt(installmentsField.val(), 12);
                             if (value < 1) {
                                 installmentsField.val(1);
                             } else if (value > maxInstallments) {
