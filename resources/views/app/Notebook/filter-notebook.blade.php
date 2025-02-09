@@ -95,18 +95,25 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const questionCountElement = document.getElementById("question-count");
             let totalQuestions = 0;
             let lastChecked = null;
-
+            const questionCountElement = document.getElementById("question-count");
+            const questionsInput = document.getElementById("questions");
+            
             const searchInput = document.querySelector('input[name="searchSubject"]');
             searchInput.addEventListener("input", function () {
                 const searchTerm = searchInput.value.trim().toLowerCase();
-                const subjectItems = document.querySelectorAll('.form-check');
+                const subjectItems = document.querySelectorAll('.subject-checkbox');
 
-                subjectItems.forEach(function (subjectItem) {
-                    const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
-                    subjectItem.style.display = subjectLabel.includes(searchTerm) ? "block" : "none";
+                subjectItems.forEach(function (subjectCheckbox) {
+                    const subjectLabel = subjectCheckbox.nextElementSibling.textContent.toLowerCase();
+                    const subjectContainer = subjectCheckbox.closest('.form-check');
+
+                    if (subjectLabel.includes(searchTerm)) {
+                        subjectContainer.style.display = "block";
+                    } else {
+                        subjectContainer.style.display = "none";
+                    }
                 });
             });
 
@@ -180,6 +187,13 @@
                 });
 
                 questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
+
+                if (questionsInput) {
+                    questionsInput.setAttribute("max", totalQuestions);
+                    if (parseInt(questionsInput.value) > totalQuestions) {
+                        questionsInput.value = totalQuestions;
+                    }
+                }
             }
 
             document.querySelectorAll('.subject-checkbox').forEach(function(subjectCheckbox) {
@@ -228,159 +242,13 @@
                 radio.addEventListener('change', updateQuestionCount);
             });
 
+            questionsInput.addEventListener('input', function () {
+                if (parseInt(questionsInput.value) > totalQuestions) {
+                    questionsInput.value = totalQuestions;
+                }
+            });
+
             updateQuestionCount();
         });
-
-        // document.addEventListener("DOMContentLoaded", function () {
-
-        //     const questionCountElement = document.getElementById("question-count");
-        //     let totalQuestions = 0;
-        //     let lastChecked = null;
-        //     let filterResolved = false;
-        //     let filterFail = false;
-
-        //     const searchInput = document.querySelector('input[name="searchSubject"]');
-        //     searchInput.addEventListener("input", function () {
-                
-        //         const searchTerm = searchInput.value.trim().toLowerCase();
-        //         const subjectItems = document.querySelectorAll('.form-check');
-
-        //         subjectItems.forEach(function (subjectItem) {
-        //             const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
-        //             if (subjectLabel.includes(searchTerm)) {
-        //                 subjectItem.style.display = "block";
-        //             } else {
-        //                 subjectItem.style.display = "none";
-        //             }
-        //         });
-        //     });
-
-        //     document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
-        //         radio.addEventListener('click', function () {
-        //             if (lastChecked === this) {
-        //                 this.checked = false;
-        //                 lastChecked = null;
-        //             } else {
-        //                 lastChecked = this;
-        //             }
-
-        //             updateQuestionCount();
-        //         });
-        //     });
-
-        //     function updateQuestionCount() {
-        //         totalQuestions = 0;
-        //         const filterResolved = document.getElementById("removeQuestionResolved").checked;
-        //         const filterFail = document.getElementById("showQuestionFail").checked;
-
-        //         document.querySelectorAll('.subject-checkbox:checked').forEach(function (subjectCheckbox) {
-        //             let subjectQuestions = parseInt(subjectCheckbox.getAttribute('data-questions')) || 0;
-        //             const subjectResolved = parseInt(subjectCheckbox.getAttribute('id-resolved')) || 0;
-        //             const subjectResolvedParent = parseInt(subjectCheckbox.getAttribute('id-resolved-parent')) || 0;
-        //             const subjectFail = parseInt(subjectCheckbox.getAttribute('id-fail')) || 0;
-
-        //             let subjectHasTopic = false;
-        //             const associatedTopics = JSON.parse(subjectCheckbox.getAttribute('data-topics'));
-
-        //             associatedTopics.forEach(function (topic) {
-        //                 const topicCheckbox = document.getElementById('topic-' + topic.id);
-        //                 if (topicCheckbox && topicCheckbox.checked) {
-        //                     let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
-        //                     const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
-        //                     const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
-
-        //                     if (filterResolved) {
-        //                         topicQuestions -= topicResolved;
-        //                     }
-        //                     if (filterFail) {
-        //                         topicQuestions = topicFail;
-        //                     }
-
-        //                     totalQuestions += Math.max(topicQuestions, 0);
-        //                     subjectHasTopic = true;
-        //                 }
-        //             });
-
-        //             if (!subjectHasTopic) {
-        //                 if (filterResolved) {
-        //                     subjectQuestions -= subjectResolvedParent;
-        //                 }
-        //                 if (filterFail) {
-        //                     subjectQuestions = subjectFail;
-        //                 }
-
-        //                 totalQuestions += Math.max(subjectQuestions, 0);
-        //             }
-        //         });
-
-        //         document.querySelectorAll('.topic-checkbox:checked').forEach(function (topicCheckbox) {
-        //             const subjectId = topicCheckbox.getAttribute('data-subject');
-        //             if (!document.querySelector(`#subject-${subjectId}:checked`)) {
-        //                 let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
-        //                 const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
-        //                 const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
-
-        //                 if (filterResolved) {
-        //                     topicQuestions -= topicResolved;
-        //                 }
-        //                 if (filterFail) {
-        //                     topicQuestions = topicFail;
-        //                 }
-
-        //                 totalQuestions += Math.max(topicQuestions, 0);
-        //             }
-        //         });
-
-        //         questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
-        //     }
-
-        //     document.querySelectorAll('.subject-checkbox').forEach(function(subjectCheckbox) {
-        //         subjectCheckbox.addEventListener('change', function() {
-        //             const subjectId = subjectCheckbox.value;
-        //             const topicsDiv = document.getElementById('topics-' + subjectId);
-
-        //             if (subjectCheckbox.checked) {
-        //                 topicsDiv.style.display = 'block';
-        //             } else {
-        //                 topicsDiv.style.display = 'none';
-        //                 topicsDiv.querySelectorAll('.topic-checkbox').forEach(function(topicCheckbox) {
-        //                     topicCheckbox.checked = false;
-        //                 });
-        //             }
-
-        //             updateQuestionCount();
-        //         });
-        //     });
-
-        //     @foreach ($subjectsFromPlan as $subject)
-            
-        //         if (document.getElementById('subject-{{ $subject->id }}')) {
-        //             document.getElementById('subject-{{ $subject->id }}').checked = @if(in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) true @else false @endif;
-
-        //             const topicsDiv = document.getElementById('topics-{{ $subject->id }}');
-        //             if (document.getElementById('subject-{{ $subject->id }}').checked) {
-        //                 topicsDiv.style.display = 'block';
-        //             } else {
-        //                 topicsDiv.style.display = 'none';
-        //             }
-        //         }
-
-        //         @foreach ($subject->topics as $topic)
-        //             if (document.getElementById('topic-{{ $topic->id }}')) {
-        //                 document.getElementById('topic-{{ $topic->id }}').checked = @if(in_array($topic->id, $notebookTopics->pluck('id')->toArray())) true @else false @endif;
-        //             }
-        //         @endforeach
-        //     @endforeach
-
-        //     document.querySelectorAll('.subject-checkbox, .topic-checkbox').forEach(function(checkbox) {
-        //         checkbox.addEventListener('change', updateQuestionCount);
-        //     });
-
-        //     document.querySelectorAll('input[name="filter"]').forEach(function(radio) {
-        //         radio.addEventListener('change', updateQuestionCount);
-        //     });
-
-        //     updateQuestionCount();
-        // });
     </script>
 @endsection

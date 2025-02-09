@@ -53,7 +53,7 @@
                     </a>
                   </div>
                   <div class="pb-2">
-                      <h5 class="card-title text-center pb-0 fs-4">Olá, {{ $greeting }}!</h5>
+                      <h5 class="card-title text-center pb-0 fs-4">Olá, Bem-vindo(a)!</h5>
                       <p class="text-center small">Faça login para ter acesso aos benefícios da sua conta.</p>
                   </div>
                   <form action="{{ route('logon') }}" method="POST" class="row g-2">
