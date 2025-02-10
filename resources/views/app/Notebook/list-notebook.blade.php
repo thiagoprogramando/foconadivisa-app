@@ -22,7 +22,7 @@
                         <tr>
                             <th>#</th>
                             <th>Nome</th>
-                            <th>Conteúdos</th>
+                            <th>Tópicos</th>
                             <th class="text-center">Progresso</th>
                             <th class="text-center">Questões</th>
                             <th class="text-center">Opções</th>
@@ -34,9 +34,6 @@
                                 <th><a href="{{ route('caderno', $notebook->id) }}">{{ $notebook->id }}</a></th>
                                 <td><a href="{{ route('caderno', $notebook->id) }}" class="text-dark">{{ $notebook->name }}</a></td>
                                 <td>
-                                    @foreach ($notebook->getSubjectsNames() as $subject)
-                                        <span class="badge bg-dark">{{ $subject }}</span>
-                                    @endforeach
                                     @foreach ($notebook->getTopicsNames() as $topic)
                                         <span class="badge bg-secondary">{{ $topic }}</span>
                                     @endforeach
@@ -49,10 +46,10 @@
                                     <form action="{{ route('delete-notebook') }}" method="POST" class="btn-group">
                                         @csrf
                                         <input type="hidden" name="id" value="{{ $notebook->id }}">
-                                        <button type="submit" class="btn btn-danger">
+                                        <button type="submit" class="btn btn-outline-danger">
                                             <i class="bi bi-trash"></i>
                                         </button>
-                                        <a href="{{ route('caderno', $notebook->id) }}" class="btn btn-outline-success">
+                                        <a href="{{ route('caderno', $notebook->id) }}" title="Acessar Caderno" class="btn btn-dark">
                                             <i class="bi bi-arrow-bar-right"></i>
                                         </a>
                                     </form>

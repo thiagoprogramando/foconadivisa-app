@@ -185,23 +185,26 @@
                             @endforeach
                         </div>
 
-                        <h6 class="card-title p-2 mt-2 mb-3 bg-light"> <a href="">#{{ $question->id }}</a> {!! $question->question_text !!} </h6>
+                        <h6 class="card-title p-2 mt-2 mb-3 bg-light"> 
+                            <a href="">#{{ $question->id }}</a> {!! $question->question_text !!} 
+                        </h6>
                         <form id="questionForm" method="POST" action="{{ route('submitAnswerAndNext', [$notebook->id, $notebookQuestion->id, $unansweredQuestions->currentPage()]) }}">
                             @csrf
-                            
                             <input type="hidden" name="notebook_question_id" value="{{ $notebookQuestion->id }}">
-
                             <div class="bg-light p-3">
                                 @foreach($question->options as $index => $option)
                                     <div class="form-check-questio form-question option-container mb-3 p-2 w-100">
                                         <input class="form-check-input" type="radio" name="option_id" value="{{ $option->id }}" id="option{{ $option->id }}" onclick="selectOption(this)" ondblclick="toggleStrikethroughOption(this)">
                                         <label class="form-check-label" for="option{{ $option->id }}">
-                                            <span class="option-letter" ondblclick="toggleStrikethroughOption(this)">{{ $letters[$index] }})</span> {{ $option->option_text }}
+                                            <button type="button" class="btn btn-link" onclick="toggleStrikethroughOption(this)">
+                                                <i class="bi bi-scissors text-danger ms-2" title="Eliminar alternativa" style="cursor: pointer;"></i>
+                                            </button>
+                                            <span class="option-letter" ondblclick="toggleStrikethroughOption(this)">{{ $letters[$index] }})</span> 
+                                            {{ $option->option_text }}
                                         </label>
                                     </div>
                                 @endforeach
                             </div>
-
                             <hr class="mt-5">
                             <div class="text-center">
                                 <div class="btn-group mt-3" role="group" style="width: 70%;">
@@ -257,14 +260,17 @@
         }
 
         function toggleStrikethroughOption(element) {
-            const label = element.tagName === 'LABEL' 
-                ? element 
-                : element.nextElementSibling;
 
-            if (label.style.textDecoration === 'line-through') {
-                label.style.textDecoration = 'none';
-            } else {
-                label.style.textDecoration = 'line-through';
+            const label = element.closest('label');
+            if (label) {
+
+                const isStrikethrough = label.style.textDecoration === 'line-through';
+                label.style.textDecoration = isStrikethrough ? 'none' : 'line-through';
+
+                const span = label.querySelector('.option-letter');
+                if (span) {
+                    span.style.textDecoration = isStrikethrough ? 'none' : 'line-through';
+                }
             }
         }
 
