@@ -22,7 +22,7 @@
                         <tr>
                             <th>#</th>
                             <th>Nome</th>
-                            <th>Tópicos</th>
+                            <th>Conteúdos</th>
                             <th class="text-center">Progresso</th>
                             <th class="text-center">Questões</th>
                             <th class="text-center">Opções</th>
@@ -34,8 +34,8 @@
                                 <th><a href="{{ route('caderno', $notebook->id) }}">{{ $notebook->id }}</a></th>
                                 <td><a href="{{ route('caderno', $notebook->id) }}" class="text-dark">{{ $notebook->name }}</a></td>
                                 <td>
-                                    @foreach ($notebook->getTopicsNames() as $topic)
-                                        <span class="badge bg-secondary">{{ $topic }}</span>
+                                    @foreach ($notebook->getParentSubjectsForTopics() as $subject)
+                                        <span class="badge bg-secondary">{{ $subject->name }}</span>
                                     @endforeach
                                 </td>
                                 <td class="text-center">

@@ -38,7 +38,7 @@ class Notebook extends Model {
                 })->pluck('subject')->unique();
     }
 
-    private function getParentSubjectsForTopics() {
+    public function getParentSubjectsForTopics() {
         
         $topicSubjectIds = $this->questions->load('subject')
             ->filter(function($question) {
