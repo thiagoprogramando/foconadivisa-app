@@ -20,6 +20,16 @@
                             <label for="name">Nomeie seu caderno</label>
                         </div>
                     </div>
+
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+                        <select id="swal-jury" name="jury_id[]" placeholder="Escolha uma Banca" required>
+                            <option value="" disabled selected>Escolha uma Banca</option>
+                            <option value="all">Todas as bancas</option>
+                            @foreach($juries as $jury)
+                                <option value="{{ $jury->id }}">{{ $jury->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                    
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 no-filter mb-3">
                         <div class="btn-group w-100 mb-3">
@@ -28,7 +38,7 @@
                         </div>
 
                         @foreach ($subjects as $subject)
-                            <div class="form-check">
+                            <div class="form-check form-check-subject">
                                 <input class="form-check-input subject-checkbox" type="checkbox" 
                                     name="subjects[]" value="{{ $subject->id }}"
                                     data-questions='{{ $subject->totalQuestions() }}'
@@ -42,11 +52,12 @@
                     
                             <div class="ps-3 topics" id="topics-{{ $subject->id }}" style="display: none;">
                                 @foreach ($subject->topics as $topic)
-                                    <div class="form-check">
+                                    <div class="form-check form-check-subject">
                                         <input class="form-check-input topic-checkbox" type="checkbox"
                                             name="topics[{{ $subject->id }}][]" value="{{ $topic->id }}"
                                             data-subject="{{ $subject->id }}"
                                             data-questions="{{ $topic->totalQuestions() }}"
+                                            data-jury-questions='@json($subject->questionsByJury($topic->id))'
                                             id="topic-{{ $topic->id }}"
                                             id-resolved='{{ $topic->questionResolved($topic->id) }}' 
                                             id-fail='{{ $topic->questionFail() }}'
@@ -92,6 +103,15 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+
+            new TomSelect("#swal-jury", {
+                create: false,
+                maxItems: 1000,
+                onInitialize: function() {
+                    this.clear();
+                }
+            });
+
             let totalQuestions = 0;
             let lastChecked = null;
             const questionCountElement = document.getElementById("question-count");
@@ -114,7 +134,7 @@
             searchInput.addEventListener("input", function () {
                 
                 const searchTerm = searchInput.value.trim().toLowerCase();
-                const subjectItems = document.querySelectorAll('.form-check');
+                const subjectItems = document.querySelectorAll('.form-check-subject');
 
                 subjectItems.forEach(function (subjectItem) {
                     const subjectLabel = subjectItem.querySelector("label").textContent.toLowerCase();
@@ -135,12 +155,13 @@
                 const filterFail = document.getElementById("showQuestionFail").checked;
                 const filterFavorite = document.getElementById("showQuestionFavorite").checked;
 
+                const selectedJuries = Array.from(document.getElementById("swal-jury").selectedOptions)
+                    .map(option => option.value)
+                    .filter(value => value !== "all");
+
                 document.querySelectorAll('.subject-checkbox:checked').forEach(function (subjectCheckbox) {
-
                     let subjectQuestions = parseInt(subjectCheckbox.getAttribute('data-questions')) || 0;
-
                     const subjectResolved = parseInt(subjectCheckbox.getAttribute('id-resolved')) || 0;
-                    const subjectResolvedParent = parseInt(subjectCheckbox.getAttribute('id-resolved-parent')) || 0;
                     const subjectFail = parseInt(subjectCheckbox.getAttribute('id-fail')) || 0;
                     const subjectFavorite = parseInt(subjectCheckbox.getAttribute('id-favorite')) || 0;
 
@@ -154,6 +175,13 @@
                             const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
                             const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
                             const topicFavorite = parseInt(topicCheckbox.getAttribute('id-favorite')) || 0;
+                            const juryQuestions = JSON.parse(topicCheckbox.getAttribute('data-jury-questions') || "{}");
+
+                            if (selectedJuries.length > 0) {
+                                topicQuestions = selectedJuries.reduce((sum, jury) => {
+                                    return sum + (juryQuestions[jury] || 0);
+                                }, 0);
+                            }
 
                             if (filterResolved) {
                                 topicQuestions -= topicResolved;
@@ -161,7 +189,6 @@
                             if (filterFail) {
                                 topicQuestions = topicFail;
                             }
-
                             if (filterFavorite) {
                                 topicQuestions = topicFavorite;
                             }
@@ -173,13 +200,11 @@
 
                     if (!subjectHasTopic) {
                         if (filterResolved) {
-                            subjectQuestions -= subjectResolvedParent;
+                            subjectQuestions -= subjectResolved;
                         }
-
                         if (filterFail) {
                             subjectQuestions = subjectFail;
                         }
-
                         if (filterFavorite) {
                             subjectQuestions = subjectFavorite;
                         }
@@ -194,6 +219,13 @@
                         let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
                         const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
                         const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
+                        const juryQuestions = JSON.parse(topicCheckbox.getAttribute('data-jury-questions') || "{}");
+
+                        if (selectedJuries.length > 0) {
+                            topicQuestions = selectedJuries.reduce((sum, jury) => {
+                                return sum + (juryQuestions[jury] || 0);
+                            }, 0);
+                        }
 
                         if (filterResolved) {
                             topicQuestions -= topicResolved;
@@ -215,6 +247,8 @@
                     }
                 }
             }
+
+            document.getElementById("swal-jury").addEventListener("change", updateQuestionCount);
 
             document.querySelectorAll('.subject-checkbox').forEach(function (subjectCheckbox) {
                 subjectCheckbox.addEventListener('change', function () {

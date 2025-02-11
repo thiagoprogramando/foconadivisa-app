@@ -6,15 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class Subject extends Model {
 
     use HasFactory;
 
     protected $table = 'subjects';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
-        'subject_id', 
         'type', 
         'name', 
         'description'
@@ -30,6 +31,17 @@ class Subject extends Model {
 
     public function parent() {
         return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function questionsByJury($id) {
+        return Question::where('subject_id', $id)
+            ->select('jury_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('jury_id')
+            ->with('jury')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                return [$item->jury->id => $item->total];
+            });
     }
 
     public function totalQuestions() {
