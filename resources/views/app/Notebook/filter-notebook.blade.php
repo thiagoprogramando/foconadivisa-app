@@ -21,14 +21,17 @@
                         </div>
                     </div>
 
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <select id="swal-jury" name="jury_id[]" placeholder="Escolha uma Banca" required>
-                            <option value="" disabled selected>Escolha uma Banca</option>
-                            <option value="all">Todas as bancas</option>
-                            @foreach($juries as $jury)
-                                <option value="{{ $jury->id }}">{{ $jury->name }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-3">
+                        <div class="btn-group w-100">
+                            <select id="swal-jury" name="jury_id[]" placeholder="Escolha uma Banca" class="w-100">
+                                <option value="" selected>Escolha uma Banca</option>
+                                <option value="all">Todas as bancas</option>
+                                @foreach($juries as $jury)
+                                    <option value="{{ $jury->id }}">{{ $jury->name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" class="btn btn-dark" title="Limpar" id="btnClearJury"><i class="bi bi-backspace"></i></button>
+                        </div>
                     </div>
                    
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-3">
@@ -107,9 +110,29 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
-            new TomSelect("#swal-jury", {
+            const selectElement = document.querySelector("#swal-jury");
+            const tomSelect = new TomSelect(selectElement, {
                 create: false,
                 maxItems: 1000,
+                onInitialize: function () {
+                },
+                onChange: function (value) {
+                    if (value.includes("all")) {
+                        const allOptions = Object.keys(this.options).filter(opt => opt !== "all");
+                        this.setValue(["all", ...allOptions], true);
+                    } 
+                    else if (!value.includes("all") && value.length === 0) {
+                        this.clear();
+                    }
+                }
+            });
+
+            let selectedValues = @json($notebookJuries->pluck('id')->toArray());
+            tomSelect.setValue(selectedValues);
+
+            const btnClearJury = document.querySelector("#btnClearJury");
+            btnClearJury.addEventListener("click", function () {
+                tomSelect.clear();
             });
 
             let totalQuestions = 0;
