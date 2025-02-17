@@ -15,6 +15,8 @@ class Invoice extends Model {
         'user_id',
         'plan_id',
         'value',
+        'due_date',
+        'type',
         'payment_token',
         'payment_url',
         'payment_status',

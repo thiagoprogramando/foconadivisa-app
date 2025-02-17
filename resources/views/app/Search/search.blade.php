@@ -2,143 +2,90 @@
 @section('title') Pesquisa:  @endsection
 @section('content')
 
-    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
+    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-2">
         <div class="row g-0">
+            @if ($questions->count())
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-2">
 
-            <div class="col-12">
-                <div class="btn-group" role="group">
-                    <button type="button" title="Excel" class="btn btn-outline-dark"><i class="bi bi-file-earmark-excel"></i></button>
-                    <a href="{{ route('topicos') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
+                    <h1 class="card-title">Questões <span class="badge bg-dark text-white">FORAM LOCALIZADAS {{ $questions->count() }} QUESTÕES</span></h1> 
+                    
+                    
+                    @foreach ($questions as $question)
+                        <div class="card p-2 m-2 mb-5">
+                            <div class="card-header">
+                                <div class="row mb-3">
+                                    <div class="col-12 col-sm-12 col-md-7 col-lg-7">
+                                        <small><b>Conteúdo/Tópico:</b> 
+                                            {{ $question->subject->parent->name ?? $question->subject->name }} |
+                                            {{ $question->topic->name ?? '---' }}
+                                        </small>
+                                        <br>
+                                        <small><b>{{ $question->responsesCount(Auth::user()->id, null, $question->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $question->correctCount(Auth::user()->id, null, $question->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $question->wrogCount(Auth::user()->id, null, $question->id) }}</b> Erros</small>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-5 col-lg-5">
+                                        <div class="btn-group">
+                                            <a href="{{ route('ver-questao', ['id' => $question->id]) }}" target="_blank" class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
+                                            <button type="button" data-bs-toggle="modal" data-bs-target="#addModal{{ $question->id }}" class="btn btn-outline-dark"><i class="ri-add-circle-line"></i> Adicionar ao caderno</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <h6 class="card-title p-2 mt-2 mb-3 bg-light"> 
+                                    {!! $question->question_text !!}
+                                </h6>
+
+                                @php
+                                    $letters = ['A', 'B', 'C', 'D', 'E'];
+                                @endphp
+
+                                <div class="bg-light p-3">
+                                    @foreach($question->options as $index => $option)
+                                    <p class="lead">{{ $letters[$index] }}) {{ $option->option_text }} </p>
+                                    @endforeach
+                                </div>
+                                <hr>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('add-question-notebook') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="question_id" value="{{ $question->id }}">
+                            <div class="modal fade" id="addModal{{ $question->id }}" tabindex="-1" aria-hidden="true" style="display: none;">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Adicionar questão</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                                                    <div class="form-floating mb-3">
+                                                        <select name="notebook_id" class="form-select" id="floatingSelect" aria-label="Floating label select example">
+                                                            <option selected="">Escolha um caderno:</option>
+                                                            @foreach ($notebooks as $notebook)
+                                                            <option value="{{ $notebook->id }}">{{ $notebook->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <label for="floatingSelect">Cadernos</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer btn-group">
+                                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Fechar</button>
+                                            <button type="submit" class="btn btn-dark">Adicionar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    @endforeach
                 </div>
-            </div>
-
-            @if($notebooks->count())
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-5">
-                    <h1 class="card-title">Meus cadernos</h1>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Conteúdos</th>
-                                    <th scope="col" class="text-center">Progresso</th>
-                                    <th scope="col" class="text-center">Questões</th>
-                                    @if (Auth::user()->type == 1) <th scope="col" class="text-center">Opções</th> @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($notebooks as $notebook)
-                                    <tr>
-                                        <th scope="row">{{ $notebook->id }}</th>
-                                        <td>{{ $notebook->name }}</td>
-                                        <td>
-                                            @foreach ($notebook->getSubjectsNames() as $subject)
-                                                <span class="badge bg-dark">{{ $subject }}</span>
-                                            @endforeach
-
-                                            @foreach ($notebook->getTopicsNames() as $topic)
-                                                <span class="badge bg-secondary">{{ $topic }}</span>
-                                            @endforeach
-                                        </td>
-                                        <td class="text-center">{{ $notebook->percentage }}%</td>
-                                        <td class="text-center">{{ $notebook->countQuestions() }}</td>
-                                        @if (Auth::user()->type == 1)
-                                            <td class="text-center">
-                                                <form action="{{ route('delete-notebook') }}" method="POST" class="btn-group delete" role="group">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{ $notebook->id }}">
-                                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                                    <a href="{{ route('caderno', ['id' => $notebook->id]) }}" class="btn btn-outline-success"><i class="bi bi-arrow-bar-right"></i></a>
-                                                </form>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>  
-                    </div>
-                    <hr>
-                </div>
-            @endif
-
-            @if($subjects->count())
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-5">
-                    <h1 class="card-title">Conteúdos</h1>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Descrição</th>
-                                    <th scope="col" class="text-center">Tópicos</th>
-                                    <th scope="col" class="text-center">Questões</th>
-                                    @if (Auth::user()->type == 1) <th scope="col" class="text-center">Opções</th> @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($subjects as $subject)
-                                    <tr>
-                                        <th scope="row">{{ $subject->id }}</th>
-                                        <td>{{ $subject->name }}</td>
-                                        <td>{{ strlen($subject->description) > 60 ? substr($subject->description, 0, 60) . '...' : $subject->description }}</td>
-                                        <td class="text-center">{{ $subject->countTopics() }}</td>
-                                        <td class="text-center">{{ $subject->countQuestions() }}</td>
-                                        @if (Auth::user()->type == 1)
-                                            <td class="text-center">
-                                                <form action="{{ route('delete-subject') }}" method="POST" class="btn-group delete" role="group">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{ $subject->id }}">
-                                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                                    <a href="{{ route('conteudo', ['id' => $subject->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
-                                                </form>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>   
-                    </div>
-                    <hr>
-                </div>
-            @endif
-
-            @if($topics->count())
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-5">
-                    <h1 class="card-title">Tópicos</h1>
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">Descrição</th>
-                                    @if (Auth::user()->type == 1) <th scope="col" class="text-center">Opções</th> @endif
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($topics as $topic)
-                                    <tr>
-                                        <th scope="row">{{ $topic->id }}</th>
-                                        <td>{{ $topic->name }}</td>
-                                        <td>{{ strlen($topic->description) > 100 ? substr($topic->description, 0, 100) . '...' : $topic->description }}</td>
-                                        @if (Auth::user()->type == 1)
-                                            <td class="text-center">
-                                                <form action="{{ route('delete-topic') }}" method="POST" class="btn-group delete" role="group">
-                                                    @csrf
-                                                    <input type="hidden" name="id" value="{{ $topic->id }}">
-                                                    <a title="Detalhes" href="{{ route('conteudo', ['id' => $topic->id]) }}" class="btn btn-outline-warning"><i class="bi bi-pen"></i></a>
-                                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                                </form>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>   
-                </div>
+            @else
+                <p class="text-center">Nenhuma questão encontrada!</p>
             @endif
 
         </div>

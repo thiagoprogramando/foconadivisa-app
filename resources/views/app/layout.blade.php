@@ -27,12 +27,12 @@
         <script src="{{ asset('template/js/tom-select.complete.min.js') }}"></script>
     </head>
 
-    <body @if(!empty($menu) && $menu == 1) class="toggle-sidebar" @endif>
+    <body>
 
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-between">
                 <a href="{{ route('app') }}" class="logo d-flex align-items-center">
-                    <img src="{{ asset('template/img/logo.png') }}" alt="Logo" class="w-25">
+                    <img src="{{ asset('template/img/logo.png') }}" class="logo-menu" alt="Logo">
                     <span class="d-none d-lg-block">{{ env('APP_NAME') }}</span>
                 </a>
                 <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -40,7 +40,7 @@
 
             <div class="search-bar">
                 <form class="search-form d-flex align-items-center" method="GET" action="{{ route('search') }}">
-                    <input type="text" name="search" placeholder="Pesquisar" title="Pesquisar">
+                    <input type="text" name="search" placeholder="Pesquisar uma questão" title="Pesquisar uma questão">
                     <button type="submit" title="Pesquisar"><i class="bi bi-search"></i></button>
                 </form>
             </div>
@@ -68,7 +68,7 @@
                             </li>
 
                             @foreach ($notifications as $notification)
-                                <a href="{{ route('delete-notification', ['id' => $notification->id]) }}">
+                            <a href="{{ route('delete-notification', ['id' => $notification->id]) }}">
                                     <li class="notification-item">
                                         {!! $notification->typeLabel() !!}
                                         <div>
@@ -103,7 +103,7 @@
                         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                             <li class="dropdown-header">
                                 <h6>{{ Auth::user()->firstName() }}</h6>
-                                <span>{{ Auth::user()->labelPlan->name }}</span>
+                                <span>{{ Auth::user()->labelPlan->name ?? '' }}</span>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
@@ -144,15 +144,14 @@
         <aside id="sidebar" class="sidebar">
             <ul class="sidebar-nav" id="sidebar-nav">
                 <li class="nav-item">
-                    <a class="nav-link " href="{{ route('app') }}">
+                    <a class="nav-link" href="{{ route('app') }}">
                         <i class="bi bi-grid"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
 
-                @if(Auth::user()->type == 1)
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('cadernos') }}">
+                    <a class="nav-link collapsed" @if (Auth::user()->notebooks->count() > 0) href="{{ route('cadernos') }}" @else onclick="notNotebook()" @endif>
                         <i class="bi bi-pen"></i>
                         <span>Resolver Questões</span>
                     </a>
@@ -164,7 +163,6 @@
                         <span>Meus Cadernos</span>
                     </a>
                 </li>
-                @endif
 
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('minhas-compras') }}">
@@ -173,10 +171,9 @@
                     </a>
                 </li>
 
-                @if(Auth::user()->type == 1)
                 <li class="nav-heading">Meus Dados</li>
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estátisticas</span></a>
+                    <a class="nav-link collapsed" href="{{ route('statistic') }}"><i class="bi bi-file-bar-graph"></i><span>Estatísticas</span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('planos') }}"><i class="bi bi-cart"></i><span>Planos</span></a>
@@ -184,22 +181,20 @@
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="{{ route('pagamentos') }}"><i class="bi bi-arrow-down-square-fill"></i><span>Pendências</span></a>
                 </li>
-                @endif
 
                 @if(Auth::user()->type == 1)
                     <li class="nav-heading">Gestão</li>
                     <li class="nav-item">
-                        <a class="nav-link collapsed" data-bs-target="#components-materiais" data-bs-toggle="collapse" href="#">
-                        <i class="bi bi-bookmarks"></i><span>Conteúdo</span><i class="bi bi-chevron-down ms-auto"></i>
+                        <a class="nav-link collapsed" href="{{ route('conteudos') }}">
+                            <i class="bi bi-bookmarks"></i>
+                            <span>Conteúdos</span>
                         </a>
-                        <ul id="components-materiais" class="nav-content collapse " data-bs-parent="#sidebar-materiais">
-                            <li>
-                                <a href="{{ route('conteudos') }}"><i class="bi bi-circle"></i><span>Conteúdos</span></a>
-                            </li>
-                            <li>
-                                <a href="{{ route('topicos') }}"><i class="bi bi-circle"></i><span>Tópicos</span></a>
-                            </li>
-                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="{{ route('bancas') }}">
+                            <i class="bi bi-bank"></i>
+                            <span>Bancas</span>
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link collapsed" data-bs-target="#components-cart" data-bs-toggle="collapse" href="#">
@@ -281,6 +276,7 @@
         <script src="{{ asset('template/js/main.js') }}"></script>
         <script src="{{ asset('template/js/jquery.js') }}"></script>
         <script src="{{ asset('template/js/sweetalert.js') }}"></script>
+        <script src="{{ asset('template/js/mask.js') }}"></script>
         <script>
             @if ($errors->any())
                 let errorMessages = '';
@@ -346,7 +342,21 @@
                         });
                     });
                 });
+
+                const money = document.getElementById('value');
+                if (money && money.value) mascaraReal(money);
             });
+
+            function notNotebook() {
+                Swal.fire({
+                    title: 'Atenção!',
+                    text: 'Você não possui caderno, clique em "NOVO CADERNO" e filtre suas questões!',
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.href = '/cadernos';
+                });
+            }
         </script>
     </body>
 </html>

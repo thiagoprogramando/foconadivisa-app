@@ -1,29 +1,26 @@
-@if ($paginator->hasPages())
-    <nav role="navigation" aria-label="Pagination Navigation">
+@if ($unansweredQuestions->hasPages())
+    <div class="text-center mt-3">
         <ul class="pagination">
-            {{-- Previous Page Link --}}
-            @if ($paginator->onFirstPage())
-                <li class="page-item disabled" aria-disabled="true">
-                    <span class="page-link">{!! __('pagination.previous') !!}</span>
-                </li>
-            @else
+            {{-- Botão Anterior --}}
+            @if ($unansweredQuestions->previousPageUrl())
                 <li class="page-item">
-                    <a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev">
-                        {!! __('pagination.previous') !!}
-                    </a>
+                    <a class="page-link" href="{{ $unansweredQuestions->previousPageUrl() }}">&laquo; Anterior</a>
                 </li>
             @endif
 
-            {{-- Next Page Link --}}
-            @if ($paginator->hasMorePages())
+            {{-- Página Atual --}}
+            <li class="page-item active">
+                <span class="page-link">
+                    Questão {{ $nextQuestionNumber }} de {{ $totalQuestions }}
+                </span>
+            </li>
+
+            {{-- Botão Próximo --}}
+            @if ($unansweredQuestions->nextPageUrl())
                 <li class="page-item">
-                    <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next">{!! __('pagination.next') !!}</a>
-                </li>
-            @else
-                <li class="page-item disabled" aria-disabled="true">
-                    <span class="page-link">{!! __('pagination.next') !!}</span>
+                    <a class="page-link" href="{{ $unansweredQuestions->nextPageUrl() }}">Próxima &raquo;</a>
                 </li>
             @endif
         </ul>
-    </nav>
+    </div>
 @endif

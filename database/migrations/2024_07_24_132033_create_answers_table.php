@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('option_id');
             
             $table->integer('status')->default(0); // 0 - is not answer 1 - is correct 2 - is false
+            $table->integer('position')->default(1); // 1 - is not answer 2 - is answer and eliminate filter
             $table->timestamps();
         });
     }

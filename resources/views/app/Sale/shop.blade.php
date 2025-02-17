@@ -2,17 +2,8 @@
 @section('title') Minhas Compras @endsection
 @section('content')
 
-    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-5">
+    <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-2">
         <div class="row g-0">
-
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="btn-group" role="group">
-                    <a href="{{ route('sale-excel', request()->query()) }}" class="btn btn-outline-dark" title="Excel">
-                        <i class="bi bi-file-earmark-excel"></i> Excel
-                    </a>  
-                    <a href="{{ route('produtos-vendas') }}" title="Recarregar" class="btn btn-outline-dark"><i class="bi bi-arrow-counterclockwise"></i></a>
-                </div>
-            </div>
 
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 mt-3">
                 <div class="table-responsive">

@@ -22,28 +22,50 @@
         <link href="{{ asset('template/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
         <link href="{{ asset('template/vendor/simple-datatables/style.css') }}" rel="stylesheet">
         <link href="{{ asset('template/css/style.css') }}" rel="stylesheet">
+
+        <style>
+            * {
+              width: 100%;
+              height: auto;
+            }
+      
+            body {
+              background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ asset('template/img/background/bg_military_us.jpg') }}');
+              background-size: 100;
+              background-repeat: no-repeat;
+              background-position: center;
+              min-height: 100vh;
+            }
+        </style>
     </head>
     <body>
 
         <main>
             <div class="container">
-                <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                <section class="section d-flex flex-column align-items-center justify-content-center py-4">
                     <div class="container">
                         <div class="row justify-content-center">
-                            <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                                <div class="d-flex justify-content-center py-4">
-                                    <a href="{{ route('cadastro') }}" class="logo d-flex align-items-center w-auto">
-                                        <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
-                                    </a>
-                                </div>
-
-                                <div class="card mb-3">
+                            <div class="col-12 col-sm-12 col-md-8 col-lg-5">
+                                <div class="card card-login mb-3">
                                     <div class="card-body">
-                                        <div class="pt-4 pb-2">
+                                        <div class="d-flex justify-content-center">
+                                            <a href="{{ route('cadastro') }}" class="logo d-flex align-items-center w-auto">
+                                                <img src="{{ asset('template/img/logo_preta.jpeg') }}" alt="{{ env('APP_NAME') }}">
+                                            </a>
+                                        </div>
+                                        <div class="pb-2">
                                             <h5 class="card-title text-center pb-0 fs-4">Faça parte!</h5>
                                             <p class="text-center small">Preencha seus dados para receber benefícios.</p>
+                                            @if ($errors->any())
+                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                                    <i class="bi bi-exclamation-octagon me-1"></i>
+                                                    @foreach ($errors->all() as $error)
+                                                        {{ $error }}
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                    @endforeach
+                                                </div>
+                                            @endif
                                         </div>
-
                                         <form action="{{ route('registrer') }}" method="POST" class="row g-3">
                                             @csrf
                                             <div class="col-12">
@@ -56,7 +78,7 @@
                                                 <input type="password" name="password" class="form-control" placeholder="Senha:" required>
                                             </div>
                                             <div class="col-12">
-                                                <input type="number" name="meta" class="form-control" placeholder="Qual sua meta de Questões?">
+                                                <input type="number" name="meta" class="form-control" placeholder="Qual sua meta de Questões?" required>
                                             </div>
                                             <div class="col-12">
                                                 <button class="btn btn-dark w-100" type="submit">Cadastrar-me</button>
@@ -68,7 +90,7 @@
                                     </div>
                                 </div>
 
-                                <div class="credits">
+                                <div class="credits text-white text-center">
                                     Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
                                 </div>
                             </div>
@@ -91,24 +113,5 @@
         <script src="{{ asset('template/js/main.js') }}"></script>
         <script src="{{ asset('template/js/jquery.js') }}"></script>
         <script src="{{ asset('template/js/sweetalert.js') }}"></script>
-        <script>
-            @if(session('error'))
-                  Swal.fire({
-                      title: 'Erro!',
-                      text: '{{ session('error') }}',
-                      icon: 'error',
-                      timer: 2000
-                  })
-              @endif
-              
-              @if(session('success'))
-                  Swal.fire({
-                      title: 'Sucesso!',
-                      text: '{{ session('success') }}',
-                      icon: 'success',
-                      timer: 2000
-                  })
-              @endif
-          </script>
     </body>
 </html>

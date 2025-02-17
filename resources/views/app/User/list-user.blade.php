@@ -73,7 +73,7 @@
                                     <th scope="row">{{ $user->id }}</th>
                                     <td>{{ $user->name }}</td>
                                     <td><span class="badge bg-dark"><i class="bi bi-envelope me-1"></i></i>{{ $user->phone }} - {{ $user->email }}</span><br> {{ $user->cpfcnpj }}</td>
-                                    <td>{{ $user->labelPlan->name }}</td>
+                                    <td>{{ $user->labelPlan->name ?? '---' }}</td>
                                     <td>{{ $user->typeLabel() }}</td>
                                     <td class="text-center">
                                         <form action="{{ route('delete-user') }}" method="POST" class="btn-group delete" role="group">

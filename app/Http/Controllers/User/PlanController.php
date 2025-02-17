@@ -33,7 +33,7 @@ class PlanController extends Controller {
         $plan               = new Plan();
         $plan->name         = $request->name;
         $plan->description  = $request->description;
-        $plan->value        = $request->value;
+        $plan->value        = $this->formatarValor($request->value);
         $plan->type         = $request->type;
         if($plan->save()) {
             return redirect()->route('plano', ['id' => $plan->id])->with('success', 'Plano criado com sucesso!');
@@ -45,13 +45,13 @@ class PlanController extends Controller {
     public function updatePlan(Request $request) {
         
         $plan = Plan::find($request->id);
-        if($plan) {
+        if ($plan) {
 
             $plan->name         = $request->name;
             $plan->description  = $request->description;
-            $plan->value        = $request->value;
+            $plan->value        = $this->formatarValor($request->value);
             $plan->type         = $request->type;
-            if($plan->save()) {  
+            if ($plan->save()) {  
                 return redirect()->back()->with('success', 'Plano atualizado com sucesso!');
             }
         }
@@ -62,10 +62,9 @@ class PlanController extends Controller {
     public function deletePlan(Request $request) {
 
         $plan = Plan::find($request->id);
-        if($plan) {
-
+        if ($plan) {
             $plan->subjects()->detach();
-            if($plan->delete()) {
+            if ($plan->delete()) {
                 return redirect()->back()->with('success', 'Plano excluído com sucesso!');
             }
         }
@@ -76,7 +75,7 @@ class PlanController extends Controller {
     public function viewPlan($id) {
 
         $plan = Plan::find($id);
-        if($plan) {
+        if ($plan) {
 
             $subjects            = Subject::where('type', 1)->orderBy('name', 'desc')->get();
             $topics              = Subject::where('type', 2)->orderBy('name', 'desc')->get();
@@ -99,7 +98,7 @@ class PlanController extends Controller {
     public function addSubject(Request $request) {
 
         $plan = Plan::find($request->plan_id);
-        if(!$plan) {
+        if (!$plan) {
             return redirect()->back()->with('error', 'Ops! Não foram encontrados dados do plano.');
         }
     
@@ -127,7 +126,7 @@ class PlanController extends Controller {
     public function addTopic(Request $request) {
 
         $plan = Plan::find($request->plan_id);
-        if(!$plan) {
+        if (!$plan) {
             return redirect()->back()->with('error', 'Ops! Não foram encontrados dados do plano.');
         }
     
@@ -175,4 +174,13 @@ class PlanController extends Controller {
 
         return redirect()->back()->with('error', 'Ops! Não foi encontrada a associação entre o Plano e o Conteúdo.');
     }
+
+    private function formatarValor($valor) {
+        
+        $valor = preg_replace('/[^0-9,]/', '', $valor);
+        $valor = str_replace(',', '.', $valor);
+        $valorFloat = floatval($valor);
+    
+        return number_format($valorFloat, 2, '.', '');
+    }    
 }

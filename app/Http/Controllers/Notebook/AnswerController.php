@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Notebook;
 
 use App\Http\Controllers\Controller;
 use App\Models\Answer;
-use App\Models\Comment;
 use App\Models\Notebook;
 use App\Models\NotebookQuestion;
 use App\Models\Question;
@@ -12,35 +11,52 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AnswerController extends Controller {
-    
-    public function answer($notebook) {
+
+    public function answer($notebook, $next_question = null) {
 
         $notebook = Notebook::find($notebook);
         if ($notebook) {
 
-            $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)->pluck('notebook_question_id')->toArray();
-
+            $answeredNotebookQuestionIds = Answer::where('notebook_id', $notebook->id)->where('position', 1)
+                ->pluck('notebook_question_id')
+                ->toArray();
+            $answeredCount = count($answeredNotebookQuestionIds);
+            
             $totalQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
-            ->whereHas('question', function ($query) {
-                $query->whereNotNull('question_text')
-                      ->where('question_text', '!=', '');
-            })
-            ->count();
+                ->whereHas('question', function ($query) {
+                    $query->whereNotNull('question_text')
+                          ->where('question_text', '!=', '');
+                })
+                ->count();
 
-            $unansweredQuestions = NotebookQuestion::where('notebook_id', $notebook->id)
-            ->whereNotIn('id', $answeredNotebookQuestionIds)
-            ->whereHas('question', function ($query) {
-                $query->whereNotNull('question_text')
-                      ->where('question_text', '!=', '');
-            })
-            ->paginate(1);
+            $totalQuestionsPendenting = NotebookQuestion::where('notebook_id', $notebook->id)
+                ->whereHas('question', function ($query) {
+                    $query->whereNotNull('question_text')
+                          ->where('question_text', '!=', '');
+                })
+                ->whereDoesntHave('answers')
+                ->count();
 
-            $nextQuestionNumber = $totalQuestions - $unansweredQuestions->total() + 1;
-            $menu = 1;
-
-            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber', 'menu'));
+            $unansweredQuestionsQuery = NotebookQuestion::where('notebook_id', $notebook->id)
+                ->whereNotIn('id', $answeredNotebookQuestionIds)
+                ->whereHas('question', function ($query) {
+                    $query->whereNotNull('question_text')
+                          ->where('question_text', '!=', '');
+                });
+    
+            if ($next_question !== null) {
+                $unansweredQuestionsQuery->where('question_id', '!=', $next_question);
+            }
+            
+            $perPage = 1;
+            $nextQuestionNumber = request()->has('page')
+                ? (($totalQuestions - $totalQuestionsPendenting) + request()->get('page'))
+                : ($totalQuestions - $totalQuestionsPendenting) + 1;
+            $unansweredQuestions = $unansweredQuestionsQuery->paginate(1);
+            
+            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber'));
         }
-    }
+    }   
 
     public function answerReview($answer) {
 
@@ -80,8 +96,8 @@ class AnswerController extends Controller {
     public function submitAnswerAndNext(Request $request, $notebookId, $notebookQuestionId, $page) {
         
         $request->validate([
-            'option_id' => 'required|exists:options,id',
-            'notebook_question_id' => 'required|exists:notebook_questions,id',
+            'option_id'             => 'required|exists:options,id',
+            'notebook_question_id'  => 'required|exists:notebook_questions,id',
         ]);
 
         $notebook = Notebook::find($notebookId);

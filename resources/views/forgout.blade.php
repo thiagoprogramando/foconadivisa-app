@@ -22,25 +22,40 @@
         <link href="{{ asset('template/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
         <link href="{{ asset('template/vendor/simple-datatables/style.css') }}" rel="stylesheet">
         <link href="{{ asset('template/css/style.css') }}" rel="stylesheet">
+
+        <style>
+            * {
+              width: 100%;
+              height: auto;
+            }
+      
+            body {
+              background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('{{ asset('template/img/background/bg_military_us.jpg') }}');
+              background-size: 100;
+              background-repeat: no-repeat;
+              background-position: center;
+              min-height: 100vh;
+            }
+        </style>
     </head>
     <body>
 
         <main>
             <div class="container">
-                <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
+                <section class="section d-flex flex-column align-items-center justify-content-center">
                     <div class="container">
                         <div class="row justify-content-center">
-                            <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                                <div class="d-flex justify-content-center py-4">
-                                    <a href="{{ route('cadastro') }}" class="logo d-flex align-items-center w-auto">
-                                        <img src="{{ asset('template/img/logo.png') }}" alt="{{ env('APP_NAME') }}">
-                                    </a>
-                                </div>
+                            <div class="col-12 col-sm-12 col-md-8 col-lg-5">
+                                <div class="card card-login mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-center">
+                                            <a href="{{ route('login') }}" class="logo d-flex align-items-center w-auto">
+                                                <img src="{{ asset('template/img/logo_preta.jpeg') }}" alt="{{ env('APP_NAME') }}">
+                                            </a>
+                                        </div>
 
-                                @if(empty($code))
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <div class="pt-4 pb-2">
+                                        @if(empty($code))
+                                            <div class="pb-2">
                                                 <h5 class="card-title text-center pb-0 fs-4">Recuperação de conta!</h5>
                                                 <p class="text-center small">Esqueceu algo? Recupere os dados da sua conta!</p>
                                             </div>
@@ -57,12 +72,8 @@
                                                     <p class="small mb-0">Já tem uma conta? <a href="{{ route('login') }}">Acessar</a></p>
                                                 </div>
                                             </form>
-                                        </div>
-                                    </div>
-                                @else
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <div class="pt-4 pb-2">
+                                        @else
+                                            <div class="pb-2">
                                                 <h5 class="card-title text-center pb-0 fs-4">Nova senha!</h5>
                                                 <p class="text-center small">Escolha uma nova senha para o seu usuário.</p>
                                             </div>
@@ -85,11 +96,11 @@
                                                     <p class="small mb-0">Já tem uma conta? <a href="{{ route('login') }}">Acessar</a></p>
                                                 </div>
                                             </form>
-                                        </div>
+                                        @endif
                                     </div>
-                                @endif
+                                </div>
 
-                                <div class="credits">
+                                <div class="credits text-white text-center">
                                     Desenvolvido por <a href="https://expressoftwareclub.com/">Express Software Club</a>
                                 </div>
                             </div>

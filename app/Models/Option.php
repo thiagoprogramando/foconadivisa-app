@@ -17,4 +17,9 @@ class Option extends Model {
         'option_text',
         'is_correct',
     ];
+
+    public function answers() {
+        return $this->hasMany(Answer::class, 'option_id');
+    }
+
 }

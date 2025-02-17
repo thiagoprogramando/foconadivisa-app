@@ -112,6 +112,7 @@ class FaqController extends Controller {
             $notification->type         = 1;
             $notification->title        = 'Ticket respondido!';
             $notification->description  = 'Olá, o suporte acabou de responde sua dúvida/relato!';
+            $notification->url          = env('APP_URL').'tickets';
             $notification->save();
 
             return redirect()->back()->with('success', 'Ticket atualizado com sucesso!');
@@ -123,7 +124,7 @@ class FaqController extends Controller {
     public function createTicket(Request $request) {
 
         $ticket                 = new Ticket();
-        $ticket->user_id        = Auth::user()->id;
+        $ticket->user_id        = $request->user_id;
         $ticket->faq_id         = $request->faq_id;
         $ticket->question_id    = $request->question_id;
         $ticket->comment        = $request->comment;
@@ -134,12 +135,13 @@ class FaqController extends Controller {
             $notification->type         = 1;
             $notification->title        = 'Novo Ticket aberto!';
             $notification->description  = 'Olá, foi aberto um Ticket de suporte!';
+            $notification->url          = env('APP_URL').'tickets';
             $notification->save();
 
-            return redirect()->back()->with('success', 'Ticket aberto com sucesso!');
+            return response()->json(['success' => true, 'message' => 'Ticket criado com sucesso!']);
         }
 
-        return redirect()->back()->with('error', 'Não foi possível enviar o Ticket!');
+        return response()->json(['success' => false, 'message' => 'Não foi possível enviar o Ticket!']);
     }
 
     public function deleteTicket($id) {

@@ -11,152 +11,243 @@ use App\Models\Sale;
 use App\Models\User;
 
 use GuzzleHttp\Client;
+use Carbon\Carbon;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class AssasController extends Controller {
     
     public function payPlan($id) {
 
-        if(empty(Auth::user()->cpfcnpj) || empty(Auth::user()->phone)) {
+        if (empty(Auth::user()->cpfcnpj) || empty(Auth::user()->phone)) {
             return redirect()->route('perfil')->with('error', 'Ops! Complete o seu cadastro antes de adquirir um plano.');
         }
 
-        if(!empty(Auth::user()->customer)) {
-            $customer = Auth::user()->customer;
-        } else {
-            $customer = $this->createCustomer(Auth::user()->id);
+        $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
+        if (!empty($customer['status']) && ($customer['status'] == false || $customer['status'] == 0)) {
+            return redirect()->back()->with('error', $customer['message']);
         }
 
         $plan = Plan::find($id);
-        if(!$plan) {
+        if (!$plan) {
             return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
         }
 
-        if($plan->value == 0 || $plan->value < 1) {
-            $user       = User::find(Auth::user()->id);
+        if ($plan->value <= 0) {
+
+            $user = User::find(Auth::id());
             $user->plan = $plan->id;
-            if($user->save()) {
+            if ($user->save()) {
                 return redirect()->back()->with('success', 'Plano alterado com sucesso!');
             }
 
+            return redirect()->back()->with('error', 'Erro ao salvar o plano gratuito.');
+        }
+
+        return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente!');
+    }
+
+    public function buyPlan(Request $request) {
+
+        if (empty(Auth::user()->cpfcnpj) || empty(Auth::user()->phone)) {
+            return redirect()->route('perfil')->with('error', 'Ops! Complete o seu cadastro antes de adquirir um plano.');
+        }
+
+        if (empty($request->method) || empty($request->installments)) {
+            return redirect()->back()->with('info', 'É necessário escolher uma Forma de Pagamento!');
+        }
+
+        $customer = Auth::user()->customer ?? $this->createCustomer(Auth::user()->id);
+        if (!empty($customer['status']) && ($customer['status'] == false || $customer['status'] == 0)) {
+            return redirect()->back()->with('error', $customer['message']);
+        }
+
+        $plan = Plan::find($request->id);
+        if (!$plan) {
             return redirect()->back()->with('error', 'Ops! O plano não está disponível.');
         }
 
-        $dataInvoice = $this->createInvoice(null, null, $customer, $plan->value, $plan->name);
-        if($dataInvoice == null) {
-            return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');
+        if ($plan->value <= 0) {
+
+            $user = User::find(Auth::id());
+            $user->plan = $plan->id;
+            if ($user->save()) {
+                return redirect()->back()->with('success', 'Plano alterado com sucesso!');
+            }
+
+            return redirect()->back()->with('error', 'Erro ao salvar o plano gratuito.');
+        }
+
+        if (Auth::user()->hasUsedTrial()) {
+            $due_date = now();
+        } else {
+            $due_date = now()->addDay(env('TIME_DUE_DATE'));
+            DB::table('trial_histories')->insert([
+                'user_id'       => Auth::user()->id,
+                'plan_id'       => $plan->id,
+                'start_date'    => now(),
+                'end_date'      => now()->addDays(env('TIME_DUE_DATE')),
+                'created_at'    => now(),
+            ]);
+        }
+
+        $dataInvoice = $this->createInvoice($request->method, $request->installments, $customer, $plan->value, $plan->name, $due_date);
+        if (!$dataInvoice) {
+            return redirect()->back()->with('error', 'Não foi possível gerar sua fatura! Verifique seus dados e tente novamente.');
         }
 
         Invoice::where('user_id', Auth::user()->id)
-        ->where('payment_status', 0)
-        ->where('plan_id', $plan->id)
-        ->delete();
+            ->where('payment_status', 0)
+            ->delete();
 
         $invoice                = new Invoice();
         $invoice->user_id       = Auth::user()->id;
         $invoice->plan_id       = $plan->id;
         $invoice->value         = $plan->value;
+        $invoice->type          = 1;
+        $invoice->due_date      = $due_date;
         $invoice->payment_token = $dataInvoice['id'];
         $invoice->payment_url   = $dataInvoice['invoiceUrl'];
-        if($invoice->save()) {
+
+        if ($invoice->save()) {
 
             $notification               = new Notification();
             $notification->user_id      = Auth::user()->id;
             $notification->type         = 1;
             $notification->title        = 'Fatura gerada para o novo Plano!';
             $notification->description  = 'Sua fatura já está disponível para pagamento, encontre-a na página de pendências!';
+            $notification->url          = env('APP_URL').'pagamentos';
             $notification->save();
 
-            return redirect($dataInvoice['invoiceUrl']);
+            $user       = User::find(Auth::id());
+            $user->plan = $plan->id;
+            if ($user->save()) {
+                return redirect()->back()->with('success', 'Plano alterado com sucesso! Aproveite os benefícios.');
+            }
+
+            return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente!');
         }
 
-        return redirect()->back()->with('error', 'Ops! Algo de errado. Revise seus dados e tente novamente!');
+        return redirect()->back()->with('error', 'Ops! Algo deu errado. Verifique seus dados e tente novamente!');
     }
 
     public function createCustomer($id) {
 
         $user = User::find($id);
-        if(!$user) {
-            return false;
+        if (!$user) {
+            return [
+                'status'  => false,
+                'message' => 'Não foi possível encontrar dados do Usuário!'
+            ];
         }
 
-        $client = new Client();
+        try {
+            $client = new Client();
 
-        $options = [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'access_token' => env('API_KEY'),
-                'User-Agent'   => env('APP_NAME')
-            ],
-            'json' => [
-                'name'          => $user->name,
-                'cpfCnpj'       => $user->cpfcnpj,
-                'mobilePhone'   => $user->phone,
-                'email'         => $user->email,
-                'notificationDisabled' => true
-            ],
-            'verify' => false
-        ];
+            $options = [
+                'headers' => [
+                    'Content-Type'  => 'application/json',
+                    'access_token'  => env('API_KEY'),
+                    'User-Agent'    => env('APP_NAME')
+                ],
+                'json' => [
+                    'name'                  => $user->name,
+                    'cpfCnpj'               => $user->cpfcnpj,
+                    'mobilePhone'           => $user->phone,
+                    'email'                 => $user->email,
+                    'notificationDisabled'  => true
+                ],
+                'verify' => false
+            ];
 
-        $response = $client->post(env('API_URL_ASSAS') . 'v3/customers', $options);
-        $body = (string) $response->getBody();
-        
-        if ($response->getStatusCode() === 200) {
-            $data = json_decode($body, true);
+            $response = $client->post(env('API_URL_ASSAS') . 'v3/customers', $options);
 
-            $user->customer = $data['id'];
-            if($user->save()) {
-                return $data['id'];
+            if ($response->getStatusCode() === 200) {
+                $data = json_decode($response->getBody(), true);
+                $user->customer = $data['id'];
+                $user->save();
+                return [
+                    'status' => true,
+                    'id'     => $data['id']
+                ];
+            }
+    
+            $errorMessage = 'Erro desconhecido.';
+            if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 500) {
+                $errorBody = json_decode($response->getBody(), true);
+                if (isset($errorBody['errors'][0]['description'])) {
+                    $errorMessage = $errorBody['errors'][0]['description'];
+                } else {
+                    $errorMessage = isset($errorBody['message']) ? $errorBody['message'] : 'Estamos com problemas no momento, tente novamente mais tarde!';
+                }
+            } elseif ($response->getStatusCode() >= 500) {
+                $errorMessage = 'Estamos com problemas no momento, tente novamente mais tarde!';
+            }
+    
+            return [
+                'status'  => false,
+                'message' => $errorMessage
+            ];
+        } catch (\Exception $e) {
+            
+            $errorMessage = $e->getMessage();
+            if ($e->hasResponse()) {
+                $response = $e->getResponse();
+                $errorBody = json_decode($response->getBody(), true);
+                if (isset($errorBody['errors'][0]['description'])) {
+                    $errorMessage = $errorBody['errors'][0]['description'];
+                } elseif (isset($errorBody['message'])) {
+                    $errorMessage = $errorBody['message'];
+                }
             }
 
-            return $data['id'];
-        } else {
-            return false;
-        }
-    }
-
-    public function createInvoice($method, $installments, $customer, $value, $description) {
-        	
-        $client = new Client();
-
-        $options = [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'access_token' => env('API_KEY'),
-                'User-Agent'   => env('APP_NAME')
-            ],
-            'json' => [
-                'customer'          => $customer,
-                'billingType'       => $method ?? 'PIX',
-                'value'             => number_format($value, 2, '.', ''),
-                'dueDate'           => now()->addDay(),
-                'description'       => $description,
-                'installmentCount'  => $installments != null ? $installments : 1,
-                'installmentValue'  => $installments != null ? number_format(($value / intval($installments)), 2, '.', '') : $value,
-                // 'callback'          => [
-                //     'successUrl'    => env('APP_URL'),
-                //     'autoRedirect'  => true
-                // ]
-            ],
-            'verify' => false
-        ];
-
-        $response = $client->post(env('API_URL_ASSAS') . 'v3/payments', $options);
-        $body = (string) $response->getBody();
-
-        if ($response->getStatusCode() === 200) {
-            $data = json_decode($body, true);
-            return $dados['json'] = [
-                'id'            => $data['id'],
-                'invoiceUrl'    => $data['invoiceUrl'],
+            return [
+                'status'  => false,
+                'message' => $errorMessage
             ];
-        } else {
-            return false;
         }
     }
+
+    public function createInvoice($method, $installments, $customer, $value, $description, $due_date = null) {
+        try {
+            $client = new Client();
+    
+            $options = [
+                'headers' => [
+                    'Content-Type'  => 'application/json',
+                    'access_token'  => env('API_KEY'),
+                    'User-Agent'    => env('APP_NAME'),
+                ],
+                'json' => [
+                    'customer'          => $customer,
+                    'billingType'       => $method ?? 'UNDEFINED',
+                    'value'             => number_format($value, 2, '.', ''),
+                    'dueDate'           => $due_date ?? now()->addDay(1)->toDateString(),
+                    'description'       => $description,
+                    'installmentCount'  => $installments,
+                    'installmentValue'  => $installments > 0 ? number_format(($value / $installments), 2, '.', '') : $value,
+                ],
+                'verify' => false,
+            ];
+    
+            $response = $client->post(env('API_URL_ASSAS') . 'v3/payments', $options);
+    
+            if ($response->getStatusCode() === 200) {
+                $data = json_decode($response->getBody(), true);
+                return [
+                    'id' => $data['id'],
+                    'invoiceUrl' => $data['invoiceUrl'],
+                ];
+            }
+        } catch (\Exception $e) {
+            Log::error('Erro Ao Criar Invoice: ' . $e->getMessage());
+            return false;
+        }
+    }    
 
     public function webhook(Request $request) {
 
@@ -215,6 +306,38 @@ class AssasController extends Controller {
             }
             
             return response()->json(['status' => 'success', 'message' => 'Nenhuma fatura encontrada!']);
+        }
+
+        if ($jsonData['event'] === 'PAYMENT_OVERDUE') {
+
+            $invoice = Invoice::where('payment_token', $token)->first();
+            if ($invoice) {
+
+
+                $user = User::find($invoice->user_id);
+                if ($user) {
+                    $user->plan = null;
+                    $user->save();
+
+                    Invoice::where('user_id', $user->id)
+                        ->where('payment_status', 0)
+                        ->delete();
+
+                    $notification               = new Notification();
+                    $notification->user_id      = $user->id;
+                    $notification->type         = 3;
+                    $notification->title        = 'Plano cancelado!';
+                    $notification->description  = 'Por falta de pagamento, cancelamos o seu plano. Você pode assinar outro!';
+                    $notification->url          = env('APP_URL').'planos';
+                    $notification->save();
+
+                    return response()->json(['status' => 'success', 'message' => 'Plano cancelado para o usuário!']);
+                }
+
+                return response()->json(['status' => 'success', 'message' => 'Nenhum usuário associado a essa Fatura!']);
+            }
+
+            return response()->json(['status' => 'success', 'message' => 'Webhook não utilizado!']);
         }
 
         return response()->json(['status' => 'success', 'message' => 'Webhook não utilizado!']);

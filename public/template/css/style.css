@@ -224,6 +224,11 @@ h6 {
   box-shadow: 0px 0 30px rgba(1, 41, 112, 0.1);
 }
 
+.card-login {
+  border: 2px double #FBB816;
+  margin-top: 20%;
+}
+
 .card-header,
 .card-footer {
   border-color: #ebeef4;
@@ -236,7 +241,7 @@ h6 {
   padding: 20px 0 15px 0;
   font-size: 18px;
   font-weight: 500;
-  color: #012970;
+  color: #000;
   font-family: "Poppins", sans-serif;
 }
 
@@ -364,13 +369,17 @@ h6 {
   }
 }
 
+.logo-menu {
+  max-height: 50px !important;
+}
+
 .logo img {
-  max-height: 90px;
+  max-height: 100px;
   margin-right: 6px;
 }
 
 .logo span {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   color: #012970;
   font-family: "Nunito", sans-serif;
@@ -1242,4 +1251,34 @@ h6 {
 
 .selected-option {
   background-color: #ECC575;
+}
+
+.floating-button {
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+  background-color: #198754;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  width: 200px;
+}
+
+.floating-button:hover {
+  background-color: #145f3f;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.floating-button i {
+  margin-right: 8px;
+  font-size: 20px;
 }

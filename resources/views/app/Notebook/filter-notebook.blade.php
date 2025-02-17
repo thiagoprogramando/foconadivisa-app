@@ -7,248 +7,308 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Filtros</button>
             </li>
-            {{-- <li class="nav-item" role="presentation">
-                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Gráficos</button>
-            </li> --}}
         </ul>
 
-        <div class="tab-content pt-2" id="myTabContent">
+        <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
-                <form action="{{ route('update-notebook') }}" method="POST" class="row">
+                <form action="{{ route('update-notebook') }}" method="POST" class="row mt-3">
                     @csrf
                     <input type="hidden" name="id" value="{{ $notebook->id }}">
-                    <div class="col-12 col-sm-12 col-md-8 col-lg-8">
-                        <div class="form-floating mb-2">
-                            <input type="text" name="name" class="form-control" id="name" placeholder="Nomeie seu caderno:" value="{{ $notebook->name }}">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                        <div class="form-floating mb-3">
+                            <input type="text" name="name" class="form-control" id="name" placeholder="Nomeie seu caderno:" value="{{ $notebook->name }}" required>
                             <label for="name">Nomeie seu caderno</label>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                        <div class="form-floating mb-2">
-                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" value="{{ $notebook->countQuestions() }}">
-                            <label for="questions">N° questões</label>
+
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-3">
+                        <div class="btn-group w-100">
+                            <select id="swal-jury" name="jury_id[]" placeholder="Escolha uma Banca" class="w-100">
+                                <option value="" selected>Escolha uma Banca</option>
+                                <option value="all">Todas as bancas</option>
+                                @foreach($juries as $jury)
+                                    <option value="{{ $jury->id }}">{{ $jury->name }}</option>
+                                @endforeach
+                            </select>
+                            <button type="button" class="btn btn-dark" title="Limpar" id="btnClearJury"><i class="bi bi-backspace"></i></button>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <div class="row">
-                            <div class="col-8 col-sm-8 col-md-8">
-                                <select id="swal-subject" name="subject[]" placeholder="Escolha de conteúdos">
-                                    <option value="" selected>Escolha de conteúdos</option>
-                                    @foreach($subjectsFromPlan as $subject)
-                                        <option value="{{ $subject->id }}" data-topics='@json($subject->topics)' id-quanty="{{ $subject->totalQuestions() }}" id-resolved="{{ $subject->questionResolved() }}" id-fail="{{ $subject->questionFail() }}">{{ $subject->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-4 col-sm-4 col-md-4">
-                                <button type="button" id="select-all-subjects" title="Selecionar todos os conteúdos" class="btn btn-block btn-dark">
-                                    <i class="bi bi-ui-checks"></i> Todos
-                                </button>
-                            </div>
+                   
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-3">
+                        <div class="btn-group w-100 mb-3">
+                            <input type="text" name="searchSubject" class="form-control" placeholder="Pesquisar conteúdos" title="Pesquisar conteúdos">
+                            <button type="button" class="btn btn-dark" title="Pesquisar"><i class="bi bi-search"></i></button>
                         </div>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
-                        <div class="row">
-                            <div class="col-8 col-sm-8 col-md-8">
-                                <select id="swal-topic" name="topic[]" placeholder="Escolha de tópicos" multiple>
-                                    <option value="" selected>Escolha de tópicos</option>
-                                    @foreach($topicsFromPlan as $topic)
-                                        <option value="{{ $topic->id }}">{{ $topic->name }}</option>
-                                    @endforeach
-                                </select>
+
+                        @foreach ($subjectsFromPlan as $subject)
+                            <div class="form-check">
+                                <input class="form-check-input subject-checkbox" type="checkbox" 
+                                    name="subjects[]" value="{{ $subject->id }}"
+                                    data-questions='{{ $subject->totalQuestions() }}'
+                                    id='subject-{{ $subject->id }}'
+                                    data-topics='@json($subject->topics)'
+                                    id-resolved='{{ $subject->questionResolved($subject->id) }}'
+                                    id-resolved-parent='{{ $subject->questionResolvedParent($subject->id) }}'
+                                    id-fail='{{ $subject->questionFail() }}'
+                                    @if (in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) checked @endif>
+                                <label class="form-check-label" for="subject-{{ $subject->id }}"><b>{{ $subject->name }}</b></label>
                             </div>
-                            <div class="col-4 col-sm-4 col-md-4">
-                                <button type="button" id="select-all-topics" title="Selecionar todos os tópicos" class="btn btn-block btn-dark">
-                                    <i class="bi bi-ui-checks"></i> Todos
-                                </button>
+
+                            <div class="ps-3 topics" id="topics-{{ $subject->id }}" style="display: none;">
+                                @foreach ($subject->topics as $topic)
+                                    <div class="form-check">
+                                        <input class="form-check-input topic-checkbox" type="checkbox"
+                                            name="topics[]" value="{{ $topic->id }}"
+                                            data-subject="{{ $subject->id }}"
+                                            data-questions="{{ $topic->totalQuestions() }}"
+                                            data-jury-questions='@json($subject->questionsByJury($topic->id))'
+                                            id="topic-{{ $topic->id }}"
+                                            id-resolved='{{ $topic->questionResolved($topic->id) }}' 
+                                            id-fail='{{ $topic->questionFail() }}'
+                                            id-favorite='{{ $topic->totalQuestionsFavoriteForTopic($topic->id) }}'
+                                            @if (in_array($topic->id, $notebookTopics->pluck('id')->toArray())) checked @endif
+                                            @if (in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) checked @endif>
+                                        <label class="form-check-label" for="topic-{{ $topic->id }}">{{ $topic->name }}</label>
+                                    </div>
+                                @endforeach
                             </div>
-                        </div>
+                        @endforeach
+
+                        <small class="btn btn-dark mt-5 w-100" id="question-count">Foram encontradas: 0 questões</small>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
+
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="filter" value="remove_question_resolved" id="removeQuestionResolved">
-                            <label class="form-check-label" for="removeQuestionResolved">Eliminar questão já resolvidas</label>
+                            <label class="form-check-label" for="removeQuestionResolved">Eliminar questões já resolvidas</label>
                         </div>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 mb-2">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="filter" value="show_question_fail" id="showQuestionFail">
                             <label class="form-check-label" for="showQuestionFail">Mostrar apenas as que eu já errei</label>
                         </div>
-                    </div>                                                                                
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 mt-3">
-                        <small class="btn btn-dark" id="question-count">Foram encontradas: 0 questões</small>
-                    </div>
-                    <div class="col-12 col-sm-12 offset-md-4 col-md-4 offset-lg-4 col-lg-4 mt-3">
-                        <button type="submit" class="btn btn-outline-success w-100">Atualizar caderno</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                <div class="row">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="filter" value="show_question_favorite" id="showQuestionFavorite">
+                            <label class="form-check-label" for="showQuestionFavorite">Mostrar apenas as questões <b>Favoritas</b></label>
+                        </div>
+                    </div>      
                     
-                </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-floating mb-3">
+                            <input type="number" name="number" class="form-control" id="questions" placeholder="N° questões:" required>
+                            <label for="questions">N° questões</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4 mt-1">
+                        <button type="submit" class="btn btn-lg btn-outline-dark w-100">Atualizar Caderno</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener("DOMContentLoaded", function () {
 
-            var topic = new TomSelect("#swal-topic", {
+            const selectElement = document.querySelector("#swal-jury");
+            const tomSelect = new TomSelect(selectElement, {
                 create: false,
-                sortField: {
-                    field: "text",
-                    direction: "asc"
-                },
-                plugins: ['remove_button'],
-                persist: false,
                 maxItems: 1000,
-            });
-
-            var selectedTopicIds = @json($selectedTopicIds);
-            selectedTopicIds.forEach(function(id) {
-                topic.addItem(id);
-            });
-
-            var subject = new TomSelect("#swal-subject", {
-                create: false,
-                sortField: {
-                    field: "text",
-                    direction: "asc"
+                onInitialize: function () {
                 },
-                plugins: ['remove_button'],
-	            persist: false,
-                maxItems: 1000,
-                onChange: function() {
-                    updateTopics();
-                    updateQuestionCount();
-                },
-                onDelete: function(values) {
-
-                    var topicSelect = document.getElementById('swal-topic');
-
-                    values.forEach(function(value) {
-                        var subjectIdToRemove = value.trim(); 
-    
-                        var currentOptions = Array.from(topicSelect.options);
-                        currentOptions.forEach(function(option) {
-                            if (option.getAttribute('data-subject') === subjectIdToRemove) {
-                                option.remove(); 
-                            }
-                        });
-                    });
-
-                    topicSelect.dispatchEvent(new Event('change'));
+                onChange: function (value) {
+                    if (value.includes("all")) {
+                        const allOptions = Object.keys(this.options).filter(opt => opt !== "all");
+                        this.setValue(["all", ...allOptions], true);
+                    } 
+                    else if (!value.includes("all") && value.length === 0) {
+                        this.clear();
+                    }
                 }
             });
 
-            var selectedIds = @json($selectedSubjectIds);
-            selectedIds.forEach(function(id) {
-                subject.addItem(id);
+            let selectedValues = @json($notebookJuries->pluck('id')->toArray());
+            tomSelect.setValue(selectedValues);
+
+            const btnClearJury = document.querySelector("#btnClearJury");
+            btnClearJury.addEventListener("click", function () {
+                tomSelect.clear();
+            });
+
+            let totalQuestions = 0;
+            let lastChecked = null;
+            const questionCountElement = document.getElementById("question-count");
+            const questionsInput = document.getElementById("questions");
+            
+            const searchInput = document.querySelector('input[name="searchSubject"]');
+            searchInput.addEventListener("input", function () {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                const subjectItems = document.querySelectorAll('.subject-checkbox');
+
+                subjectItems.forEach(function (subjectCheckbox) {
+                    const subjectLabel = subjectCheckbox.nextElementSibling.textContent.toLowerCase();
+                    const subjectContainer = subjectCheckbox.closest('.form-check');
+
+                    if (subjectLabel.includes(searchTerm)) {
+                        subjectContainer.style.display = "block";
+                    } else {
+                        subjectContainer.style.display = "none";
+                    }
+                });
+            });
+
+            document.querySelectorAll('input[name="filter"]').forEach(function (radio) {
+                radio.addEventListener('click', function () {
+                    if (lastChecked === this) {
+                        this.checked = false;
+                        lastChecked = null;
+                    } else {
+                        lastChecked = this;
+                    }
+                    updateQuestionCount();
+                });
             });
 
             function updateQuestionCount() {
+                totalQuestions = 0;
+                const filterResolved = document.getElementById("removeQuestionResolved").checked;
+                const filterFail = document.getElementById("showQuestionFail").checked;
+                const filterFavorites = document.getElementById("showQuestionFavorite").checked;
 
-                var selectedSubjects = Array.from(subject.getValue());
-                var filter = $('input[name="filter"]:checked').val();
-                var totalQuestions = 0;
+                const selectedJuries = Array.from(document.getElementById("swal-jury").selectedOptions)
+                    .map(option => option.value)
+                    .filter(value => value !== "all");
 
-                selectedSubjects.forEach(function(optionId) {
-                    var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
-                    var quanty = parseInt(option.getAttribute('id-quanty')) || 0;
-                    var resolved = parseInt(option.getAttribute('id-resolved')) || 0;
-                    var fail = parseInt(option.getAttribute('id-fail')) || 0;
+                document.querySelectorAll('.subject-checkbox:checked').forEach(function (subjectCheckbox) {
+                    let subjectQuestions = parseInt(subjectCheckbox.getAttribute('data-questions')) || 0;
+                    const subjectResolvedParent = parseInt(subjectCheckbox.getAttribute('id-resolved-parent')) || 0;
+                    const subjectFail = parseInt(subjectCheckbox.getAttribute('id-fail')) || 0;
+                    const subjectFavorite = parseInt(subjectCheckbox.getAttribute('id-favorite')) || 0;
 
-                    if (filter === 'remove_question_resolved') {
-                        totalQuestions += quanty;
-                        totalQuestions -= resolved;
-                    } else if (filter === 'show_question_fail') {
-                        totalQuestions += fail;
-                    } else {
-                        totalQuestions += quanty;
+                    let subjectHasTopic = false;
+                    const associatedTopics = JSON.parse(subjectCheckbox.getAttribute('data-topics'));
+
+                    associatedTopics.forEach(function (topic) {
+                        const topicCheckbox = document.getElementById('topic-' + topic.id);
+                        if (topicCheckbox && topicCheckbox.checked) {
+                            let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
+                            const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
+                            const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
+                            const topicFavorite = parseInt(topicCheckbox.getAttribute('id-favorite')) || 0;
+                            const juryQuestions = JSON.parse(topicCheckbox.getAttribute('data-jury-questions') || "{}");
+
+                            if (selectedJuries.length > 0) {
+                                topicQuestions = selectedJuries.reduce((sum, jury) => {
+                                    return sum + (juryQuestions[jury] || 0);
+                                }, 0);
+                            }
+
+                            if (filterResolved) topicQuestions -= topicResolved;
+                            if (filterFail) topicQuestions = topicFail;
+                            if (filterFavorites && topicFavorite !== 1) return;
+
+                            totalQuestions += Math.max(topicQuestions, 0);
+                            subjectHasTopic = true;
+                        }
+                    });
+
+                    if (!subjectHasTopic) {
+                        if (filterResolved) subjectQuestions -= subjectResolvedParent;
+                        if (filterFail) subjectQuestions = subjectFail;
+                        if (filterFavorites && subjectFavorite !== 1) return;
+
+                        totalQuestions += Math.max(subjectQuestions, 0);
                     }
                 });
 
-                document.getElementById('question-count').textContent = `Foram encontradas: ${totalQuestions} questões`;
+                document.querySelectorAll('.topic-checkbox:checked').forEach(function (topicCheckbox) {
+                    const subjectId = topicCheckbox.getAttribute('data-subject');
+                    if (!document.querySelector(`#subject-${subjectId}:checked`)) {
+                        let topicQuestions = parseInt(topicCheckbox.getAttribute('data-questions')) || 0;
+                        const topicResolved = parseInt(topicCheckbox.getAttribute('id-resolved')) || 0;
+                        const topicFail = parseInt(topicCheckbox.getAttribute('id-fail')) || 0;
+                        const topicFavorite = parseInt(topicCheckbox.getAttribute('id-favorite')) || 0;
+                        const juryQuestions = JSON.parse(topicCheckbox.getAttribute('data-jury-questions') || "{}");
 
-                var inputQuestions = document.getElementById('questions');
-                inputQuestions.max = totalQuestions;
-
-                if (parseInt(inputQuestions.value) > totalQuestions) {
-                    inputQuestions.value = totalQuestions;
-                }
-            }
-
-            function updateTopics() {
-
-                var selectedSubjects = Array.from(subject.getValue());
-                var topicSelect = document.getElementById('swal-topic');
-                var addedTopicIds = new Set();
-                
-                selectedSubjects.forEach(function(optionId) {
-                    var option = document.querySelector('#swal-subject option[value="' + optionId + '"]');
-                    var topics = JSON.parse(option.getAttribute('data-topics'));
-
-                    topics.forEach(function(topic) {
-                        if (!addedTopicIds.has(topic.id)) {
-                            var newOption = document.createElement('option');
-                            newOption.value = topic.id;
-                            newOption.setAttribute('data-subject', topic.subject_id);
-                            newOption.innerHTML = topic.name;
-                            topicSelect.appendChild(newOption);
-                            addedTopicIds.add(topic.id);
+                        if (selectedJuries.length > 0) {
+                            topicQuestions = selectedJuries.reduce((sum, jury) => {
+                                return sum + (juryQuestions[jury] || 0);
+                            }, 0);
                         }
-                    });
+
+                        if (filterResolved) topicQuestions -= topicResolved;
+                        if (filterFail) topicQuestions = topicFail;
+                        if (filterFavorites && topicFavorite !== 1) return;
+
+                        totalQuestions += Math.max(topicQuestions, 0);
+                    }
                 });
 
-                if (selectedSubjects.length === 0) {
-                    topicSelect.innerHTML = '<option value="" selected>Escolha de tópicos (opcional)</option>';
-                }
+                questionCountElement.textContent = `Foram encontradas: ${totalQuestions} questões`;
 
-                topic.sync();
+                if (questionsInput) {
+                    questionsInput.setAttribute("max", totalQuestions);
+                    if (parseInt(questionsInput.value) > totalQuestions) {
+                        questionsInput.value = totalQuestions;
+                    }
+                }
             }
 
-            $('#select-all-subjects').on('click', function() {
-                var allOptions = Array.from(document.querySelectorAll('#swal-subject option')).map(option => option.value);
-                subject.setValue(allOptions);
-                updateQuestionCount();
+            document.getElementById("swal-jury").addEventListener("change", updateQuestionCount);
+
+            document.querySelectorAll('.subject-checkbox').forEach(function(subjectCheckbox) {
+                subjectCheckbox.addEventListener('change', function() {
+                    const subjectId = subjectCheckbox.value;
+                    const topicsDiv = document.getElementById('topics-' + subjectId);
+
+                    topicsDiv.querySelectorAll('.topic-checkbox').forEach(function(topicCheckbox) {
+                        topicCheckbox.checked = subjectCheckbox.checked;
+                    });
+
+                    if (subjectCheckbox.checked) {
+                        topicsDiv.style.display = 'block';
+                    } else {
+                        topicsDiv.style.display = 'none';
+                        topicsDiv.querySelectorAll('.topic-checkbox').forEach(function(topicCheckbox) {
+                            topicCheckbox.checked = false;
+                        });
+                    }
+
+                    updateQuestionCount();
+                });
             });
 
-            $('#select-all-topics').on('click', function() {
-                var allOptions = Array.from(document.querySelectorAll('#swal-topic option')).map(option => option.value);
-                topic.setValue(allOptions);
-                updateQuestionCount();
-            });
+            @foreach ($subjectsFromPlan as $subject)
+            
+                if (document.getElementById('subject-{{ $subject->id }}')) {
+                    document.getElementById('subject-{{ $subject->id }}').checked = @if(in_array($subject->id, $notebookSubjects->pluck('id')->toArray())) true @else false @endif;
 
-            $('#questions').on('input', function() {
-                var inputQuestions = document.getElementById('questions');
-                var maxQuestions = parseInt(inputQuestions.max);
-
-                if (parseInt(inputQuestions.value) > maxQuestions) {
-                    inputQuestions.value = maxQuestions;
+                    const topicsDiv = document.getElementById('topics-{{ $subject->id }}');
+                    topicsDiv.style.display = document.getElementById('subject-{{ $subject->id }}').checked ? 'block' : 'none';
                 }
+
+                @foreach ($subject->topics as $topic)
+                    if (document.getElementById('topic-{{ $topic->id }}')) {
+                        document.getElementById('topic-{{ $topic->id }}').checked = @if(in_array($topic->id, $notebookTopics->pluck('id')->toArray())) true @else false @endif;
+                    }
+                @endforeach
+            @endforeach
+
+            document.querySelectorAll('.subject-checkbox, .topic-checkbox').forEach(function(checkbox) {
+                checkbox.addEventListener('change', updateQuestionCount);
             });
 
-            $('input[name="filter"]').on('change', function() {
-                updateQuestionCount();
+            document.querySelectorAll('input[name="filter"]').forEach(function(radio) {
+                radio.addEventListener('change', updateQuestionCount);
+            });
+
+            questionsInput.addEventListener('input', function () {
+                if (parseInt(questionsInput.value) > totalQuestions) {
+                    questionsInput.value = totalQuestions;
+                }
             });
 
             updateQuestionCount();
-
-            $('input[type="radio"]').click(function() {
-                var $radio = $(this);
-
-                if ($radio.data('wasChecked') === true) {
-                    $radio.prop('checked', false);
-                    $radio.data('wasChecked', false);
-                } else {
-                    $('input[type="radio"]').data('wasChecked', false);
-                    $radio.data('wasChecked', true);
-                }
-
-                updateQuestionCount();
-            });
         });
     </script>
 @endsection

@@ -84,7 +84,7 @@
                     </div>
                     <div class="col-12 col-sm-12 col-md-3 col-lg-3">
                         <div class="form-floating mb-2">
-                            <input type="number" name="value" class="form-control" id="value" placeholder="Valor:" value="{{ $plan->value }}">
+                            <input type="text" name="value" class="form-control" id="value" placeholder="Valor:" value="{{ $plan->value }}" oninput="mascaraReal(this)">
                             <label for="value">Valor</label>
                         </div>
                     </div>

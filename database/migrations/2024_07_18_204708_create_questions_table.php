@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subject_id')->nullable()->constrained('subjects')->onDelete('cascade');
+            $table->foreignId('jury_id')->nullable()->constrained('juries');
             $table->longText('question_text')->nullable();
             $table->longText('comment_text')->nullable();
             $table->timestamps();

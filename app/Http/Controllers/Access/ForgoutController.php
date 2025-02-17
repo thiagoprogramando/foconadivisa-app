@@ -27,7 +27,7 @@ class ForgoutController extends Controller {
     public function sendRecovery(Request $request) {
 
         $user = User::where('email', $request->email)->first();
-        if($user) {
+        if ($user) {
 
             $token = $this->createCode($user);
 
@@ -61,7 +61,7 @@ class ForgoutController extends Controller {
 
     public function recoveryPassword(Request $request) {
 
-        if($request->password !== $request->confirmpassword) {
+        if ($request->password !== $request->confirmpassword) {
             return redirect()->back()->with('error', 'Senhas não coincidem!');
         }
 
@@ -81,7 +81,7 @@ class ForgoutController extends Controller {
         }
 
         $user->password = Hash::make($request->password);
-        if($user->save()) {
+        if ($user->save()) {
             DB::table('password_reset_tokens')->where('email', $tokenData->email)->delete();
             return redirect()->route('login')->with('success', 'Senha redefinida com sucesso! Agora você pode fazer login.');
         }

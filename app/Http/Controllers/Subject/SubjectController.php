@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Subject;
 
 use App\Http\Controllers\Controller;
+use App\Models\Plan;
 use App\Models\Question;
 use App\Models\Subject;
 use App\Models\Topic;
@@ -14,11 +15,11 @@ class SubjectController extends Controller {
 
         $query = Subject::orderBy('name', 'desc')->where('type', 1);
 
-        if(!empty($request->name)) {
+        if (!empty($request->name)) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
-        if(!empty($request->description)) {
+        if (!empty($request->description)) {
             $query->where('description', 'like', '%' . $request->description . '%');
         }
 
@@ -32,7 +33,7 @@ class SubjectController extends Controller {
     public function viewSubject($id) {
 
         $subject = Subject::find($id);
-        if($subject) {
+        if ($subject) {
 
             $topics     = Subject::where('subject_id', $subject->id)->where('type', 2)->get();
             $questions  = Question::where('subject_id', $subject->id)->orderBy('subject_id', 'asc')->get();
@@ -52,6 +53,18 @@ class SubjectController extends Controller {
         $subject->name          = $request->name;
         $subject->description   = $request->description;
         if($subject->save()) {
+
+            if (env('ONEPLAN', false)) {
+                $plans = Plan::all();
+                $subjectIds = [$subject->id];
+    
+                foreach ($plans as $plan) {
+                    if (!$plan->subjects()->where('plan_subject.subject_id', $subject->id)->exists()) {
+                        $plan->subjects()->attach($subjectIds);
+                    }
+                }
+            }
+            
             return redirect()->route('conteudo', ['id' => $subject->id])->with('success', 'Conteúdo criado com sucesso!');
         }
 
@@ -87,20 +100,21 @@ class SubjectController extends Controller {
 
     public function topics(Request $request) {
 
-        $query = Subject::orderBy('name', 'desc')->where('type', 2);
+        $query = Subject::orderBy('name', 'asc')->where('type', 2);
 
         if(!empty($request->name)) {
             $query->where('name', 'like', '%' . $request->name . '%');
         }
 
-        if(!empty($request->description)) {
-            $query->where('description', 'like', '%' . $request->description . '%');
+        if(!empty($request->subjects)) {
+            $query->whereIn('subject_id', $request->subjects);
         }
 
         $topics = $query->get();
 
         return view('app.Subject.list-topic', [
-            'topics' => $topics
+            'topics'    => $topics,
+            'subjects'  => Subject::all()
         ]);
     }
 
@@ -112,6 +126,17 @@ class SubjectController extends Controller {
         $topic->subject_id  = $request->subject_id;
         $topic->type        = 2;
         if($topic->save()) {
+
+            if (env('ONEPLAN', false)) {
+                $plans = Plan::all();
+                $topicIds = [$topic->id];
+    
+                foreach ($plans as $plan) {
+                    if (!$plan->topics()->where('plan_subject.subject_id', $topic->id)->exists()) {
+                        $plan->subjects()->attach($topicIds);
+                    }
+                }
+            }
 
             return redirect()->back()->with('success', 'Tópico criado com sucesso!');
         }

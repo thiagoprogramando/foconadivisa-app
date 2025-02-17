@@ -50,14 +50,14 @@
 
                     <div class="input-group input-group-lg mb-3">
                         <select name="method" class="form-select" id="paymentMethod">
-                            <option selected>Forma de pagamento</option>
+                            <option selected value="">Forma de pagamento</option>
                             @foreach($paymentMethods as $method)
                                 <option value="{{ $method->method }}">{{ $method->methodLabel() }}</option>
                             @endforeach
                         </select>
                 
                         <select name="installments" class="form-select" id="installments">
-                            <option selected>Parcelas</option>
+                            <option selected value="">Parcelas</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-dark w-100">PAGAR</button>

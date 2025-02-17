@@ -7,9 +7,6 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Geral</button>
             </li>
-            {{-- <li class="nav-item" role="presentation">
-                <button class="nav-link" id="gabarito-tab" data-bs-toggle="tab" data-bs-target="#gabarito" type="button" role="tab" aria-controls="gabarito" aria-selected="false" tabindex="-1">Gabarito</button>
-            </li> --}}
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab" aria-controls="contact" aria-selected="false" tabindex="-1">Gráficos</button>
             </li>
@@ -79,8 +76,14 @@
     </div>
 
     <script>
-        $('#result').click(function (){
-            $('#contact-tab').click();
+        document.addEventListener('DOMContentLoaded', function () {
+            $('#result').click(function () {
+                $('#contact-tab').click();
+            });
+    
+            @if (!empty($tab))
+                $('#{!! $tab !!}').click();
+            @endif
         });
-    </script>
+    </script>    
 @endsection

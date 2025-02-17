@@ -19,6 +19,40 @@ class Notebook extends Model {
         'status'
     ];
 
+    public function subjects() {
+        $subjects = $this->questions->load('subject')
+            ->filter(function($question) {
+                return $question->subject->type === 1;
+            })
+            ->pluck('subject')
+            ->unique();
+
+        $parentSubjectsForTopics = $this->getParentSubjectsForTopics();
+        return $subjects->merge($parentSubjectsForTopics)->unique();
+    }
+
+    public function topics() {
+        return $this->questions->load('subject')
+                ->filter(function($question) {
+                    return $question->subject->type === 2;
+                })->pluck('subject')->unique();
+    }
+
+    public function getParentSubjectsForTopics() {
+        
+        $topicSubjectIds = $this->questions->load('subject')
+            ->filter(function($question) {
+                return $question->subject->type === 2;
+            })
+            ->pluck('subject.subject_id')
+            ->toArray();
+
+        return Subject::whereIn('id', $topicSubjectIds)
+            ->where('type', 1)
+            ->with('parent')
+            ->get();
+    }
+
     public function notebookQuestions() {
         return $this->hasManyThrough(Question::class, NotebookQuestion::class, 'notebook_id', 'id', 'id', 'question_id');
     }
@@ -139,40 +173,45 @@ class Notebook extends Model {
     private function calculatePerformanceByContent($type, $best = true) {
 
         $contents = [];
-        $notebookQuestionIds = NotebookQuestion::where('notebook_id', $this->id)->pluck('question_id');
 
         $questions = Question::select('questions.*')
-        ->join('notebook_questions as nq', 'questions.id', '=', 'nq.question_id')
-        ->where('nq.notebook_id', $this->id)
-        ->get();
-    
-        foreach ($questions as $question) {
-            $content = ($type == 'subject') 
-            ? ($question->subject_id && $question->subject->type === 1 ? $question->subject : null)
-            : ($question->subject_id && $question->subject->type === 2 ? $question->subject : null);
+            ->join('notebook_questions as nq', 'questions.id', '=', 'nq.question_id')
+            ->where('nq.notebook_id', $this->id)
+            ->with('subject')
+            ->get();
 
-            if ($content) {
-                if (!isset($contents[$content->name])) {
-                    $contents[$content->name] = [
+        foreach ($questions as $question) {
+            $subject = $question->subject;
+
+            if ($subject && $subject->type === ($type === 'subject' ? 1 : 2)) {
+                
+                $contentName = $subject->name;
+                if (!isset($contents[$contentName])) {
+                    $contents[$contentName] = [
                         'total' => 0,
-                        'correct' => 0
+                        'correct' => 0,
                     ];
                 }
-                $contents[$content->name]['total']++;
-                if ($question->answers()->where('notebook_id', $this->id)->first()?->isCorrect()) {
-                    $contents[$content->name]['correct']++;
+
+                $contents[$contentName]['total']++;
+
+                if ($question->answers()
+                    ->where('notebook_id', $this->id)
+                    ->first()?->isCorrect()) {
+                    $contents[$contentName]['correct']++;
                 }
             }
         }
-    
+
         $results = [];
         foreach ($contents as $name => $data) {
+            
             $percentage = ($data['correct'] / $data['total']) * 100;
             if (($best && $percentage > 50) || (!$best && $percentage <= 50)) {
                 $results[] = "<span class='badge bg-dark'>{$name}</span>";
             }
         }
-    
+
         return implode(' ', $results);
-    }    
+    }  
 }
