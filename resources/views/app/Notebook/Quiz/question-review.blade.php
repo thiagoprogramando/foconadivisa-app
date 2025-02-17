@@ -101,7 +101,7 @@
     <div class="col-sm-12 col-md-12 col-lg-12 card mb-3 p-3">
         <div class="card-header">
             <div class="row mb-3">
-                <div class="col-12 col-sm-12 col-md-7 col-lg-7">
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                     <h6 class="question">
                         Questão: {{ $currentQuestionNumber }} de {{ $totalQuestions }}
                     </h6>
@@ -118,13 +118,14 @@
                     @endif                   
                     <small><b>{{ $answer->question->responsesCount(Auth::user()->id, $answer->notebook->id) }}</b> Resolvidas</small> <small class="text-success"><b>{{ $answer->question->correctCount(Auth::user()->id, $answer->notebook->id) }}</b> Acertos</small> <small class="text-danger"><b>{{ $answer->question->wrogCount(Auth::user()->id, $answer->notebook->id) }}</b> Erros</small>
                 </div>
-                <div class="col-12 col-sm-12 col-md-5 col-lg-5">
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                     <div class="btn-group">
                         <a href="{{ route('ver-questao', ['id' => $answer->question->id]) }}" target="_blank" class="btn btn-outline-dark" title="Dados da Questão"><i class="bi bi-pie-chart"></i> Dados</a>
                         <a href="{{ route('caderno-filtros', ['id' => $answer->notebook->id]) }}" class="btn btn-outline-dark" title="Modificar filtros"><i class="bx bx-filter"></i> Filtros</a>
                         <button class="btn btn-outline-dark" title="Relatar problema" data-bs-toggle="modal" data-bs-target="#newTicket"><i class="ri-alarm-warning-fill"></i> Relatar problema</button>
                         <button class="btn btn-outline-dark btn-resolution" title="Comentário do Professor"><i class="bx bxs-book-reader"></i></button>
                         <button type="button" class="btn btn-outline-dark btn-comment" title="Comentários sobre a questão"><i class="bi bi-chat-square-text"></i></button>
+                        <button type="button" class="btn btn-outline-dark" onclick="favorite({{ $answer->question->id }})" title="Favoritar"><i id="favorite" class="bi {{ $answer->question->favorites->where('user_id', Auth::id())->isNotEmpty() ? 'bi-heart-fill' : 'bi-heart' }} text-danger"></i></button>
                     </div>
 
                     <div class="modal fade" id="newTicket" tabindex="-1" aria-hidden="true" style="display: none;">
@@ -227,5 +228,50 @@
                 scrollTop: $('#resolution').offset().top - 100
             }, 400);
         });
+
+        function favorite(question_id) {
+            
+            fetch("{{ route('create-favorite') }}", {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value,
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: new URLSearchParams({
+                    question_id : question_id,
+                    user_id     : "{{ Auth::user()->id }}"
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title : 'Sucesso!',
+                        text  : data.message,
+                        icon  : 'success',
+                        timer : 3000
+                    });
+
+                    $('#favorite').removeClass().addClass(data.icon);
+                } else {
+                    Swal.fire({
+                        title : 'Erro!',
+                        text  : data.message || 'Houve um problema, tente novamente mais tarde!',
+                        icon  : 'error',
+                        timer : 3000
+                    });
+
+                    $('#favorite').removeClass().addClass(data.icon);
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Erro!',
+                    text: 'Erro ao processar a requisição!',
+                    icon: 'error',
+                    timer: 3000
+                });
+            });
+        }
     </script>
 @endsection
