@@ -27,7 +27,8 @@ use App\Http\Controllers\User\UserController;
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [AccessController::class, 'welcome'])->name('index');
+Route::get('/loja', [AccessController::class, 'welcome'])->name('loja');
+Route::get('/', [AccessController::class, 'login'])->name('index');
 Route::get('/login', [AccessController::class, 'login'])->name('login');
 Route::post('logon', [AccessController::class, 'logon'])->name('logon');
 
