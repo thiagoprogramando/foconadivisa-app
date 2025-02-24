@@ -27,7 +27,7 @@
     <body>
         <nav class="navbar navbar-expand-lg bg-dark border-bottom border-body" data-bs-theme="dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ route('index') }}">
+                <a class="navbar-brand" href="{{ route('loja') }}">
                     <img src="{{ asset('template/img/logo_branca.png') }}" alt="{{ env('APP_NAME') }}" width="90" height="36" class="d-inline-block align-text-top">
                     {{ env('APP_NAME') }}
                 </a>
@@ -38,7 +38,7 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ route('index') }}">Início</a>
+                            <a class="nav-link active" aria-current="page" href="{{ route('loja') }}">Início</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('ecommerce') }}">Produtos</a>
@@ -47,7 +47,7 @@
                             <a class="nav-link" href="{{ route('login') }}">Minhas compras</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" aria-disabled="true">Acessar Questões</a>
+                            <a class="nav-link" href="{{ route('login') }}">Acessar Questões</a>
                         </li>
                     </ul>
                 </div>

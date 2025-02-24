@@ -100,12 +100,9 @@
                         </div>
                     </div>
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                        <div class="form-floating mb-2">
-                            <textarea name="description" class="form-control" placeholder="Descrição" id="description" style="height: 100px;">{{ $plan->description }}</textarea>
-                            <label for="description">Descrição</label>
-                        </div>
+                        <textarea name="description" class="tinymce-editor" placeholder="Descrição" id="description">{{ $plan->description }}</textarea>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-3 offset-md-9 col-lg-3 offset-lg-9">
+                    <div class="col-12 col-sm-12 col-md-3 offset-md-9 col-lg-3 offset-lg-9 mt-3">
                         <button type="submit" class="btn btn-outline-success w-100">Atualizar Plano</button>
                     </div>
                 </form>
