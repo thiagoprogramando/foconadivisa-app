@@ -21,5 +21,4 @@ class Option extends Model {
     public function answers() {
         return $this->hasMany(Answer::class, 'option_id');
     }
-
 }

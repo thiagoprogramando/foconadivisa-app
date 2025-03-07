@@ -53,8 +53,10 @@ class AnswerController extends Controller {
                 ? (($totalQuestions - $totalQuestionsPendenting) + request()->get('page'))
                 : ($totalQuestions - $totalQuestionsPendenting) + 1;
             $unansweredQuestions = $unansweredQuestionsQuery->paginate(1);
+
+            $menu = true;
             
-            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber'));
+            return view('app.Notebook.Quiz.question-notebook', compact('notebook', 'unansweredQuestions', 'totalQuestions', 'nextQuestionNumber', 'menu'));
         }
     }   
 
@@ -85,10 +87,10 @@ class AnswerController extends Controller {
             $currentQuestionNumber = array_search($answer->notebook_question_id, $answeredQuestions) + 1;
             
             return view('app.Notebook.Quiz.question-review', [
-                'answer' => $answer,
-                'totalQuestions' => $totalQuestions,
+                'answer'                => $answer,
+                'totalQuestions'        => $totalQuestions,
                 'currentQuestionNumber' => $currentQuestionNumber,
-                'menu'   => 1
+                'menu'                  => true
             ]);
         }
     }

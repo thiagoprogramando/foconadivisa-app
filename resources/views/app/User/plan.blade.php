@@ -161,7 +161,7 @@
                                 <div class="card-body">
                                     <h1 class="card-title pricing-card-title text-center">R$ {{ number_format($plan->value, 2, ',', '.') }} <small class="text-muted">/ {{ $plan->typeLabel() }}</small></h1>
                                     <p class="text-justify mb-5">
-                                        {{ strlen($plan->description) > 150 ? substr($plan->description, 0, 150) . '...' : $plan->description }}
+                                        {!! $plan->description !!}
                                     </p>
                                     <form action="{{ route('delete-plan') }}" method="POST" class="delete">
                                         @csrf
