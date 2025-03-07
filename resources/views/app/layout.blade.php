@@ -30,7 +30,6 @@
     </head>
 
     <body>
-
         <header id="header" class="header fixed-top d-flex align-items-center">
             <div class="d-flex align-items-center justify-content-between">
                 <a href="{{ route('app') }}" class="logo d-flex align-items-center">
@@ -45,7 +44,9 @@
                     <input type="text" name="search" placeholder="Pesquisar uma questão" title="Pesquisar uma questão">
                     <button type="submit" title="Pesquisar"><i class="bi bi-search"></i></button>
                 </form>
+               
             </div>
+            <a href="{{ route('cadernos') }}" class="btn btn-dark">Resolver Questões</a>
 
             <nav class="header-nav ms-auto">
                 <ul class="d-flex align-items-center">
@@ -143,7 +144,7 @@
             </nav>
         </header>
 
-        <aside id="sidebar" class="sidebar">
+        <aside id="sidebar" class="sidebar @if(Request::is('answer/*') || Request::is('answer-review/*')) toggle-sidebar @endif">
             <ul class="sidebar-nav" id="sidebar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('app') }}">
@@ -221,6 +222,19 @@
                             </li>
                             <li>
                                 <a href="{{ route('produtos-vendas') }}"><i class="bi bi-circle"></i><span>Vendas</span></a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" data-bs-target="#components-simulated" data-bs-toggle="collapse" href="#">
+                        <i class="ri-sticky-note-line"></i><span>Simulados</span><i class="bi bi-chevron-down ms-auto"></i>
+                        </a>
+                        <ul id="components-simulated" class="nav-content collapse " data-bs-parent="#sidebar-simulated">
+                            <li>
+                                <a href=""><i class="bi bi-circle"></i><span>Simulados</span></a>
+                            </li>
+                            <li>
+                                <a href=""><i class="bi bi-circle"></i><span>Vendas</span></a>
                             </li>
                         </ul>
                     </li>
@@ -348,6 +362,12 @@
 
                 const money = document.getElementById('value');
                 if (money && money.value) mascaraReal(money);
+
+                @if(Request::is('answer/*') || Request::is('answer-review/*'))
+                    document.addEventListener("DOMContentLoaded", function() {
+                        document.body.classList.add("toggle-sidebar");
+                    });
+                @endif
             });
 
             function notNotebook() {
